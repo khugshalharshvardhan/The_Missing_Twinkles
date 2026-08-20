@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mystery: Lights Out</title>
+
+  <link rel="stylesheet" href="css/reset.css" />
+  <link rel="stylesheet" href="css/main.css" />
+  <link rel="stylesheet" href="css/story.css" />
+  <link rel="stylesheet" href="css/game.css" />
+</head>
+<body>
+  <div id="app">
+
+    <!-- ===== Title screen ===== -->
+    <section class="screen is-active" id="screen-title">
+      <div class="screen__inner">
+        <p class="eyebrow">A puzzle mystery</p>
+        <h1 class="title">Lights Out</h1>
+        <p class="subtitle">The house remembers what the dark forgets.</p>
+
+        <div class="menu">
+          <button class="btn btn--primary" data-action="start">Begin</button>
+          <button class="btn" data-action="continue" disabled>Continue</button>
+          <button class="btn" data-action="about">About</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Story screen ===== -->
+    <section class="screen" id="screen-story">
+      <div class="screen__inner story">
+        <header class="story__head">
+          <span class="story__chapter" id="story-chapter">Chapter 1</span>
+          <span class="story__location" id="story-location">Somewhere</span>
+        </header>
+
+        <div class="story__body">
+          <p class="story__text" id="story-text"></p>
+        </div>
+
+        <footer class="story__foot">
+          <div class="story__choices" id="story-choices"></div>
+        </footer>
+      </div>
+    </section>
+
+    <!-- ===== Game screen ===== -->
+    <section class="screen" id="screen-game">
+      <div class="screen__inner game">
+        <header class="game__head">
+          <h2 class="game__title" id="game-title">The Fuse Box</h2>
+          <div class="game__stats">
+            <span class="stat">Moves <b id="stat-moves">0</b></span>
+            <span class="stat">Lit <b id="stat-lit">0</b></span>
+          </div>
+        </header>
+
+        <div class="board" id="board"></div>
+
+        <p class="game__hint" id="game-hint">Tap a light. Its neighbours listen too.</p>
+
+        <footer class="game__foot">
+          <button class="btn" data-action="reset">Reset</button>
+          <button class="btn" data-action="back">Leave</button>
+        </footer>
+      </div>
+    </section>
+
+    <!-- ===== About screen ===== -->
+    <section class="screen" id="screen-about">
+      <div class="screen__inner">
+        <h2 class="title title--sm">About</h2>
+        <p class="prose">
+          A short mystery told between puzzles. Work in progress.
+        </p>
+        <button class="btn" data-action="title">Back</button>
+      </div>
+    </section>
+
+  </div>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

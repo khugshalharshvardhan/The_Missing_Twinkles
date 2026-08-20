@@ -1,0 +1,43 @@
+/* ---- story screen ---- */
+.story {
+  max-width: 34rem;
+  text-align: left;
+  display: grid;
+  gap: 2rem;
+}
+
+.story__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--line);
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.story__chapter { color: var(--accent); }
+
+.story__text {
+  font-family: var(--font-body);
+  font-size: 1.15rem;
+  line-height: 1.8;
+  white-space: pre-line;
+}
+
+.story__choices {
+  display: grid;
+  gap: 0.6rem;
+}
+
+/* choices are left-aligned in prose context */
+.story__choices .btn {
+  min-width: 0;
+  text-align: left;
+  text-transform: none;
+  letter-spacing: 0;
+  font-family: var(--font-body);
+  font-size: 1rem;
+}
