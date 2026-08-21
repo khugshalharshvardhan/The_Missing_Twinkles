@@ -15,13 +15,25 @@
 </head>
 <body>
 
-  <!-- Runs before the first paint, so arriving from the story never flashes
-       the game before the mist is up. js/main.js clears the class once the
-       art is loaded and the first beat is on screen. -->
+  <!-- Runs before the first paint, so the run always starts in the same place.
+       The story is the only way in: this page on its own — opened straight
+       from the editor, or refreshed after the handoff — sends you back to it,
+       rather than starting the game out of order. `?beat=` is the dev way in.
+
+       Setting the class here rather than from a module also means arriving
+       from the story never flashes the game before the mist is up; js/main.js
+       clears it once the art is loaded and the first beat is on screen. -->
   <script>
-    if (new URLSearchParams(location.search).has("from")) {
-      document.documentElement.classList.add("from-story");
-    }
+    (function () {
+      var q = new URLSearchParams(location.search);
+
+      if (!q.has("from") && !q.has("beat")) {
+        location.replace("../index.html");
+        return;
+      }
+
+      if (q.has("from")) document.documentElement.classList.add("from-story");
+    })();
   </script>
 
   <!-- The mist we arrived in. Its own background covers the page from the

@@ -61,6 +61,10 @@ preload(manifest, (ratio) => {
     startGame();
     document.documentElement.classList.remove("from-story");
 
+    // Spend the marker. Refreshing from here should send the player back to
+    // the story rather than replaying the game under a mist that never rose.
+    history.replaceState(null, "", location.pathname);
+
     // Take the cover out of the page for good, so a stalled transition can
     // never leave it sitting over the game.
     window.setTimeout(() => mist.remove(), MIST_FADE + 200);
