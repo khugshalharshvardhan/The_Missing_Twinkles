@@ -45,9 +45,10 @@ const AGNI_WALKING = {
   fill: { left: "-22.65%", top: "0%", width: "175.74%", height: "100%" }
 };
 
+// Figma Screen 1.1 › neel_walking (124:2). The art is trimmed to the box's own
+// aspect, so the fill covers it exactly and needs no crop transform.
 const NEEL_WALKING = {
-  key: "neel", src: `${IMG}neel_walking.png`, x: 866, y: 399, w: 506, h: 625,
-  fill: { left: "-18.23%", top: "-7.68%", width: "158.39%", height: "114.08%" }
+  key: "neel", src: `${IMG}neel_walking.png`, x: 835, y: 388, w: 510, h: 627
 };
 
 const NEEL_CHEEKY = {
