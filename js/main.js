@@ -1,49 +1,63 @@
-// Entry point: wires the modules together and owns the top-level actions.
+// Entry point: fit the stage, preload the chapter, then hand control to the
+// story player. When the chapter ends we raise `story:complete` — that is the
+// seam the puzzle half of the game hooks into.
 
-import { state, reset, setScreen } from "./state.js";
-import { showScreen } from "./ui.js";
-import { initStory, startStory, goToNode } from "./story.js";
-import { initGame, loadPuzzle, resetPuzzle } from "./game.js";
+import { manifest } from "./data/scenes.js";
+import { watchStage } from "./stage.js";
+import { preload } from "./preload.js";
+import { initStory, startStory, next, skip } from "./story.js";
+
+const loader = document.getElementById("loader");
+const loaderBar = document.getElementById("loader-bar");
+const loaderNote = document.getElementById("loader-note");
+const loaderCta = document.getElementById("loader-cta");
+const endcard = document.getElementById("endcard");
+const hud = document.getElementById("hud");
+
+watchStage();
 
 initStory({
-  // A story node of type "game" hands control to the puzzle.
-  onPuzzle: (puzzleId, nextNode) => loadPuzzle(puzzleId, nextNode),
-  onTitle: () => go("title")
+  onComplete: () => {
+    endcard.classList.add("is-active");
+    document.dispatchEvent(new CustomEvent("story:complete"));
+  }
 });
 
-initGame({
-  // Puzzle solved -> continue the story where it left off.
-  onSolved: (nextNode) => goToNode(nextNode),
-  // "Leave" bails back to the title for now.
-  onLeave: () => go("title")
+preload(manifest, (ratio) => {
+  loaderBar.style.width = `${Math.round(ratio * 100)}%`;
+}).then(() => {
+  loaderNote.textContent = "The lamps are lit — for now.";
+  loaderCta.hidden = false;
+  loaderCta.focus();
 });
-
-function go(screen) {
-  setScreen(screen);
-  showScreen(screen);
-}
 
 const actions = {
-  start: () => {
-    reset();
+  begin: () => {
+    loader.classList.remove("is-active");
     startStory();
   },
-  continue: () => {
-    if (state.storyNode) goToNode(state.storyNode);
-  },
-  about: () => go("about"),
-  title: () => go("title"),
-  reset: () => resetPuzzle(),
-  back: () => go("title")
+  next: () => next(),
+  skip: () => skip(),
+  replay: () => {
+    endcard.classList.remove("is-active");
+    startStory();
+  }
 };
 
-// One listener for every [data-action] button on the page.
 document.addEventListener("click", (event) => {
   const trigger = event.target.closest("[data-action]");
   if (!trigger) return;
 
-  const run = actions[trigger.dataset.action];
-  if (run) run();
+  actions[trigger.dataset.action]?.();
 });
 
-go("title");
+// Space / Enter / Right arrow advance the story, matching the tap target.
+document.addEventListener("keydown", (event) => {
+  if (!["Space", "Enter", "ArrowRight"].includes(event.code)) return;
+  // Only while the story is on screen, so the loader and end-card buttons
+  // keep their native keyboard behaviour.
+  if (!hud.classList.contains("is-active")) return;
+
+  event.preventDefault();
+  next();
+});

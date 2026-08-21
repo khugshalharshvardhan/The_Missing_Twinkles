@@ -1,0 +1,68 @@
+/* ---- font ---- */
+@font-face {
+  font-family: "Fredoka One";
+  src: url("../assets/fonts/FredokaOne-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ---- tokens ---- */
+:root {
+  /* Design frame — every scene coordinate is relative to this. */
+  --frame-w: 1920;
+  --frame-h: 1080;
+
+  --letterbox: #05060d;
+  --ink:       #000;
+  --paper:     #fdf6e6;
+  --ember:     #ef5a24;
+  --dusk:      #1b2036;
+
+  --font-display: "Fredoka One", "Trebuchet MS", system-ui, sans-serif;
+
+  --speed:      480ms;
+  --speed-slow: 900ms;
+  --ease:       cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+/* ---- base ---- */
+body {
+  background: var(--letterbox);
+  color: var(--paper);
+  font-family: var(--font-display);
+  overflow: hidden;
+  overscroll-behavior: none;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ---- viewport / stage ---- */
+#viewport {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+}
+
+/* Centred by offset rather than by grid/flex: the un-scaled frame is larger
+   than most viewports, and an overflowing grid item is pinned to the start
+   edge instead of being centred. */
+#stage {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: calc(var(--frame-w) * 1px);
+  height: calc(var(--frame-h) * 1px);
+  overflow: hidden;
+  background: var(--letterbox);
+  /* --scale is written by js/stage.js on every resize. */
+  transform: translate(-50%, -50%) scale(var(--scale, 1));
+  will-change: transform;
+}
+
+/* Nothing on the stage should ever be text-selected or drag-ghosted. */
+#stage img {
+  user-select: none;
+  -webkit-user-drag: none;
+  pointer-events: none;
+}
