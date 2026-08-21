@@ -45,6 +45,17 @@ export function initGame(handlers) {
   hold = Boolean(handlers.hold);
 }
 
+// Let a held run start reading. Used when arriving from the story: the first
+// screen is built behind the mist, and only starts its clock once the mist has
+// cleared, so none of its reading time is spent under the cover.
+export function releaseHold() {
+  if (!hold) return;
+  hold = false;
+
+  const screen = screens[index];
+  if (screen && !screen.interact) advanceIn(readingTime(screen));
+}
+
 // `at` jumps straight to a beat — see the ?beat= dev shortcut in main.js.
 export function startGame(at = 0) {
   clearTimeout(timer);
@@ -376,10 +387,9 @@ function inset(el, [top, right, bottom, left]) {
   el.style.inset = `${top}% ${right}% ${bottom}% ${left}%`;
 }
 
-// Side breathing room inside the balloon, and the band at the bottom the tail
-// occupies. Both are fractions of the bubble box.
+// Side breathing room inside the balloon, as a fraction of the bubble box. It
+// is symmetric, so it never pulls the words off centre.
 const BUBBLE_PAD_X = 0.1;
-const BUBBLE_TAIL = 0.16;
 
 function bubble(spec) {
   const box = document.createElement("div");
@@ -401,9 +411,10 @@ function bubble(spec) {
   artImg.alt = "";
   art.append(artImg);
 
-  // Centre the words in the balloon itself, both ways. That means measuring
-  // from the art's own box rather than the bubble's — on two screens Figma
-  // insets the balloon inside its frame — and keeping clear of the tail.
+  // Dead centre of the balloon, both ways. The box measured is the art's own,
+  // not the bubble frame's — on two screens Figma insets the balloon inside
+  // its frame — and the insets are applied symmetrically, so the centre of
+  // the text box is exactly the centre of the balloon on both axes.
   const [aTop, aRight, aBottom, aLeft] = spec.artInset ?? [0, 0, 0, 0];
   const padX = BUBBLE_PAD_X * spec.w;
 
@@ -413,7 +424,7 @@ function bubble(spec) {
   line.style.left = `${(aLeft / 100) * spec.w + padX}px`;
   line.style.right = `${(aRight / 100) * spec.w + padX}px`;
   line.style.top = `${(aTop / 100) * spec.h}px`;
-  line.style.bottom = `${(aBottom / 100) * spec.h + BUBBLE_TAIL * spec.h}px`;
+  line.style.bottom = `${(aBottom / 100) * spec.h}px`;
 
   box.append(art, line);
   return box;

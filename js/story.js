@@ -29,7 +29,12 @@ const dots = document.getElementById("dots");
 const LAYER_FADE = 700;   // must track .layer's opacity transition in story.css
 const SETTLE = 380;       // how long a step is protected from a double-tap
 
-const mounted = new Map(); // key -> element
+// The lone light keeper's crossing. Both must track .firefly in story.css:
+// FLIGHT_MS its animation-duration, FLIGHT_TOP the lane she flies down.
+const FLIGHT_MS = 2600;
+const FLIGHT_TOP = 470;
+
+const mounted = new Map(); // key -> { el, spec } for the layer showing now
 let cursor = -1;
 let busy = false;
 let holdTimer = 0;
@@ -128,7 +133,7 @@ function go(target) {
 function playTransition(cover, entry) {
   transition.replaceChildren(
     effect({ kind: "night" }),
-    effect({ kind: "fireflies", count: 7 })
+    effect({ kind: "firefly-trail" })
   );
   transition.classList.add("is-active");
 
@@ -177,19 +182,19 @@ function setWaiting(on) {
 function diffLayers(want) {
   const keep = new Set(want.map((layer) => layer.key));
 
-  for (const [key, el] of [...mounted]) {
+  for (const [key, held] of [...mounted]) {
     if (keep.has(key)) continue;
     mounted.delete(key);
-    el.style.opacity = "0";
-    window.setTimeout(() => el.remove(), LAYER_FADE);
+    held.el.style.opacity = "0";
+    window.setTimeout(() => held.el.remove(), LAYER_FADE);
   }
 
   want.forEach((layer, depth) => {
-    let el = mounted.get(layer.key);
+    const held = mounted.get(layer.key);
 
-    if (!el) {
-      el = layer.kind ? effect(layer) : image(layer, "layer");
-      mounted.set(layer.key, el);
+    if (!held) {
+      const el = layer.kind ? effect(layer) : image(layer, "layer");
+      mounted.set(layer.key, { el, spec: layer });
       layerHost.append(el);
 
       // Image layers fade in from nothing. One whose fx animates opacity — the
@@ -204,11 +209,61 @@ function diffLayers(want) {
         el.style.opacity = "0";
         requestAnimationFrame(() => { el.style.opacity = String(target); });
       }
+
+      // Depth by z-index, never by DOM order: moving a node restarts its
+      // animation, and these layers are mid-drift.
+      el.style.zIndex = String(depth + 1);
+      return;
     }
 
-    // Depth by z-index, never by DOM order: moving a node restarts its
-    // animation, and these layers are mid-drift.
-    el.style.zIndex = String(depth + 1);
+    // A character who is already on stage and changes pose keeps the same
+    // layer: the box glides to its new mark while the art dissolves inside
+    // it. Cross-fading two separate layers instead would put two copies of
+    // the same character on screen at once, at different marks.
+    if (!layer.kind && restyled(held.spec, layer)) {
+      dissolve(held.el, layer);
+      held.spec = layer;
+    }
+
+    held.el.style.zIndex = String(depth + 1);
+  });
+}
+
+// Has anything about this layer's art or mark actually moved?
+function restyled(before, after) {
+  return (
+    before.src !== after.src ||
+    before.x !== after.x ||
+    before.y !== after.y ||
+    before.w !== after.w ||
+    before.h !== after.h ||
+    before.fx !== after.fx ||
+    before.flipX !== after.flipX ||
+    JSON.stringify(before.fill ?? null) !== JSON.stringify(after.fill ?? null)
+  );
+}
+
+// Swap a layer's art in place. The new fill fades up over the old one inside
+// the same box, and the box itself transitions to the new mark, so the two
+// poses stay registered and read as one character changing.
+function dissolve(box, layer) {
+  box.className = layer.fx ? `layer fx-${layer.fx}` : "layer";
+  box.style.left = `${layer.x}px`;
+  box.style.top = `${layer.y}px`;
+  box.style.width = `${layer.w}px`;
+  box.style.height = `${layer.h}px`;
+  if (layer.opacity != null) box.style.opacity = String(layer.opacity);
+
+  const outgoing = [...box.querySelectorAll(".fill")];
+  const incoming = fillImage(layer);
+
+  incoming.style.opacity = "0";
+  box.append(incoming);
+  requestAnimationFrame(() => { incoming.style.opacity = "1"; });
+
+  outgoing.forEach((img) => {
+    img.style.opacity = "0";
+    window.setTimeout(() => img.remove(), LAYER_FADE);
   });
 }
 
@@ -241,7 +296,15 @@ function image(layer, className) {
   box.style.width = `${layer.w}px`;
   box.style.height = `${layer.h}px`;
 
+  box.append(fillImage(layer));
+  return box;
+}
+
+// The art inside a layer box. Kept separate from image() so a pose change can
+// fade a new fill in over the old one without rebuilding the box.
+function fillImage(layer) {
   const img = document.createElement("img");
+
   img.className = layer.fill ? "fill fill--crop" : "fill";
   img.src = layer.src;
   img.alt = "";
@@ -256,8 +319,7 @@ function image(layer, className) {
   }
   if (layer.flipX) img.style.transform = "scaleX(-1)";
 
-  box.append(img);
-  return box;
+  return img;
 }
 
 function line({ text, lines }) {
@@ -333,21 +395,39 @@ function effect(layer) {
       el.style.animationDelay = `${layer.delay ?? 0}ms`;
       break;
 
-    case "fireflies":
-      for (let i = 0; i < (layer.count ?? 6); i++) {
-        const fly = document.createElement("img");
-        fly.className = "firefly";
-        fly.src = "assets/images/firefly.png";
-        fly.alt = "";
-        // Spread the swarm without needing a random seed: vary the lane, the
-        // head start and the speed so they don't fly in formation.
-        fly.style.top = `${90 + ((i * 137) % 820)}px`;
-        fly.style.marginLeft = `${(i % 4) * -280}px`;
-        fly.style.animationDelay = `${i * 160}ms`;
-        fly.style.animationDuration = `${1700 + (i % 3) * 450}ms`;
-        el.append(fly);
+    // One light keeper crosses the dark, shedding glitter as she goes. The
+    // sparks are laid along her flight path rather than parented to her, so
+    // they stay where they fell and wink out behind her.
+    case "firefly-trail": {
+      const SPARKS = 40;
+
+      for (let i = 0; i < SPARKS; i++) {
+        const t = i / (SPARKS - 1);
+        const spark = document.createElement("i");
+
+        spark.className = "spark";
+        // Same curve as fly-across, sampled: out to the right, rising to the
+        // halfway mark, then easing back down.
+        spark.style.left = `${t * 2260}px`;
+        spark.style.top = `${FLIGHT_TOP + (t <= 0.5 ? -220 * t : -110 + 340 * (t - 0.5))}px`;
+        // Scatter them off the line so the trail has body rather than reading
+        // as a dotted rule. No random seed — the offsets just have to differ.
+        spark.style.marginLeft = `${((i * 37) % 54) - 27}px`;
+        spark.style.marginTop = `${((i * 53) % 62) - 31}px`;
+        spark.style.width = spark.style.height = `${9 + ((i * 11) % 13)}px`;
+        // Each lights as she reaches it, then fades.
+        spark.style.animationDelay = `${Math.round(t * FLIGHT_MS)}ms`;
+        el.append(spark);
       }
+
+      const fly = document.createElement("img");
+      fly.className = "firefly";
+      fly.src = "assets/images/firefly.png";
+      fly.alt = "";
+      fly.style.top = `${FLIGHT_TOP}px`;
+      el.append(fly);
       break;
+    }
 
     default:
       break;

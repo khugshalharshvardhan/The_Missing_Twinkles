@@ -10,10 +10,15 @@
    ========================================================= */
 
 .handoff {
-  position: absolute;
+  /* Fixed to the viewport, not the stage: the mist has to swallow the
+     letterbox bars too, or the screen is only partly covered when the page
+     changes. This is why the element lives outside #viewport in index.html —
+     #stage carries a transform, which would capture a fixed descendant. */
+  position: fixed;
   inset: 0;
   /* Above the HUD (4) and the loader / end card (5). */
   z-index: 6;
+  background: #131a2b;
   overflow: hidden;
   opacity: 0;
   pointer-events: none;

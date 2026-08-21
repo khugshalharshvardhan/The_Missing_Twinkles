@@ -31,8 +31,6 @@
       <!-- Covers a page change — the fireflies out of the dark -->
       <div class="transition" id="transition"></div>
 
-      <!-- Closes the chapter: the mist that carries us into the game -->
-      <div class="handoff" id="handoff" aria-hidden="true"></div>
 
       <!-- ===== HUD ===== -->
       <div class="hud" id="hud">
@@ -79,6 +77,12 @@
 
     </div>
   </div>
+
+  <!-- Closes the chapter: the mist that carries us into the game. It sits
+       outside the stage on purpose — the stage is letterboxed and carries a
+       transform, so a cover inside it would leave the bars showing and could
+       not be fixed to the viewport. -->
+  <div class="handoff" id="handoff" aria-hidden="true"></div>
 
   <script type="module" src="js/main.js"></script>
 </body>

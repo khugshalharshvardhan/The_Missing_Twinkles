@@ -41,22 +41,22 @@ const TOWN_LIT = { key: "bg-lit", src: `${IMG}bg_town_lit.jpg`, x: 0, y: 0, w: 1
 const TOWN_DARK = { key: "bg-dark", src: `${IMG}bg_town_dark.jpg`, x: 0, y: 0, w: 1920, h: 1080 };
 
 const AGNI_WALKING = {
-  key: "agni-walk", src: `${IMG}agni_walking.png`, x: 380, y: 442, w: 460, h: 539,
+  key: "agni", src: `${IMG}agni_walking.png`, x: 380, y: 442, w: 460, h: 539,
   fill: { left: "-22.65%", top: "0%", width: "175.74%", height: "100%" }
 };
 
 const NEEL_WALKING = {
-  key: "neel-walk", src: `${IMG}neel_walking.png`, x: 866, y: 399, w: 506, h: 625,
+  key: "neel", src: `${IMG}neel_walking.png`, x: 866, y: 399, w: 506, h: 625,
   fill: { left: "-18.23%", top: "-7.68%", width: "158.39%", height: "114.08%" }
 };
 
 const NEEL_CHEEKY = {
-  key: "neel-cheeky", src: `${IMG}neel_cheeky.png`, x: 908, y: 371, w: 472, h: 622,
+  key: "neel", src: `${IMG}neel_cheeky.png`, x: 908, y: 371, w: 472, h: 622,
   fill: { left: "-16.4%", top: "-0.06%", width: "126.88%", height: "100.13%" }
 };
 
 const AGNI_TALKING = {
-  key: "agni-talk", src: `${IMG}agni_talking.png`, x: 358, y: 443, w: 550, h: 557
+  key: "agni", src: `${IMG}agni_talking.png`, x: 358, y: 443, w: 550, h: 557
 };
 
 // The three eye frames are one shot, hard-cut like the source video.
@@ -166,9 +166,9 @@ export const pages = [
         hold: 4400, // lets the mist finish rising
         layers: [
           { key: "bg-moonlit", src: `${IMG}bg_town_moonlit.jpg`, x: 0, y: 0, w: 1920, h: 1080 },
-          { key: "agni-down", src: `${IMG}agni_looking_down.png`, x: 297, y: 461, w: 613, h: 566, fx: "breathe" },
+          { key: "agni", src: `${IMG}agni_looking_down.png`, x: 297, y: 461, w: 613, h: 566, fx: "breathe" },
           {
-            key: "neel-scared", src: `${IMG}neel_scared.png`, x: 945, y: 403, w: 489, h: 624,
+            key: "neel", src: `${IMG}neel_scared.png`, x: 945, y: 403, w: 489, h: 624,
             fill: { left: "-15.02%", top: "0%", width: "152.56%", height: "104.64%" },
             fx: "shiver"
           },
@@ -234,7 +234,7 @@ export const pages = [
       {
         id: "4.1",
         hold: 5200, // "…the little light-keepers!" ends at 4.02s
-        layers: [{ key: "cast-shock", src: `${IMG}scene_shock.png`, x: 239, y: 191, w: 1276, h: 851, fx: "breathe" }],
+        layers: [{ key: "cast", src: `${IMG}scene_shock.png`, x: 239, y: 191, w: 1276, h: 851, fx: "breathe" }],
         say: {
           bubble: { src: `${IMG}bubble_agni.png`, x: 118, y: 96, w: 586, h: 294, flipX: true },
           text: { x: 169, y: 153, w: 482 },
@@ -247,7 +247,7 @@ export const pages = [
         // Last step of the chapter: chevron in, then the end card.
         id: "4.2",
         reveal: 3100,
-        layers: [{ key: "cast-cheer", src: `${IMG}scene_cheer.png`, x: 273, y: 241, w: 1258, h: 839, fx: "breathe" }],
+        layers: [{ key: "cast", src: `${IMG}scene_cheer.png`, x: 273, y: 241, w: 1258, h: 839, fx: "breathe" }],
         say: {
           bubble: { src: `${IMG}bubble_agni.png`, x: 54, y: 78, w: 606, h: 326, flipX: true },
           text: { x: 117, y: 169, w: 481 },

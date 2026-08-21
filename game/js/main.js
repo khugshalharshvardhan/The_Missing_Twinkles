@@ -5,7 +5,7 @@
 import { manifest } from "./data/screens.js";
 import { watchStage } from "./stage.js";
 import { preload } from "./preload.js";
-import { initGame, startGame } from "./game.js";
+import { initGame, startGame, releaseHold } from "./game.js";
 
 const loader = document.getElementById("loader");
 const loaderBar = document.getElementById("loader-bar");
@@ -20,15 +20,18 @@ watchStage();
 const params = new URLSearchParams(location.search);
 const jumpTo = params.get("beat");
 
-initGame({
-  onComplete: () => endcard.classList.add("is-active"),
-  hold: params.has("hold")
-});
-
 // Arriving straight from the story: no title card, the mist is the only cover.
 const mist = document.getElementById("mist");
 const fromStory = document.documentElement.classList.contains("from-story");
 const MIST_FADE = 900; // must track .mist's opacity transition in css/game.css
+const MIST_SHUT = 420; // fully covered, first screen being built underneath
+
+initGame({
+  onComplete: () => endcard.classList.add("is-active"),
+  // Coming out of the story, the first screen is built behind a closed mist
+  // and waits — releaseHold() starts its clock once the mist has gone.
+  hold: params.has("hold") || fromStory
+});
 
 if (fromStory) {
   // The same two images the story closes on, so the wipe reads as one move.
@@ -55,19 +58,25 @@ preload(manifest, (ratio) => {
   if (fromStory) {
     loader.classList.remove("is-active");
 
-    // startGame() paints the first beat and starts its clock together, so lift
-    // the mist in the same turn — waiting on a frame callback here would risk
-    // the opening lines playing out behind the cover.
+    // The mist is shut over the whole screen at this point. Build the first
+    // screen behind it — held, so it is not spending its reading time under
+    // a cover — let it sit a moment, then lift and start the clock.
     startGame();
-    document.documentElement.classList.remove("from-story");
 
     // Spend the marker. Refreshing from here should send the player back to
     // the story rather than replaying the game under a mist that never rose.
     history.replaceState(null, "", location.pathname);
 
-    // Take the cover out of the page for good, so a stalled transition can
-    // never leave it sitting over the game.
-    window.setTimeout(() => mist.remove(), MIST_FADE + 200);
+    window.setTimeout(() => {
+      document.documentElement.classList.remove("from-story");
+
+      // Take the cover out of the page for good, so a stalled transition can
+      // never leave it sitting over the game.
+      window.setTimeout(() => {
+        mist.remove();
+        releaseHold();
+      }, MIST_FADE);
+    }, MIST_SHUT);
     return;
   }
 

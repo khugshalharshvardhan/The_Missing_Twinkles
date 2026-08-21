@@ -35,6 +35,10 @@
 .layer {
   position: absolute;
   overflow: hidden;
+  /* A character changing pose keeps this box and glides to the new mark, so
+     the outgoing and incoming art stay registered while they dissolve. */
+  transition: opacity 700ms var(--ease), left 700ms var(--ease),
+    top 700ms var(--ease), width 700ms var(--ease), height 700ms var(--ease);
 }
 
 /* ---- page transition cover ---- */
@@ -57,6 +61,9 @@
   height: 100%;
   max-width: none;
   object-fit: cover;
+  /* A pose change fades the new fill up over the old one inside this box.
+     Duration must track LAYER_FADE in js/story.js. */
+  transition: opacity 700ms var(--ease);
 }
 
 /* A cropped fill already carries its exact rect, so it must not be re-fitted. */
@@ -260,7 +267,8 @@
   animation: glimmer 4.2s ease-in-out infinite;
 }
 
-.fxlayer--fireflies { inset: 0; }
+.fxlayer--fireflies,
+.fxlayer--firefly-trail { inset: 0; }
 
 .firefly {
   position: absolute;
@@ -269,8 +277,29 @@
   height: 90px;
   filter: drop-shadow(0 0 26px rgba(255, 214, 120, 0.9));
   animation-name: fly-across;
+  animation-duration: 2600ms; /* must track FLIGHT_MS in js/story.js */
   animation-timing-function: ease-in-out;
   animation-fill-mode: both;
+}
+
+/* The glitter she sheds. Laid along the flight path by js/story.js, each one
+   lighting as she reaches it and dying out behind her. */
+.spark {
+  position: absolute;
+  display: block;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fffdf0 0%, #ffe9a8 32%, #ffc247 58%, rgba(255, 170, 40, 0) 78%);
+  filter: drop-shadow(0 0 10px rgba(255, 206, 110, 0.95));
+  opacity: 0;
+  animation: spark-shed 1900ms var(--ease) both;
+}
+
+/* Lights as she passes, swells, then drifts down and dies out behind her. */
+@keyframes spark-shed {
+  0% { opacity: 0; transform: translate(-190px, 0) scale(0.3); }
+  12% { opacity: 1; transform: translate(-190px, -2px) scale(1.35); }
+  40% { opacity: 0.85; transform: translate(-190px, 8px) scale(1); }
+  100% { opacity: 0; transform: translate(-190px, 40px) scale(0.2); }
 }
 
 @keyframes wave-out {
