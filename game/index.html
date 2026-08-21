@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Lights Out — Count the Light Keepers</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>%F0%9F%AA%B0</text></svg>" />
+
+  <link rel="stylesheet" href="css/reset.css" />
+  <link rel="stylesheet" href="css/stage.css" />
+  <link rel="stylesheet" href="css/game.css" />
+
+  <link rel="preload" href="assets/fonts/FredokaOne-Regular.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="assets/images/bg_night.png" as="image" />
+</head>
+<body>
+
+  <!-- The viewport letterboxes a fixed 1882x1059 stage so every Figma
+       coordinate can be used verbatim. See js/stage.js. -->
+  <div id="viewport">
+    <div id="stage">
+
+      <!-- Beats are built from js/data/screens.js -->
+      <div class="scene" id="scene-a"></div>
+      <div class="scene" id="scene-b"></div>
+
+      <!-- ===== HUD ===== -->
+      <!-- Dialogue beats advance on their own; the only control is the way out. -->
+      <div class="hud" id="hud">
+        <a class="home" href="../index.html">Home</a>
+      </div>
+
+      <!-- ===== Loader ===== -->
+      <div class="loader is-active" id="loader">
+        <p class="loader__title">Lights Out</p>
+        <div class="loader__track"><i class="loader__bar" id="loader-bar"></i></div>
+        <p class="loader__note" id="loader-note">Counting the stars…</p>
+        <button class="cta" id="loader-cta" data-action="begin" hidden>Start the game</button>
+      </div>
+
+      <!-- ===== End card ===== -->
+      <div class="endcard" id="endcard">
+        <p class="endcard__kicker">Chapter 1</p>
+        <p class="endcard__title">Well counted</p>
+        <p class="endcard__note">Guess, then count to check. That is the whole trick.</p>
+        <div class="endcard__row">
+          <button class="cta" data-action="replay">Play again</button>
+          <a class="cta cta--ghost" href="../index.html">Home</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

@@ -58,7 +58,11 @@
         <p class="loader__title">Lights Out</p>
         <div class="loader__track"><i class="loader__bar" id="loader-bar"></i></div>
         <p class="loader__note" id="loader-note">Waking the town…</p>
-        <button class="cta" id="loader-cta" data-action="begin" hidden>Begin the story</button>
+        <div class="endcard__row">
+          <button class="cta" id="loader-cta" data-action="begin" hidden>Begin the story</button>
+          <!-- The game half lives in game/ and preloads its own art. -->
+          <a class="cta" href="game/index.html">Start the game</a>
+        </div>
       </div>
 
       <!-- ===== End card — the seam where the puzzle takes over ===== -->
