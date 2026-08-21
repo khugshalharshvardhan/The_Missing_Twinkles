@@ -25,9 +25,48 @@ initGame({
   hold: params.has("hold")
 });
 
+// Arriving straight from the story: no title card, the mist is the only cover.
+const mist = document.getElementById("mist");
+const fromStory = document.documentElement.classList.contains("from-story");
+const MIST_FADE = 900; // must track .mist's opacity transition in css/game.css
+
+if (fromStory) {
+  // The same two images the story closes on, so the wipe reads as one move.
+  mist.append(
+    mistLayer("../assets/images/bg_mist_full.jpg", "mist__wall"),
+    mistLayer("../assets/images/mist_band.png", "mist__band")
+  );
+} else {
+  // Nothing to cover — drop it rather than leave a dead full-screen layer.
+  mist.remove();
+}
+
+function mistLayer(src, className) {
+  const img = document.createElement("img");
+  img.className = className;
+  img.src = src;
+  img.alt = "";
+  return img;
+}
+
 preload(manifest, (ratio) => {
   loaderBar.style.width = `${Math.round(ratio * 100)}%`;
 }).then(() => {
+  if (fromStory) {
+    loader.classList.remove("is-active");
+
+    // startGame() paints the first beat and starts its clock together, so lift
+    // the mist in the same turn — waiting on a frame callback here would risk
+    // the opening lines playing out behind the cover.
+    startGame();
+    document.documentElement.classList.remove("from-story");
+
+    // Take the cover out of the page for good, so a stalled transition can
+    // never leave it sitting over the game.
+    window.setTimeout(() => mist.remove(), MIST_FADE + 200);
+    return;
+  }
+
   if (jumpTo !== null) {
     loader.classList.remove("is-active");
     startGame(Number(jumpTo));

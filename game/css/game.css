@@ -4,6 +4,70 @@
 }
 
 /* =========================================================
+   Arrival from the story — the mist we came in under
+
+   The story closes by going fully opaque with these same two
+   images, then loads this page. Holding the mist here until
+   the art is ready turns the page change into one continuous
+   wipe, and covers the preload while it runs.
+   ========================================================= */
+
+.mist {
+  position: fixed;
+  inset: 0;
+  z-index: 9;
+  overflow: hidden;
+  background: #131a2b;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 900ms var(--ease), visibility 900ms;
+}
+
+/* Up until main.js says the game is ready. */
+.from-story .mist {
+  opacity: 1;
+  visibility: visible;
+}
+
+.mist__wall {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  animation: mist-drift 9s var(--ease) infinite alternate;
+}
+
+.mist__band {
+  position: absolute;
+  left: -3%;
+  bottom: -8%;
+  width: 106%;
+  height: 78%;
+  object-fit: cover;
+  opacity: 0.85;
+  animation: mist-settle 1400ms var(--ease) both;
+}
+
+@keyframes mist-drift {
+  from { transform: scale(1.12) translateX(18px); }
+  to { transform: scale(1.04) translateX(-18px); }
+}
+
+/* Picks up where the story's rise left off and sinks back down. */
+@keyframes mist-settle {
+  from { transform: translateY(0) scaleX(1.04); }
+  to { transform: translateY(34%) scaleX(1.04); }
+}
+
+/* Coming in from the story, the title card is not wanted — the mist is the
+   only cover, and the game starts itself. */
+.from-story .loader {
+  display: none;
+}
+
+/* =========================================================
    Scenes — two panes that cross-fade
    ========================================================= */
 

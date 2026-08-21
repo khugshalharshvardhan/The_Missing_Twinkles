@@ -1,0 +1,70 @@
+/* =========================================================
+   Chapter handoff — the mist closes over the town, and the
+   counting game opens on the other side of it.
+
+   The game lives on its own page (game/), which keeps its
+   1882 x 1059 frame and its own stylesheet clear of this
+   one. This cover is what hides the page change: it goes
+   fully opaque before the navigation, and game/ opens under
+   the same mist and clears it.
+   ========================================================= */
+
+.handoff {
+  position: absolute;
+  inset: 0;
+  /* Above the HUD (4) and the loader / end card (5). */
+  z-index: 6;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--handoff-rise, 1500ms) var(--ease);
+}
+
+.handoff.is-active {
+  opacity: 1;
+  /* Once the mist is closing, the story below must stop taking taps. */
+  pointer-events: auto;
+}
+
+/* The wall of mist that fills the frame. */
+.handoff__wall {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  animation: handoff-drift 6s var(--ease) both;
+}
+
+/* A denser band rolling up from the ground to meet it. */
+.handoff__band {
+  position: absolute;
+  left: -3%;
+  bottom: -8%;
+  width: 106%;
+  height: 78%;
+  object-fit: cover;
+  opacity: 0.85;
+  animation: handoff-rise var(--handoff-rise, 1500ms) var(--ease) both;
+}
+
+@keyframes handoff-rise {
+  from { transform: translateY(46%) scaleX(1.04); }
+  to { transform: translateY(0) scaleX(1.04); }
+}
+
+@keyframes handoff-drift {
+  from { transform: scale(1.04) translateX(-22px); }
+  to { transform: scale(1.12) translateX(18px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .handoff {
+    --handoff-rise: 260ms;
+  }
+
+  .handoff__wall,
+  .handoff__band {
+    animation: none;
+  }
+}

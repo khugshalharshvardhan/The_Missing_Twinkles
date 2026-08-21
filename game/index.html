@@ -15,6 +15,21 @@
 </head>
 <body>
 
+  <!-- Runs before the first paint, so arriving from the story never flashes
+       the game before the mist is up. js/main.js clears the class once the
+       art is loaded and the first beat is on screen. -->
+  <script>
+    if (new URLSearchParams(location.search).has("from")) {
+      document.documentElement.classList.add("from-story");
+    }
+  </script>
+
+  <!-- The mist we arrived in. Its own background covers the page from the
+       first paint; js/main.js fills in the two images — the same ones the
+       story closes on, at the same URLs, so they come from cache — and takes
+       the whole element out again once the game is up. -->
+  <div class="mist" id="mist" aria-hidden="true"></div>
+
   <!-- The viewport letterboxes a fixed 1882x1059 stage so every Figma
        coordinate can be used verbatim. See js/stage.js. -->
   <div id="viewport">

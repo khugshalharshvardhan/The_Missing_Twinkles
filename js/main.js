@@ -7,6 +7,7 @@ import { audioManifest, UI_ADVANCE } from "./data/audio.js";
 import { watchStage } from "./stage.js";
 import { preload } from "./preload.js";
 import { initStory, startStory, advance, skip } from "./story.js";
+import { playHandoff } from "./handoff.js";
 import { initAudio, loadAudio, unlockAudio, playUi, toggleMuted, isMuted, stopAudio } from "./audio.js";
 
 const loader = document.getElementById("loader");
@@ -25,9 +26,11 @@ const hasAudio = initAudio();
 paintSound();
 
 initStory({
+  // The chapter no longer stops here — the mist closes over the town and the
+  // counting game opens on the other side of it. See js/handoff.js.
   onComplete: () => {
-    endcard.classList.add("is-active");
     document.dispatchEvent(new CustomEvent("story:complete"));
+    playHandoff();
   }
 });
 

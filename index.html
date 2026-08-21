@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="css/reset.css" />
   <link rel="stylesheet" href="css/stage.css" />
   <link rel="stylesheet" href="css/story.css" />
+  <link rel="stylesheet" href="css/handoff.css" />
 
   <link rel="preload" href="assets/fonts/FredokaOne-Regular.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="preload" href="assets/images/bg_town_lit.jpg" as="image" />
@@ -29,6 +30,9 @@
 
       <!-- Covers a page change — the fireflies out of the dark -->
       <div class="transition" id="transition"></div>
+
+      <!-- Closes the chapter: the mist that carries us into the game -->
+      <div class="handoff" id="handoff" aria-hidden="true"></div>
 
       <!-- ===== HUD ===== -->
       <div class="hud" id="hud">
@@ -58,11 +62,9 @@
         <p class="loader__title">Lights Out</p>
         <div class="loader__track"><i class="loader__bar" id="loader-bar"></i></div>
         <p class="loader__note" id="loader-note">Waking the town…</p>
-        <div class="endcard__row">
-          <button class="cta" id="loader-cta" data-action="begin" hidden>Begin the story</button>
-          <!-- The game half lives in game/ and preloads its own art. -->
-          <a class="cta" href="game/index.html">Start the game</a>
-        </div>
+        <!-- One way in. The story runs, the mist closes over it, and the
+             counting game opens on the other side — see js/handoff.js. -->
+        <button class="cta" id="loader-cta" data-action="begin" hidden>Begin</button>
       </div>
 
       <!-- ===== End card — the seam where the puzzle takes over ===== -->
