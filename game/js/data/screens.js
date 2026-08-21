@@ -348,6 +348,9 @@ export const keypad = {
   keyArt: `${IMG}key.png`,
   keyFill: CROP.key,
   clearArt: `${IMG}key_x.png`,
+  confirmArt: `${IMG}key_ok.png`,
+  // The tick sits inset inside its key, at the size Figma gives it (146:12).
+  tick: { src: `${IMG}tick.svg`, x: 30, y: 14, w: 56, h: 56 },
   keys: [
     { label: "1", x: 766, y: 421 },
     { label: "2", x: 886, y: 421 },
@@ -359,7 +362,8 @@ export const keypad = {
     { label: "8", x: 886, y: 595 },
     { label: "9", x: 1006, y: 595 },
     { label: "X", x: 766, y: 682, clear: true },
-    { label: "0", x: 886, y: 682 }
+    { label: "0", x: 886, y: 682 },
+    { label: "OK", x: 1006, y: 682, confirm: true }
   ]
 };
 

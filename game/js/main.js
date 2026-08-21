@@ -87,9 +87,10 @@ const actions = {
     loader.classList.remove("is-active");
     startGame();
   },
+  // Play again means the whole thing again — story first, then the game —
+  // not just this half. The story page is the one entry point.
   replay: () => {
-    endcard.classList.remove("is-active");
-    startGame();
+    location.href = "../index.html";
   }
 };
 

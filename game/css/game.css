@@ -257,8 +257,23 @@
   line-height: 60px;
 }
 
+/* The tick is art at its designed size, positioned inside its key. */
+.key__tick {
+  position: absolute;
+  pointer-events: none;
+}
+
+/* Nothing typed yet — the tick is there, but plainly not ready. */
+.key.is-off {
+  cursor: default;
+  filter: saturate(0.25) brightness(0.72);
+}
+
 .key:hover { transform: translateY(-2px); }
 .key:active { transform: translateY(3px); }
+
+.key.is-off:hover,
+.key.is-off:active { transform: none; }
 
 .key:focus-visible {
   outline: 4px solid var(--paper);

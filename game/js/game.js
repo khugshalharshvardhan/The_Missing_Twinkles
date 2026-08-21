@@ -26,7 +26,6 @@ const READ_MAX = 6200;
 
 const AFTER_COUNT = 950; // let the last light keeper land before moving on
 const AFTER_LAMP = 900; // hold on the lit lamp for a moment
-const GUESS_SETTLE = 1700; // in case a second digit is still coming
 
 let index = -1;
 let front = 0;
@@ -283,33 +282,33 @@ function keypadPanel() {
   display.append(value);
   panel.append(display);
 
-  // With no confirm button, a typed number settles on its own — but only after
-  // a pause, so the second digit of a two-digit guess still lands.
+  // The player types, then taps the tick to commit — so nothing advances on a
+  // timer, and a two-digit guess is never cut off halfway.
+  const ticks = [];
   const paint = () => {
     value.textContent = entry;
-    clearTimeout(timer);
-
-    if (!entry.length) return;
-    timer = window.setTimeout(() => {
-      guess = Number(entry);
-      next();
-    }, GUESS_SETTLE);
+    // Nothing to confirm until at least one digit is in.
+    ticks.forEach((t) => {
+      t.classList.toggle("is-off", entry.length === 0);
+      t.disabled = entry.length === 0;
+    });
   };
 
   keypad.keys.forEach((key) => {
     const btn = document.createElement("button");
 
     btn.type = "button";
-    btn.className = key.clear ? "key key--clear" : "key";
+    btn.className = `key${key.clear ? " key--clear" : ""}${key.confirm ? " key--confirm" : ""}`;
     place(btn, { x: key.x, y: key.y, w: keypad.keyW, h: keypad.keyH });
-    btn.setAttribute("aria-label", key.clear ? "Clear" : key.label);
+    btn.setAttribute("aria-label", key.clear ? "Clear" : key.confirm ? "Confirm guess" : key.label);
 
-    // The number keys carry a crop; the clear key's art fills its box.
+    // The number keys carry a crop; the clear and confirm art fills its box.
+    const plain = key.clear || key.confirm;
     const img = document.createElement("img");
-    img.src = key.clear ? keypad.clearArt : keypad.keyArt;
+    img.src = key.clear ? keypad.clearArt : key.confirm ? keypad.confirmArt : keypad.keyArt;
     img.alt = "";
 
-    if (key.clear) {
+    if (plain) {
       img.className = "fill";
     } else {
       img.className = "fill fill--crop";
@@ -319,12 +318,31 @@ function keypadPanel() {
       img.style.height = keypad.keyFill.height;
     }
 
-    const label = document.createElement("span");
-    label.className = "key__label";
-    label.textContent = key.label;
+    btn.append(img);
 
-    btn.append(img, label);
+    if (key.confirm) {
+      // The tick is art, not a glyph, and keeps its designed box.
+      const tick = document.createElement("img");
+      tick.className = "key__tick";
+      tick.src = keypad.tick.src;
+      tick.alt = "";
+      place(tick, keypad.tick);
+      btn.append(tick);
+      ticks.push(btn);
+    } else {
+      const label = document.createElement("span");
+      label.className = "key__label";
+      label.textContent = key.label;
+      btn.append(label);
+    }
+
     btn.addEventListener("click", () => {
+      if (key.confirm) {
+        if (!entry.length) return;
+        guess = Number(entry);
+        return next();
+      }
+
       if (key.clear) entry = "";
       else if (entry.length < 2) entry = (entry + key.label).replace(/^0+(?=\d)/, "");
       paint();

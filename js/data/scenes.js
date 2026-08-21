@@ -97,13 +97,11 @@ export const pages = [
     // The lit street is painted once and stays for the whole page.
     layers: [TOWN_LIT],
     steps: [
-      // Figma 1.1 — the lane before anyone walks into it.
-      { id: "1.0", hold: 2200, layers: [] },
-
-      // Figma 1.2 — they stroll in.
+      // Figma 1.2 — they stroll in. This opens the chapter: an establishing
+      // shot of the empty lane came first, but the pair should be in the
+      // opening frame rather than a bare street.
       {
         id: "1.1",
-        beat: "Agni and Neil were taking a walk.",
         hold: 3000,
         layers: [
           { ...AGNI_WALKING, fx: "walk-in-left" },
@@ -146,7 +144,6 @@ export const pages = [
       {
         // Last step of the page: waits for the reader, chevron in at 2.1s.
         id: "1.4",
-        beat: "Neil just grins.",
         reveal: 2100,
         layers: [
           { ...NEEL_CHEEKY, fx: "grin" },
@@ -193,44 +190,33 @@ export const pages = [
           { key: "bg-mist", src: `${IMG}bg_mist_full.jpg`, x: 0, y: 0, w: 1920, h: 1080, fx: "drift-slow" },
           { key: "wave", kind: "wave" },
           { key: "lamp-die", kind: "lamp-die" }
-        ],
-        sfx: [
-          { kind: "pop", x: 960, y: 575, text: "POP!", delay: 800 },
-          { kind: "pop", x: 880, y: 590, text: "POP!", delay: 1200 },
-          { kind: "pop", x: 600, y: 530, text: "POP!", delay: 1600 },
-          { kind: "pop", x: 300, y: 350, text: "POP!", delay: 2000 },
-          { kind: "laugh", y: 300, text: "Hee-hee-hee-hee!", delay: 3700 }
         ]
+        // The lanterns going out and the laugh are carried by their sound
+        // cues; the shouted words that used to sit over the art are gone.
       },
 
       // Figma 2.3 / 2.4 / 3 — pitch dark, two pairs of eyes. A bubble would
       // light the frame, so these lines are spoken in each character's colour.
       {
         id: "3.1",
-        hold: 3800, // "Neil?" then both BLINK!s
+        hold: 3800, // "Neil?", then the eyes blink on their own
         layers: [{ key: "night", kind: "night" }, ...EYES],
-        voices: [{ x: 355, y: 700, w: 400, tone: "agni", text: "Neil?" }],
-        sfx: [
-          { kind: "blink", x: 330, y: 450, text: "BLINK!", delay: 700 },
-          { kind: "blink", x: 1490, y: 400, text: "BLINK!", delay: 1900 }
-        ]
+        voices: [{ x: 355, y: 700, w: 400, tone: "agni", text: "Neil?" }]
       },
 
       {
         id: "3.2",
         hold: 3600, // "I am here… I think."
         layers: [{ key: "night", kind: "night" }, ...EYES],
-        voices: [{ x: 1040, y: 690, w: 560, tone: "neel", text: "I am here… I think." }],
-        sfx: [{ kind: "blink", x: 1490, y: 400, text: "BLINK!", delay: 900 }]
+        voices: [{ x: 1040, y: 690, w: 560, tone: "neel", text: "I am here… I think." }]
       },
 
-      // The laugh crosses the top edge without ever showing him.
+      // The laugh crosses overhead without ever showing him — heard, not read.
       {
-        // Last step of the page: chevron in once the laugh has crossed.
+        // Last step of the page: chevron in once the laugh has passed.
         id: "3.3",
         reveal: 3400,
-        layers: [{ key: "night", kind: "night" }, ...EYES],
-        sfx: [{ kind: "laugh", y: 40, text: "Hee-hee-hee-hee!", delay: 600 }]
+        layers: [{ key: "night", kind: "night" }, ...EYES]
       }
     ]
   },
