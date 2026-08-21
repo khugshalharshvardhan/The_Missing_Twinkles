@@ -4,26 +4,50 @@
    so they scale with #stage rather than with the viewport.
    ========================================================= */
 
-.scene {
+.scene,
+.layers,
+.overlays {
   position: absolute;
   inset: 0;
-  opacity: 0;
-  visibility: hidden;
   pointer-events: none;
-  transition: opacity var(--speed-slow) var(--ease), visibility var(--speed-slow);
 }
 
-.scene.is-active {
-  opacity: 1;
-  visibility: visible;
+/* isolate keeps .overlays' z-index inside the scene, so the transition cover
+   above can hide the bubbles instead of losing to them. */
+.scene {
+  z-index: 1;
+  isolation: isolate;
 }
+
+/* Bubbles and captions always sit above the cast. */
+.overlays { z-index: 500; }
 
 /* A layer is the designed box; .fill is the image inside it. Boxes clip,
-   which is what lets a cropped fill and an off-frame prop both behave. */
+   which is what lets a cropped fill and an off-frame prop both behave.
+   Depth is set as z-index by the player, in the order the data declares. */
+.layer,
+.fxlayer {
+  /* Layers cross-fade when a step swaps them. Duration must track
+     LAYER_FADE in js/story.js. */
+  transition: opacity 700ms var(--ease);
+}
+
 .layer {
   position: absolute;
   overflow: hidden;
 }
+
+/* ---- page transition cover ---- */
+.transition {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 700ms var(--ease);
+}
+
+.transition.is-active { opacity: 1; }
 
 .fill {
   position: absolute;
@@ -57,6 +81,19 @@
   animation: fade-up 320ms var(--ease) 520ms both;
 }
 
+/* ---- dialogue with no bubble, for the pitch-dark beats ---- */
+.voice {
+  position: absolute;
+  font-size: 54px;
+  line-height: 1.24;
+  text-align: center;
+  text-shadow: 0 0 30px rgba(0, 0, 0, 0.95), 0 0 8px rgba(0, 0, 0, 0.8);
+  animation: fade-up 420ms var(--ease) 380ms both;
+}
+
+.voice--agni { color: #ffb066; }
+.voice--neel { color: #8fd0ff; }
+
 /* =========================================================
    Layer motion — one class per `fx` key in js/data/scenes.js
    ========================================================= */
@@ -71,6 +108,11 @@
 }
 .fx-breathe-slow { animation-duration: 5.6s; animation-delay: -1.4s; }
 
+.fx-grin {
+  transform-origin: 50% 100%;
+  animation: grin 1s var(--ease) both;
+}
+
 .fx-shiver { animation: shiver 220ms ease-in-out infinite alternate; }
 .fx-float  { animation: float 5s ease-in-out infinite; }
 
@@ -78,6 +120,10 @@
 
 .fx-drift      { animation: drift 22s ease-in-out infinite alternate; }
 .fx-drift-slow { animation: drift-slow 26s ease-in-out infinite alternate; }
+
+/* Mist coming up off the cobbles. Only the transform animates, so the layer
+   keeps the 67% opacity the design gives it. */
+.fx-mist-rise { animation: mist-rise 3.2s var(--ease) both; }
 
 /* Three frames of the same shot, hard-cut like the source video. */
 .fx-blink-1,
@@ -115,6 +161,13 @@
   50%      { transform: translateY(-9px) scale(1.008); }
 }
 
+@keyframes grin {
+  0%   { transform: scale(1) rotate(0); }
+  30%  { transform: scale(1.06) rotate(-1.8deg); }
+  62%  { transform: scale(1.02) rotate(1.2deg); }
+  100% { transform: scale(1) rotate(0); }
+}
+
 @keyframes shiver {
   from { transform: translateX(-3px) rotate(-0.25deg); }
   to   { transform: translateX(3px) rotate(0.25deg); }
@@ -141,6 +194,11 @@
   to   { transform: scale(1.06) translateX(30px); }
 }
 
+@keyframes mist-rise {
+  from { transform: translateY(180px) scaleX(1.06); }
+  to   { transform: translateY(0) scaleX(1.06); }
+}
+
 @keyframes blink-cycle {
   0%      { opacity: 1; }
   33.333% { opacity: 0; }
@@ -148,26 +206,157 @@
 }
 
 /* =========================================================
-   Blackout — the lights-out cut
+   Effect layers — the `kind` entries in js/data/scenes.js
    ========================================================= */
 
-.blackout {
-  position: absolute;
+.fxlayer { position: absolute; }
+
+/* Flat night, so a dark beat doesn't lean on the letterbox colour. */
+.fxlayer--night {
   inset: 0;
-  background: #000;
+  background: #04050c;
+}
+
+/* The lanterns going out from the far end in. The street recedes upwards, so
+   "far to near" is a soft-edged darkness falling down the frame — sliding a
+   gradient is interpolatable, where animating its colour stops is not. */
+.fxlayer--wave {
+  left: 0;
+  top: 0;
+  width: 1920px;
+  height: 2400px;
+  background: linear-gradient(
+    to bottom,
+    #04050c 0%,
+    #04050c 55%,
+    rgba(4, 5, 12, 0.6) 78%,
+    rgba(4, 5, 12, 0) 100%
+  );
+  transform: translateY(-2400px);
+  animation: wave-out 2s ease-in 400ms forwards;
+}
+
+/* The last lamp overhead: two flickers, then out for good. */
+.fxlayer--lamp-die {
+  inset: 0;
+  background: #04050c;
   opacity: 0;
-  pointer-events: none;
+  animation: lamp-die 1.4s ease-in-out 2.4s forwards;
 }
 
-.blackout.is-firing {
-  animation: blackout 1.15s ease-in-out both;
+/* A faint light blinking in a distant hiding place. */
+.fxlayer--glimmer {
+  width: 30px;
+  height: 30px;
+  margin: -15px 0 0 -15px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 216, 138, 0.95) 0%,
+    rgba(255, 180, 70, 0.42) 38%,
+    rgba(255, 170, 60, 0) 72%
+  );
+  opacity: 0;
+  animation: glimmer 4.2s ease-in-out infinite;
 }
 
-@keyframes blackout {
+.fxlayer--fireflies { inset: 0; }
+
+.firefly {
+  position: absolute;
+  left: -190px;
+  width: 135px;
+  height: 90px;
+  filter: drop-shadow(0 0 26px rgba(255, 214, 120, 0.9));
+  animation-name: fly-across;
+  animation-timing-function: ease-in-out;
+  animation-fill-mode: both;
+}
+
+@keyframes wave-out {
+  to { transform: translateY(0); }
+}
+
+@keyframes lamp-die {
   0%   { opacity: 0; }
-  22%  { opacity: 1; }
-  78%  { opacity: 1; }
-  100% { opacity: 0; }
+  18%  { opacity: 0.92; }
+  30%  { opacity: 0.12; }
+  46%  { opacity: 1; }
+  58%  { opacity: 0.22; }
+  100% { opacity: 1; }
+}
+
+@keyframes glimmer {
+  0%, 72%, 100% { opacity: 0; }
+  12%           { opacity: 0.85; }
+  30%           { opacity: 0.14; }
+  48%           { opacity: 0.7; }
+}
+
+@keyframes fly-across {
+  0%   { opacity: 0; transform: translate(0, 0) scale(0.7); }
+  15%  { opacity: 1; }
+  50%  { transform: translate(1150px, -110px) scale(1); }
+  85%  { opacity: 1; }
+  100% { opacity: 0; transform: translate(2260px, 60px) scale(0.75); }
+}
+
+/* =========================================================
+   Onomatopoeia
+   ========================================================= */
+
+.sfx {
+  position: absolute;
+  white-space: nowrap;
+  opacity: 0;
+}
+
+.sfx--pop {
+  font-size: 58px;
+  color: #ffd98a;
+  text-shadow: 0 0 34px rgba(255, 178, 56, 0.95), 0 4px 0 #8a3d0c;
+  animation: shout 800ms var(--ease) both;
+}
+
+.sfx--blink {
+  font-size: 40px;
+  color: #cfe3ff;
+  letter-spacing: 0.08em;
+  text-shadow: 0 0 24px rgba(140, 190, 255, 0.75);
+  animation: shout 900ms var(--ease) both;
+}
+
+@keyframes shout {
+  0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.4) rotate(-8deg); }
+  30%  { opacity: 1; transform: translate(-50%, -50%) scale(1.16) rotate(3deg); }
+  56%  { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(0); }
+  100% { opacity: 0; transform: translate(-50%, -66%) scale(0.95); }
+}
+
+/* Mr. Giggles is never shown — only heard crossing the frame. */
+.sfx-laugh {
+  position: absolute;
+  left: 0;
+  width: 1000px;
+  animation: laugh-across 2.6s linear both;
+}
+
+.sfx-laugh svg { overflow: visible; }
+
+.sfx-laugh text {
+  font-family: var(--font-display);
+  font-size: 68px;
+  fill: #ffe6a3;
+  paint-order: stroke;
+  stroke: rgba(52, 18, 0, 0.6);
+  stroke-width: 9px;
+}
+
+@keyframes laugh-across {
+  0%   { opacity: 0; transform: translateX(-1060px); }
+  12%  { opacity: 1; }
+  88%  { opacity: 1; }
+  100% { opacity: 0; transform: translateX(1960px); }
 }
 
 /* =========================================================
@@ -177,6 +366,8 @@
 .hud {
   position: absolute;
   inset: 0;
+  z-index: 5;
+  isolation: isolate;
   opacity: 0;
   pointer-events: none;
   transition: opacity var(--speed) var(--ease);
@@ -184,9 +375,11 @@
 
 .hud.is-active { opacity: 1; }
 
-/* A faded-out HUD must not keep swallowing clicks. */
-.hud.is-active .tap,
+/* A faded-out HUD must not keep swallowing clicks. Skip is offered throughout;
+   the stage-wide tap target only exists while a page is waiting to be turned,
+   so a stray tap mid-page cannot skip a line. */
 .hud.is-active .skip { pointer-events: auto; }
+.hud.is-waiting .tap { pointer-events: auto; }
 
 /* Whole-stage advance target; the chevron is just its visible hint. */
 .tap {
@@ -196,8 +389,11 @@
   cursor: pointer;
 }
 
+/* Shown three times in the chapter: once at the end of each page. */
 .tap__chevron {
   position: absolute;
+  opacity: 0;
+  visibility: hidden;
   right: 74px;
   bottom: 66px;
   width: 62px;
@@ -206,6 +402,12 @@
   background: rgba(253, 246, 230, 0.9);
   box-shadow: 0 0 0 10px rgba(253, 246, 230, 0.14);
   animation: nudge 1.6s ease-in-out infinite;
+  transition: opacity var(--speed-slow) var(--ease), visibility var(--speed-slow);
+}
+
+.hud.is-waiting .tap__chevron {
+  opacity: 1;
+  visibility: visible;
 }
 
 /* The chevron glyph itself */
@@ -232,7 +434,7 @@
   50%      { transform: translateX(12px); }
 }
 
-/* ---- narration caption for the wordless beats ---- */
+/* ---- narration ---- */
 .beat {
   position: absolute;
   left: 50%;
@@ -256,11 +458,11 @@
 .beat:empty { opacity: 0; }
 
 /* ---- skip ---- */
-/* Bottom-left: the only corner no scene puts art or a bubble in. */
+/* Paired with the sound toggle in the bottom-left, which no scene paints in. */
 .skip {
   position: absolute;
   bottom: 62px;
-  left: 74px;
+  left: 176px;
   z-index: 2;
   padding: 14px 34px;
   border-radius: 999px;
@@ -285,14 +487,14 @@
   bottom: 34px;
   z-index: 2;
   display: flex;
-  gap: 14px;
+  gap: 12px;
   transform: translateX(-50%);
   pointer-events: none;
 }
 
 .dots li {
-  width: 14px;
-  height: 14px;
+  width: 13px;
+  height: 13px;
   border-radius: 50%;
   background: rgba(253, 246, 230, 0.28);
   transition: background var(--speed) var(--ease), transform var(--speed) var(--ease);
@@ -304,6 +506,66 @@
 }
 
 /* =========================================================
+   Sound toggle — above the loader and end card, so it is always reachable
+   ========================================================= */
+
+/* Bottom-left with Skip: the top corners carry the firefly prop on the
+   Screen 4 beats and a speech bubble on 1.3 / 4.1 / 4.2. */
+.sound {
+  position: absolute;
+  bottom: 52px;
+  left: 74px;
+  z-index: 8;
+  width: 74px;
+  height: 74px;
+  border-radius: 50%;
+  border: 3px solid rgba(253, 246, 230, 0.4);
+  background: rgba(8, 10, 22, 0.55);
+  backdrop-filter: blur(6px);
+  display: grid;
+  place-items: center;
+  transition: border-color var(--speed) var(--ease), background var(--speed) var(--ease);
+}
+
+.sound:hover,
+.sound:focus-visible {
+  border-color: var(--ember);
+  background: rgba(8, 10, 22, 0.8);
+  outline: none;
+}
+
+.sound__icon {
+  width: 38px;
+  height: 38px;
+}
+
+.sound__cone { fill: var(--paper); }
+
+.sound__wave {
+  fill: none;
+  stroke: var(--paper);
+  stroke-width: 2;
+  stroke-linecap: round;
+  transition: opacity var(--speed) var(--ease);
+}
+
+/* Drawn as a dashed line so it can wipe in rather than just appear. */
+.sound__slash {
+  fill: none;
+  stroke: var(--ember);
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-dasharray: 22;
+  stroke-dashoffset: 22;
+  transition: stroke-dashoffset var(--speed) var(--ease);
+}
+
+.sound.is-off .sound__wave { opacity: 0; }
+.sound.is-off .sound__slash { stroke-dashoffset: 0; }
+
+.sound:disabled { opacity: 0.35; }
+
+/* =========================================================
    Loader + end card (shared cover styling)
    ========================================================= */
 
@@ -311,7 +573,7 @@
 .endcard {
   position: absolute;
   inset: 0;
-  z-index: 5;
+  z-index: 7;
   display: grid;
   place-content: center;
   justify-items: center;
@@ -403,7 +665,9 @@
 }
 
 /* =========================================================
-   Reduced motion — keep the story, drop the idling
+   Reduced motion — keep the story, drop the idling.
+   The scripted beats (mist, blackout, laugh, fireflies) still play,
+   because they are the story rather than decoration.
    ========================================================= */
 
 @media (prefers-reduced-motion: reduce) {
@@ -414,16 +678,20 @@
   .fx-flicker,
   .fx-drift,
   .fx-drift-slow,
+  .fx-grin,
   .tap__chevron {
     animation: none;
   }
 
   .say__bubble,
   .say__text,
+  .voice,
   .fx-walk-in-left,
   .fx-walk-in-right {
     animation-duration: 1ms;
   }
 
-  .scene { transition-duration: 160ms; }
+  .layer,
+  .fxlayer,
+  .transition { transition-duration: 160ms; }
 }

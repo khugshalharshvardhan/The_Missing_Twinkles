@@ -1,159 +1,305 @@
-// Story beats, transcribed from Figma › Mystry › Story (node 98:269).
+// Chapter 1 as three pages, built from the story script and the Figma frames
+// (Mystry › Story, node 98:269).
+//
+//   Page 1  Figma 1.1 + 1.2 + 1.3   the walk, the cake, the grin
+//   Page 2  Figma 2.1 -> 3          the mist, the lanterns, the dark, the eyes
+//   Page 3  Figma 4.2 + 4.3         Agni's spark and the call to adventure
+//
+// A page owns a background that stays put. Its `steps` are the moments inside
+// it, and they play themselves: every step carries a `hold` (run for N ms, then
+// move on) except the one that closes the page, which carries `reveal` instead
+// (wait for the reader, and fade the chevron in after N ms, once the line has
+// landed). That is why the chevron appears exactly three times.
+//
+// Each step lists only the layers it needs, and the player diffs them by `key`,
+// so a layer present in consecutive steps is never rebuilt — the street does
+// not re-fade under the dialogue, and the ghost keeps drifting across a step
+// change.
 //
 // Every x / y / w / h is a literal Figma coordinate inside the 1920 x 1080
 // frame, so the stage can be scaled as one unit (see stage.js) and the layout
-// stays pixel-faithful to the design. Boxes are free to run off the frame —
-// the stage clips them, exactly as Figma clips them.
+// stays pixel-faithful. Boxes may run off the frame — the stage clips them,
+// exactly as Figma clips them.
 //
 // A layer is:
+//   key      identity across steps; a changed key cross-fades, a kept one does not
 //   src      the image fill (Figma's own source art, so alpha survives)
 //   x y w h  the layer box, in frame coordinates
-//   fill     Figma's crop transform for the fill, when it has one. Without it
-//            the fill covers the box, which is what Figma's "fill" mode does.
+//   fill     Figma's crop transform, when the fill has one. Without it the
+//            fill covers the box, which is what Figma's "fill" mode does.
 //   flipX    the fill is mirrored in the design
-//   opacity  layer opacity
+//   opacity  layer opacity — only honoured alongside `fx`, since a plain
+//            layer's fade-in animation would override it
 //   fx       motion hook -> .fx-* in css/story.css
+// ...or an effect, keyed by `kind` (see effect() in story.js).
 
 const IMG = "assets/images/";
 
-export const scenes = [
-  // ---- Screen 1.1 — the town, still lit, nobody about yet (98:270) ----
-  {
-    id: "1.1",
-    beat: "The lamps are still burning on Cupcake Lane.",
-    layers: [
-      { src: `${IMG}bg_town_lit.jpg`, x: 0, y: 0, w: 1920, h: 1080 }
-    ]
-  },
+/* ---- shared marks ---------------------------------------------------- */
 
-  // ---- Screen 1.2 — Agni and Neel stroll in (98:275) ----
-  {
-    id: "1.2",
-    layers: [
-      { src: `${IMG}bg_town_lit.jpg`, x: 0, y: 0, w: 1920, h: 1080 },
-      {
-        src: `${IMG}agni_walking.png`, x: 380, y: 442, w: 460, h: 539,
-        fill: { left: "-22.65%", top: "0%", width: "175.74%", height: "100%" },
-        fx: "walk-in-left"
-      },
-      {
-        src: `${IMG}neel_walking.png`, x: 866, y: 399, w: 506, h: 625,
-        fill: { left: "-18.23%", top: "-7.68%", width: "158.39%", height: "114.08%" },
-        fx: "walk-in-right"
-      }
-    ],
-    say: {
-      bubble: { src: `${IMG}bubble_neel.png`, x: 732, y: 182, w: 420, h: 226, flipX: true },
-      text:   { x: 777, y: 224, w: 342 },
-      lines:  ["Mmm…", "do I smell cake?"]
-    }
-  },
+const TOWN_LIT = { key: "bg-lit", src: `${IMG}bg_town_lit.jpg`, x: 0, y: 0, w: 1920, h: 1080 };
+const TOWN_DARK = { key: "bg-dark", src: `${IMG}bg_town_dark.jpg`, x: 0, y: 0, w: 1920, h: 1080 };
 
-  // ---- Screen 1.3 — Agni is unimpressed (98:282) ----
-  {
-    id: "1.3",
-    layers: [
-      { src: `${IMG}bg_town_lit.jpg`, x: 0, y: 0, w: 1920, h: 1080 },
-      {
-        src: `${IMG}neel_cheeky.png`, x: 908, y: 371, w: 472, h: 622,
-        fill: { left: "-16.4%", top: "-0.06%", width: "126.88%", height: "100.13%" },
-        fx: "breathe-slow"
-      },
-      { src: `${IMG}agni_talking.png`, x: 358, y: 443, w: 550, h: 557, fx: "breathe" }
-    ],
-    say: {
-      bubble: { src: `${IMG}bubble_agni.png`, x: 128, y: 190, w: 586, h: 294, flipX: true },
-      text:   { x: 179, y: 265.95, w: 482 },
-      lines:  ["Oh, come on. You just", "had a cookie!"]
-    }
-  },
+const AGNI_WALKING = {
+  key: "agni-walk", src: `${IMG}agni_walking.png`, x: 380, y: 442, w: 460, h: 539,
+  fill: { left: "-22.65%", top: "0%", width: "175.74%", height: "100%" }
+};
 
-  // ---- Screen 2.1 — mist creeps up the lane (98:289) ----
-  {
-    id: "2.1",
-    beat: "Something cold rolls in off the hills.",
-    layers: [
-      { src: `${IMG}bg_town_moonlit.jpg`, x: 0, y: 0, w: 1920, h: 1080 },
-      { src: `${IMG}agni_looking_down.png`, x: 297, y: 461, w: 613, h: 566, fx: "breathe" },
-      {
-        src: `${IMG}neel_scared.png`, x: 945, y: 403, w: 489, h: 624,
-        fill: { left: "-15.02%", top: "0%", width: "152.56%", height: "104.64%" },
-        fx: "shiver"
-      },
-      { src: `${IMG}mist_band.png`, x: 0, y: 510, w: 1920, h: 640, opacity: 0.67, fx: "drift" }
-    ]
-  },
+const NEEL_WALKING = {
+  key: "neel-walk", src: `${IMG}neel_walking.png`, x: 866, y: 399, w: 506, h: 625,
+  fill: { left: "-18.23%", top: "-7.68%", width: "158.39%", height: "114.08%" }
+};
 
-  // ---- Screen 2.2 — the mist swallows the street (98:295) ----
-  {
-    id: "2.2",
-    beat: "…and it keeps on rising.",
-    layers: [
-      { src: `${IMG}bg_mist_full.jpg`, x: 0, y: 0, w: 1920, h: 1080, fx: "drift-slow" }
-    ]
-  },
+const NEEL_CHEEKY = {
+  key: "neel-cheeky", src: `${IMG}neel_cheeky.png`, x: 908, y: 371, w: 472, h: 622,
+  fill: { left: "-16.4%", top: "-0.06%", width: "126.88%", height: "100.13%" }
+};
 
-  // ---- Screens 2.3 / 2.4 / 3 — lights out (98:298, 98:300, 98:302) ----
-  // Three frames of the same blinking-eyes shot, so they play as one beat
-  // instead of three near-identical clicks.
-  {
-    id: "3",
-    beat: "Every lamp goes out at once.",
-    enter: "blackout",
-    layers: [
-      { src: `${IMG}eyes_1.png`, x: 0, y: 0, w: 1920, h: 1080, fx: "blink-1" },
-      { src: `${IMG}eyes_2.png`, x: 0, y: 0, w: 1920, h: 1080, fx: "blink-2" },
-      { src: `${IMG}eyes_3.png`, x: 0, y: 0, w: 1920, h: 1080, fx: "blink-3" }
-    ]
-  },
+const AGNI_TALKING = {
+  key: "agni-talk", src: `${IMG}agni_talking.png`, x: 358, y: 443, w: 550, h: 557
+};
 
-  // ---- Screen 4.2 — Agni works out what happened (98:314) ----
-  {
-    id: "4.2",
-    layers: [
-      { src: `${IMG}bg_town_dark.jpg`, x: 0, y: 0, w: 1920, h: 1080 },
-      { src: `${IMG}scene_shock.png`, x: 239, y: 191, w: 1276, h: 851, fx: "breathe" },
-      { src: `${IMG}ghost.png`, x: -113, y: 487, w: 271, h: 181, fx: "float" },
-      { src: `${IMG}firefly.png`, x: 1787, y: 48, w: 135, h: 90, fx: "flicker" },
-      {
-        src: `${IMG}berry.png`, x: 1874, y: 758, w: 62, h: 55,
-        fill: { left: "-22.76%", top: "-3.04%", width: "143.72%", height: "108.51%" },
-        fx: "float"
-      }
-    ],
-    say: {
-      bubble: { src: `${IMG}bubble_agni.png`, x: 118, y: 96, w: 586, h: 294, flipX: true },
-      text:   { x: 169, y: 171.95, w: 482 },
-      lines:  ["Mr. Giggles has scared", "the little light-keepers!"]
-    }
-  },
+// The three eye frames are one shot, hard-cut like the source video.
+const EYES = [
+  { key: "eyes-1", src: `${IMG}eyes_1.png`, x: 0, y: 0, w: 1920, h: 1080, fx: "blink-1" },
+  { key: "eyes-2", src: `${IMG}eyes_2.png`, x: 0, y: 0, w: 1920, h: 1080, fx: "blink-2" },
+  { key: "eyes-3", src: `${IMG}eyes_3.png`, x: 0, y: 0, w: 1920, h: 1080, fx: "blink-3" }
+];
 
-  // ---- Screen 4.3 — the call to adventure (98:304) ----
+const NIGHT_PROPS = [
+  { key: "ghost", src: `${IMG}ghost.png`, x: -113, y: 487, w: 271, h: 181, fx: "float" },
+  { key: "firefly", src: `${IMG}firefly.png`, x: 1787, y: 48, w: 135, h: 90, fx: "flicker" },
   {
-    id: "4.3",
-    layers: [
-      { src: `${IMG}bg_town_dark.jpg`, x: 0, y: 0, w: 1920, h: 1080 },
-      { src: `${IMG}scene_cheer.png`, x: 273, y: 241, w: 1258, h: 839, fx: "breathe" },
-      { src: `${IMG}ghost.png`, x: -113, y: 487, w: 271, h: 181, fx: "float" },
-      { src: `${IMG}firefly.png`, x: 1787, y: 48, w: 135, h: 90, fx: "flicker" },
-      {
-        src: `${IMG}berry.png`, x: 1874, y: 758, w: 62, h: 55,
-        fill: { left: "-22.76%", top: "-3.04%", width: "143.72%", height: "108.51%" },
-        fx: "float"
-      }
-    ],
-    say: {
-      bubble: { src: `${IMG}bubble_agni.png`, x: 54, y: 78, w: 606, h: 326, flipX: true },
-      text:   { x: 117, y: 169, w: 481 },
-      lines:  ["Let us find them and", "light the town again!"]
-    }
+    key: "berry", src: `${IMG}berry.png`, x: 1874, y: 758, w: 62, h: 55,
+    fill: { left: "-22.76%", top: "-3.04%", width: "143.72%", height: "108.51%" },
+    fx: "float"
   }
 ];
 
+// "Very faint lights blink in distant hiding places" — clear of the characters
+// and of the props above, so they read as far away.
+const GLIMMERS = [
+  { key: "glim-1", kind: "glimmer", x: 1640, y: 430, delay: 0 },
+  { key: "glim-2", kind: "glimmer", x: 1700, y: 690, delay: 900 },
+  { key: "glim-3", kind: "glimmer", x: 210, y: 300, delay: 1700 },
+  { key: "glim-4", kind: "glimmer", x: 95, y: 880, delay: 2600 },
+  { key: "glim-5", kind: "glimmer", x: 1500, y: 220, delay: 3400 }
+];
+
+const BUBBLE_NEEL = { src: `${IMG}bubble_neel.png`, x: 732, y: 182, w: 420, h: 226, flipX: true };
+
+/* ---- the pages ------------------------------------------------------- */
+
+export const pages = [
+  {
+    id: "page-1",
+    name: "Cupcake Lane",
+    // The lit street is painted once and stays for the whole page.
+    layers: [TOWN_LIT],
+    steps: [
+      // Figma 1.1 — the lane before anyone walks into it.
+      { id: "1.0", hold: 2200, layers: [] },
+
+      // Figma 1.2 — they stroll in.
+      {
+        id: "1.1",
+        beat: "Agni and Neil were taking a walk.",
+        hold: 3000,
+        layers: [
+          { ...AGNI_WALKING, fx: "walk-in-left" },
+          { ...NEEL_WALKING, fx: "walk-in-right" }
+        ]
+      },
+
+      // Neel catches the bakery on the air.
+      {
+        id: "1.2",
+        hold: 3800, // "do I smell cake?" ends at 2.58s
+        layers: [
+          { ...AGNI_WALKING, fx: "breathe" },
+          { ...NEEL_WALKING, fx: "breathe-slow" }
+        ],
+        say: {
+          bubble: BUBBLE_NEEL,
+          text: { x: 777, y: 224, w: 342 },
+          lines: ["Mmm…", "do I smell cake?"]
+        }
+      },
+
+      // Figma 1.3 — Agni is unimpressed. The pair changes mark, so these
+      // cross-fade over the same street.
+      {
+        id: "1.3",
+        hold: 4900, // "…had a cookie!" ends at 3.68s
+        layers: [
+          { ...NEEL_CHEEKY, fx: "breathe-slow" },
+          { ...AGNI_TALKING, fx: "breathe" }
+        ],
+        say: {
+          bubble: { src: `${IMG}bubble_agni.png`, x: 128, y: 190, w: 586, h: 294, flipX: true },
+          text: { x: 179, y: 265.95, w: 482 },
+          lines: ["Oh, come on. You just", "had a cookie!"]
+        }
+      },
+
+      // …and Neil is unrepentant.
+      {
+        // Last step of the page: waits for the reader, chevron in at 2.1s.
+        id: "1.4",
+        beat: "Neil just grins.",
+        reveal: 2100,
+        layers: [
+          { ...NEEL_CHEEKY, fx: "grin" },
+          { ...AGNI_TALKING, fx: "breathe" }
+        ]
+      }
+    ]
+  },
+
+  {
+    id: "page-2",
+    name: "Lights Out",
+    // This page travels from a moonlit street to pitch dark, so the backdrop
+    // belongs to the steps rather than to the page.
+    layers: [],
+    steps: [
+      // Figma 2.1 — mist at their feet.
+      {
+        id: "2.1",
+        hold: 4400, // lets the mist finish rising
+        layers: [
+          { key: "bg-moonlit", src: `${IMG}bg_town_moonlit.jpg`, x: 0, y: 0, w: 1920, h: 1080 },
+          { key: "agni-down", src: `${IMG}agni_looking_down.png`, x: 297, y: 461, w: 613, h: 566, fx: "breathe" },
+          {
+            key: "neel-scared", src: `${IMG}neel_scared.png`, x: 945, y: 403, w: 489, h: 624,
+            fill: { left: "-15.02%", top: "0%", width: "152.56%", height: "104.64%" },
+            fx: "shiver"
+          },
+          { key: "mist-band", src: `${IMG}mist_band.png`, x: 0, y: 510, w: 1920, h: 640, opacity: 0.67, fx: "mist-rise" }
+        ],
+        say: {
+          bubble: BUBBLE_NEEL,
+          text: { x: 777, y: 265, w: 342 },
+          lines: ["What was that?"]
+        }
+      },
+
+      // Figma 2.2 — the mist rushes the street and the lanterns go out from
+      // the far end in, then the last one flickers and dies.
+      {
+        id: "2.2",
+        hold: 6400,
+        layers: [
+          { key: "bg-mist", src: `${IMG}bg_mist_full.jpg`, x: 0, y: 0, w: 1920, h: 1080, fx: "drift-slow" },
+          { key: "wave", kind: "wave" },
+          { key: "lamp-die", kind: "lamp-die" }
+        ],
+        sfx: [
+          { kind: "pop", x: 960, y: 575, text: "POP!", delay: 800 },
+          { kind: "pop", x: 880, y: 590, text: "POP!", delay: 1200 },
+          { kind: "pop", x: 600, y: 530, text: "POP!", delay: 1600 },
+          { kind: "pop", x: 300, y: 350, text: "POP!", delay: 2000 },
+          { kind: "laugh", y: 300, text: "Hee-hee-hee-hee!", delay: 3700 }
+        ]
+      },
+
+      // Figma 2.3 / 2.4 / 3 — pitch dark, two pairs of eyes. A bubble would
+      // light the frame, so these lines are spoken in each character's colour.
+      {
+        id: "3.1",
+        hold: 3800, // "Neil?" then both BLINK!s
+        layers: [{ key: "night", kind: "night" }, ...EYES],
+        voices: [{ x: 355, y: 700, w: 400, tone: "agni", text: "Neil?" }],
+        sfx: [
+          { kind: "blink", x: 330, y: 450, text: "BLINK!", delay: 700 },
+          { kind: "blink", x: 1490, y: 400, text: "BLINK!", delay: 1900 }
+        ]
+      },
+
+      {
+        id: "3.2",
+        hold: 3600, // "I am here… I think."
+        layers: [{ key: "night", kind: "night" }, ...EYES],
+        voices: [{ x: 1040, y: 690, w: 560, tone: "neel", text: "I am here… I think." }],
+        sfx: [{ kind: "blink", x: 1490, y: 400, text: "BLINK!", delay: 900 }]
+      },
+
+      // The laugh crosses the top edge without ever showing him.
+      {
+        // Last step of the page: chevron in once the laugh has crossed.
+        id: "3.3",
+        reveal: 3400,
+        layers: [{ key: "night", kind: "night" }, ...EYES],
+        sfx: [{ kind: "laugh", y: 40, text: "Hee-hee-hee-hee!", delay: 600 }]
+      }
+    ]
+  },
+
+  {
+    id: "page-3",
+    name: "The Light-Keepers",
+    // Fireflies carry us out of the dark and into the last page.
+    enter: { id: "3.4", fx: "fireflies", hold: 2800 },
+    // Street, distant glimmers and the off-frame props all persist, so nothing
+    // restarts between Agni's two lines.
+    layers: [TOWN_DARK, ...GLIMMERS, ...NIGHT_PROPS],
+    steps: [
+      // Figma 4.2 — Agni's spark picks out the two of them.
+      {
+        id: "4.1",
+        hold: 5200, // "…the little light-keepers!" ends at 4.02s
+        layers: [{ key: "cast-shock", src: `${IMG}scene_shock.png`, x: 239, y: 191, w: 1276, h: 851, fx: "breathe" }],
+        say: {
+          bubble: { src: `${IMG}bubble_agni.png`, x: 118, y: 96, w: 586, h: 294, flipX: true },
+          text: { x: 169, y: 153, w: 482 },
+          lines: ["I think Mr. Giggles", "has scared the little", "light-keepers!"]
+        }
+      },
+
+      // Figma 4.3 — the call to adventure.
+      {
+        // Last step of the chapter: chevron in, then the end card.
+        id: "4.2",
+        reveal: 3100,
+        layers: [{ key: "cast-cheer", src: `${IMG}scene_cheer.png`, x: 273, y: 241, w: 1258, h: 839, fx: "breathe" }],
+        say: {
+          bubble: { src: `${IMG}bubble_agni.png`, x: 54, y: 78, w: 606, h: 326, flipX: true },
+          text: { x: 117, y: 169, w: 481 },
+          lines: ["Let us find them and", "light the town again!"]
+        }
+      }
+    ]
+  }
+];
+
+// Flat list of every step, in order, so the player can walk the chapter and
+// still know which page each step belongs to.
+export const timeline = pages.flatMap((page, p) =>
+  page.steps.map((step, s) => ({
+    page,
+    step,
+    p,
+    s,
+    first: s === 0,
+    // Only a page's closing step waits for the reader, which is why the
+    // chevron appears exactly three times.
+    last: s === page.steps.length - 1
+  }))
+);
+
 // Everything the story needs on screen, in one list, for the preloader.
 export const manifest = [
-  ...new Set(scenes.flatMap((scene) => [
-    ...scene.layers.map((layer) => layer.src),
-    ...(scene.say ? [scene.say.bubble.src] : [])
-  ]))
+  ...new Set(
+    pages.flatMap((page) => [
+      ...page.layers,
+      ...page.steps.flatMap((step) => [
+        ...step.layers,
+        ...(step.say ? [step.say.bubble] : [])
+      ])
+    ])
+      .filter((layer) => layer.src)
+      .map((layer) => layer.src)
+      // Built at runtime by the firefly transition.
+      .concat(`${IMG}firefly.png`)
+  )
 ];

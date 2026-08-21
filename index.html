@@ -20,12 +20,15 @@
   <div id="viewport">
     <div id="stage">
 
-      <!-- Story scenes are built from js/data/scenes.js -->
-      <div class="scene" id="scene-a"></div>
-      <div class="scene" id="scene-b"></div>
+      <!-- Three pages, built from js/data/scenes.js. Layers persist across the
+           steps within a page; overlays are rebuilt each step. -->
+      <div class="scene">
+        <div class="layers" id="layers"></div>
+        <div class="overlays" id="overlays"></div>
+      </div>
 
-      <!-- Wipes to black for the lights-out beat -->
-      <div class="blackout" id="blackout"></div>
+      <!-- Covers a page change — the fireflies out of the dark -->
+      <div class="transition" id="transition"></div>
 
       <!-- ===== HUD ===== -->
       <div class="hud" id="hud">
@@ -38,6 +41,17 @@
         <button class="skip" data-action="skip">Skip</button>
         <ol class="dots" id="dots" aria-hidden="true"></ol>
       </div>
+
+      <!-- Sound toggle sits above the loader and end card so it is always
+           reachable, not just during the story. -->
+      <button class="sound" id="sound" data-action="sound" aria-pressed="true" aria-label="Turn sound off">
+        <svg class="sound__icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path class="sound__cone" d="M3.4 9h3.4l4.9-4v14l-4.9-4H3.4z" />
+          <path class="sound__wave" d="M15.4 9.3a3.9 3.9 0 0 1 0 5.4" />
+          <path class="sound__wave" d="M18.1 6.7a7.6 7.6 0 0 1 0 10.6" />
+          <path class="sound__slash" d="M4.6 19.4 19.4 4.6" />
+        </svg>
+      </button>
 
       <!-- ===== Loader ===== -->
       <div class="loader is-active" id="loader">
