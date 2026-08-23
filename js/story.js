@@ -549,7 +549,7 @@ function effect(layer) {
 
       const fly = document.createElement("img");
       fly.className = "firefly";
-      fly.src = "assets/images/firefly.png";
+      fly.src = "assets/images/firefly.webp";
       fly.alt = "";
       fly.style.top = `${FLIGHT_TOP}px`;
       el.append(fly);

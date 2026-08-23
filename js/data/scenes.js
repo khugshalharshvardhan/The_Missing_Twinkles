@@ -42,47 +42,47 @@ const IMG = "assets/images/";
 
 /* ---- shared marks ---------------------------------------------------- */
 
-const TOWN_LIT = { key: "bg-lit", src: `${IMG}bg_town_lit.jpg`, x: 0, y: 0, w: 1920, h: 1080 };
-const TOWN_DARK = { key: "bg-dark", src: `${IMG}bg_town_dark.jpg`, x: 0, y: 0, w: 1920, h: 1080 };
+const TOWN_LIT = { key: "bg-lit", src: `${IMG}bg_town_lit.webp`, x: 0, y: 0, w: 1920, h: 1080 };
+const TOWN_DARK = { key: "bg-dark", src: `${IMG}bg_town_dark.webp`, x: 0, y: 0, w: 1920, h: 1080 };
 
 const AGNI_WALKING = {
-  key: "agni", src: `${IMG}agni_walking.png`, x: 380, y: 442, w: 460, h: 539,
+  key: "agni", src: `${IMG}agni_walking.webp`, x: 380, y: 442, w: 460, h: 539,
   fill: { left: "-22.65%", top: "0%", width: "175.74%", height: "100%" }
 };
 
 // Figma Screen 1.1 › neel_walking (124:2). The art is trimmed to the box's own
 // aspect, so the fill covers it exactly and needs no crop transform.
 const NEEL_WALKING = {
-  key: "neel", src: `${IMG}neel_walking.png`, x: 835, y: 388, w: 510, h: 627
+  key: "neel", src: `${IMG}neel_walking.webp`, x: 835, y: 388, w: 510, h: 627
 };
 
 // Figma-matched mark for the walking box's centre (1090) and ground line
 // (1015), so the pose change reads as a reaction rather than a reposition.
 const NEEL_SMELLING = {
-  key: "neel", src: `${IMG}neel_smelling.png`, x: 836, y: 388, w: 508, h: 627
+  key: "neel", src: `${IMG}neel_smelling.webp`, x: 836, y: 388, w: 508, h: 627
 };
 
 const NEEL_CHEEKY = {
-  key: "neel", src: `${IMG}neel_cheeky.png`, x: 908, y: 371, w: 472, h: 622,
+  key: "neel", src: `${IMG}neel_cheeky.webp`, x: 908, y: 371, w: 472, h: 622,
   fill: { left: "-16.4%", top: "-0.06%", width: "126.88%", height: "100.13%" }
 };
 
 const AGNI_TALKING = {
-  key: "agni", src: `${IMG}agni_talking.png`, x: 358, y: 443, w: 550, h: 557
+  key: "agni", src: `${IMG}agni_talking.webp`, x: 358, y: 443, w: 550, h: 557
 };
 
 // The three eye frames are one shot, hard-cut like the source video.
 const EYES = [
-  { key: "eyes-1", src: `${IMG}eyes_1.png`, x: 0, y: 0, w: 1920, h: 1080, fx: "blink-1" },
-  { key: "eyes-2", src: `${IMG}eyes_2.png`, x: 0, y: 0, w: 1920, h: 1080, fx: "blink-2" },
-  { key: "eyes-3", src: `${IMG}eyes_3.png`, x: 0, y: 0, w: 1920, h: 1080, fx: "blink-3" }
+  { key: "eyes-1", src: `${IMG}eyes_1.webp`, x: 0, y: 0, w: 1920, h: 1080, fx: "blink-1" },
+  { key: "eyes-2", src: `${IMG}eyes_2.webp`, x: 0, y: 0, w: 1920, h: 1080, fx: "blink-2" },
+  { key: "eyes-3", src: `${IMG}eyes_3.webp`, x: 0, y: 0, w: 1920, h: 1080, fx: "blink-3" }
 ];
 
 const NIGHT_PROPS = [
-  { key: "ghost", src: `${IMG}ghost.png`, x: -113, y: 487, w: 271, h: 181, fx: "float" },
-  { key: "firefly", src: `${IMG}firefly.png`, x: 1787, y: 48, w: 135, h: 90, fx: "flicker" },
+  { key: "ghost", src: `${IMG}ghost.webp`, x: -113, y: 487, w: 271, h: 181, fx: "float" },
+  { key: "firefly", src: `${IMG}firefly.webp`, x: 1787, y: 48, w: 135, h: 90, fx: "flicker" },
   {
-    key: "berry", src: `${IMG}berry.png`, x: 1874, y: 758, w: 62, h: 55,
+    key: "berry", src: `${IMG}berry.webp`, x: 1874, y: 758, w: 62, h: 55,
     fill: { left: "-22.76%", top: "-3.04%", width: "143.72%", height: "108.51%" },
     fx: "float"
   }
@@ -120,7 +120,7 @@ const AROMA = {
   ]
 };
 
-const BUBBLE_NEEL = { src: `${IMG}bubble_neel.png`, x: 732, y: 182, w: 420, h: 226, flipX: true };
+const BUBBLE_NEEL = { src: `${IMG}bubble_neel.webp`, x: 732, y: 182, w: 420, h: 226, flipX: true };
 
 /* ---- the pages ------------------------------------------------------- */
 
@@ -164,7 +164,7 @@ export const pages = [
         hold: 3800, // "…had a cookie!" ends at 3.68s — his pose turns on that beat
         layers: [NEEL_SMELLING, AGNI_TALKING],
         say: {
-          bubble: { src: `${IMG}bubble_agni.png`, x: 128, y: 190, w: 586, h: 294, flipX: true },
+          bubble: { src: `${IMG}bubble_agni.webp`, x: 128, y: 190, w: 586, h: 294, flipX: true },
           text: { x: 179, y: 265.95, w: 482 },
           lines: ["Oh, come on. You just", "had a cookie!"]
         }
@@ -193,14 +193,14 @@ export const pages = [
         id: "2.1",
         hold: 4400, // lets the mist finish rising
         layers: [
-          { key: "bg-moonlit", src: `${IMG}bg_town_moonlit.jpg`, x: 0, y: 0, w: 1920, h: 1080 },
-          { key: "agni", src: `${IMG}agni_looking_down.png`, x: 297, y: 461, w: 613, h: 566 },
+          { key: "bg-moonlit", src: `${IMG}bg_town_moonlit.webp`, x: 0, y: 0, w: 1920, h: 1080 },
+          { key: "agni", src: `${IMG}agni_looking_down.webp`, x: 297, y: 461, w: 613, h: 566 },
           {
-            key: "neel", src: `${IMG}neel_scared.png`, x: 945, y: 403, w: 489, h: 624,
+            key: "neel", src: `${IMG}neel_scared.webp`, x: 945, y: 403, w: 489, h: 624,
             fill: { left: "-15.02%", top: "0%", width: "152.56%", height: "104.64%" },
             fx: "shiver"
           },
-          { key: "mist-band", src: `${IMG}mist_band.png`, x: 0, y: 510, w: 1920, h: 640, opacity: 0.67, fx: "mist-rise" }
+          { key: "mist-band", src: `${IMG}mist_band.webp`, x: 0, y: 510, w: 1920, h: 640, opacity: 0.67, fx: "mist-rise" }
         ],
         say: {
           bubble: BUBBLE_NEEL,
@@ -215,7 +215,7 @@ export const pages = [
         id: "2.2",
         hold: 6400,
         layers: [
-          { key: "bg-mist", src: `${IMG}bg_mist_full.jpg`, x: 0, y: 0, w: 1920, h: 1080, fx: "drift-slow" },
+          { key: "bg-mist", src: `${IMG}bg_mist_full.webp`, x: 0, y: 0, w: 1920, h: 1080, fx: "drift-slow" },
           { key: "wave", kind: "wave" },
           { key: "lamp-die", kind: "lamp-die" }
         ]
@@ -262,9 +262,9 @@ export const pages = [
       {
         id: "4.1",
         hold: 5200, // "…the little light-keepers!" ends at 4.02s
-        layers: [{ key: "cast", src: `${IMG}scene_shock.png`, x: 239, y: 191, w: 1276, h: 851 }],
+        layers: [{ key: "cast", src: `${IMG}scene_shock.webp`, x: 239, y: 191, w: 1276, h: 851 }],
         say: {
-          bubble: { src: `${IMG}bubble_agni.png`, x: 118, y: 96, w: 586, h: 294, flipX: true },
+          bubble: { src: `${IMG}bubble_agni.webp`, x: 118, y: 96, w: 586, h: 294, flipX: true },
           text: { x: 169, y: 153, w: 482 },
           lines: ["I think Mr. Giggles", "has scared the little", "light-keepers!"]
         }
@@ -275,9 +275,9 @@ export const pages = [
         // Last step of the chapter: chevron in, then the end card.
         id: "4.2",
         reveal: 3100,
-        layers: [{ key: "cast", src: `${IMG}scene_cheer.png`, x: 273, y: 241, w: 1258, h: 839 }],
+        layers: [{ key: "cast", src: `${IMG}scene_cheer.webp`, x: 273, y: 241, w: 1258, h: 839 }],
         say: {
-          bubble: { src: `${IMG}bubble_agni.png`, x: 54, y: 78, w: 606, h: 326, flipX: true },
+          bubble: { src: `${IMG}bubble_agni.webp`, x: 54, y: 78, w: 606, h: 326, flipX: true },
           text: { x: 117, y: 169, w: 481 },
           lines: ["Let us find them and", "light the town again!"]
         }
@@ -314,6 +314,6 @@ export const manifest = [
       .filter((layer) => layer.src)
       .map((layer) => layer.src)
       // Built at runtime by the firefly transition.
-      .concat(`${IMG}firefly.png`)
+      .concat(`${IMG}firefly.webp`)
   )
 ];

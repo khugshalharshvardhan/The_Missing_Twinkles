@@ -24,8 +24,8 @@ const THICK = 420; // sit in the thick of it while the acts change underneath
 // Resolves once the mist is opaque enough to work behind.
 export function closeMist() {
   host.replaceChildren(
-    mistLayer(`${IMG}bg_mist_full.jpg`, "handoff__wall"),
-    mistLayer(`${IMG}mist_band.png`, "handoff__band")
+    mistLayer(`${IMG}bg_mist_full.webp`, "handoff__wall"),
+    mistLayer(`${IMG}mist_band.webp`, "handoff__band")
   );
 
   // Let the browser see opacity 0 with the layers in place, so the fade has
