@@ -351,6 +351,50 @@
   pointer-events: none;
 }
 
+/* ---- the last page is dark ----
+   A full-frame multiply that takes the brightness out of the street and the
+   pair. The blend sits on the layer itself, never on a child: the player gives
+   every layer a z-index, which makes it a stacking context, and a blend mode
+   inside one has no backdrop to work against. Anything meant to glow is
+   layered above this. */
+.fxlayer--dim {
+  inset: 0;
+  background: rgba(12, 15, 30, 0.62);
+  mix-blend-mode: multiply;
+}
+
+/* ---- the little lights ----
+   drop-shadow rather than box-shadow, so the glow follows the shape of the art
+   through its alpha instead of ringing a rectangle. Two passes each: a tight
+   core and a wide halo. */
+.glow--spark {
+  filter: drop-shadow(0 0 16px rgba(255, 214, 120, 0.95))
+          drop-shadow(0 0 46px rgba(255, 176, 58, 0.6));
+  /* In her hand it stays put and breathes, rather than wandering the frame. */
+  animation: spark-breathe 2.8s ease-in-out infinite;
+}
+
+.glow--ghost {
+  filter: drop-shadow(0 0 18px rgba(168, 246, 214, 0.75))
+          drop-shadow(0 0 44px rgba(110, 196, 255, 0.45));
+}
+
+.glow--berry {
+  filter: drop-shadow(0 0 14px rgba(214, 150, 255, 0.85))
+          drop-shadow(0 0 34px rgba(150, 92, 232, 0.5));
+}
+
+@keyframes spark-breathe {
+  0%, 100% {
+    filter: drop-shadow(0 0 14px rgba(255, 214, 120, 0.85))
+            drop-shadow(0 0 38px rgba(255, 176, 58, 0.5));
+  }
+  50% {
+    filter: drop-shadow(0 0 22px rgba(255, 226, 150, 1))
+            drop-shadow(0 0 60px rgba(255, 186, 70, 0.75));
+  }
+}
+
 .fxlayer--fireflies,
 .fxlayer--firefly-trail { inset: 0; }
 

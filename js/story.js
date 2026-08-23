@@ -354,6 +354,10 @@ function image(layer, className) {
   box.className = layer.fx ? `${className} fx-${layer.fx}` : className;
   // Names what this is, so devtools/ can report edits against the data.
   if (layer.key) box.dataset.key = layer.key;
+  // A glow goes on the box, not on the fill: the fill is clipped by the box, so
+  // a shadow drawn on it would be cut off at the edge. The box's own filter is
+  // applied after that clip and is free to spill past it.
+  if (layer.glow) box.classList.add(`glow--${layer.glow}`);
   box.style.left = `${layer.x}px`;
   box.style.top = `${layer.y}px`;
   box.style.width = `${layer.w}px`;

@@ -120,15 +120,35 @@ const LAMP_LIST = [
 const LAMPS_FLARE = { key: "lamp-flare", kind: "lamps", mode: "flare", lamps: LAMP_LIST };
 const LAMPS_OUT = { key: "lamp-out", kind: "lamps", mode: "out", lamps: LAMP_LIST };
 
+// The three little lights on the last page. Each one glows — see .glow--* in
+// css/story.css — because on that page they are the only light there is.
 const NIGHT_PROPS = [
-  { key: "ghost", src: `${IMG}ghost.webp`, x: -113, y: 487, w: 271, h: 181, fx: "float" },
-  { key: "firefly", src: `${IMG}firefly.webp`, x: 1787, y: 48, w: 135, h: 90, fx: "flicker" },
+  // Off the right edge now, and mirrored so the pair face into the street.
   {
-    key: "berry", src: `${IMG}berry.webp`, x: 1874, y: 758, w: 62, h: 55,
+    key: "ghost", src: `${IMG}ghost.webp`, x: 1618, y: 430, w: 271, h: 181,
+    flipX: true, glow: "ghost", fx: "float"
+  },
+  {
+    // Figma has this at x 1874, which put most of it and nearly all of its
+    // glow past the right edge. Pulled in so the light it gives off is on
+    // screen, since on this page it is one of only three sources.
+    key: "berry", src: `${IMG}berry.webp`, x: 1800, y: 742, w: 62, h: 55,
     fill: { left: "-22.76%", top: "-3.04%", width: "143.72%", height: "108.51%" },
-    fx: "float"
+    glow: "berry", fx: "float"
   }
 ];
+
+// The firefly sits in Agni's hand, on the spark already painted into the art,
+// so it moves with her between the two poses.
+//
+// Both marks come from measuring the swirl in the source art — (255,336) in
+// scene_shock, (240,343) in scene_cheer, both 1024px wide — then scaling by the
+// layer box's own width over 1024 and adding the box origin. Skipping that
+// scale is what first put the firefly up by her wing instead of in her hand.
+const FIREFLY_IN_HAND = {
+  shock: { key: "firefly", src: `${IMG}firefly.webp`, x: 498, y: 570, w: 118, h: 79, glow: "spark" },
+  cheer: { key: "firefly", src: `${IMG}firefly.webp`, x: 509, y: 622, w: 118, h: 79, glow: "spark" }
+};
 
 // "Very faint lights blink in distant hiding places" — clear of the characters
 // and of the props above, so they read as far away.
@@ -162,7 +182,13 @@ const AROMA = {
   ]
 };
 
-const BUBBLE_NEEL = { src: `${IMG}bubble_neel.webp`, x: 732, y: 182, w: 420, h: 226, flipX: true };
+// Takes the brightness out of the last page, so the street and the pair read as
+// still being in the dark and the only light on screen is what the firefly, the
+// berry and the ghost are giving off. Everything meant to glow is layered above
+// this; everything meant to be dark sits below it.
+const DIM = { key: "dim", kind: "dim" };
+
+const BUBBLE_NEEL ={ src: `${IMG}bubble_neel.webp`, x: 732, y: 182, w: 420, h: 226, flipX: true };
 
 /* ---- the pages ------------------------------------------------------- */
 
@@ -296,15 +322,22 @@ export const pages = [
     name: "The Light-Keepers",
     // Fireflies carry us out of the dark and into the last page.
     enter: { id: "3.4", fx: "fireflies", hold: 2800 },
-    // Street, distant glimmers and the off-frame props all persist, so nothing
-    // restarts between Agni's two lines.
-    layers: [TOWN_DARK, ...GLIMMERS, ...NIGHT_PROPS],
+    // Only the street belongs to the page. Everything else sits above the dim,
+    // which is what makes the little lights the only light on this page — and
+    // they all keep their keys, so nothing restarts between Agni's two lines.
+    layers: [TOWN_DARK],
     steps: [
       // Figma 4.2 — Agni's spark picks out the two of them.
       {
         id: "4.1",
         hold: 5200, // "…the little light-keepers!" ends at 4.02s
-        layers: [{ key: "cast", src: `${IMG}scene_shock.webp`, x: 239, y: 191, w: 1276, h: 851 }],
+        layers: [
+          { key: "cast", src: `${IMG}scene_shock.webp`, x: 239, y: 191, w: 1276, h: 851 },
+          DIM,
+          ...GLIMMERS,
+          FIREFLY_IN_HAND.shock,
+          ...NIGHT_PROPS
+        ],
         say: {
           bubble: { src: `${IMG}bubble_agni.webp`, x: 118, y: 96, w: 586, h: 294, flipX: true },
           text: { x: 169, y: 153, w: 482 },
@@ -317,7 +350,13 @@ export const pages = [
         // Last step of the chapter: chevron in, then the end card.
         id: "4.2",
         reveal: 3100,
-        layers: [{ key: "cast", src: `${IMG}scene_cheer.webp`, x: 273, y: 241, w: 1258, h: 839 }],
+        layers: [
+          { key: "cast", src: `${IMG}scene_cheer.webp`, x: 273, y: 241, w: 1258, h: 839 },
+          DIM,
+          ...GLIMMERS,
+          FIREFLY_IN_HAND.cheer,
+          ...NIGHT_PROPS
+        ],
         say: {
           bubble: { src: `${IMG}bubble_agni.webp`, x: 54, y: 78, w: 606, h: 326, flipX: true },
           text: { x: 117, y: 169, w: 481 },
