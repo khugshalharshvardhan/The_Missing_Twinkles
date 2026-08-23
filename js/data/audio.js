@@ -144,6 +144,21 @@ export const cues = {
       { id: "twinkle", at: 1600, gain: 0.35, pan: 0.77 }
     ],
     vo: { id: "vo_agni_light", at: 560 }
+  },
+
+  // The walk between the acts. bed_hope is already running from page 3, so it
+  // carries straight through; the footsteps and twinkles are what is new.
+  walk: {
+    bed: "bed_hope",
+    sfx: [
+      { id: "footsteps", at: 200, gain: 0.6 },
+      { id: "footsteps", at: 2100, gain: 0.6 },
+      { id: "footsteps", at: 4000, gain: 0.55 },
+      { id: "twinkle", at: 700, gain: 0.4, pan: 0.5 },
+      { id: "twinkle", at: 2600, gain: 0.35, pan: 0.3 },
+      { id: "twinkle", at: 4600, gain: 0.4, pan: 0.6 },
+      { id: "sparkle", at: 6100, gain: 0.5 }
+    ]
   }
 };
 

@@ -79,25 +79,52 @@ body {
 
 /* =========================================================
    Acts
-   One document, two acts. They never overlap: the mist cover in
-   css/handoff.css sits over the swap, and js/main.js flips
-   body[data-act] underneath it. Nothing here navigates, so the
-   audio context, the stage and the loaded art all survive the
-   change — which is what makes the two halves one product.
+   One document, three acts: the story, the walk down the
+   path, and the counting game. Each change is a cross-fade —
+   the outgoing act stays on screen at falling opacity while
+   the incoming one comes up — so none of them needs a cover
+   over the top. Nothing here navigates, so the audio context,
+   the stage and every decoded image survive the change.
    ========================================================= */
 
-[data-act="story"] #game {
+/* The story fades rather than cuts, so it can still be on screen while the
+   walk comes up over it. Hiding it with display would end the fade instantly. */
+#story {
+  transition: opacity var(--speed-slow) var(--ease);
+}
+
+[data-act="walk"] #story,
+[data-act="game"] #story {
+  opacity: 0;
+}
+
+[data-act="story"] #game,
+[data-act="story"] #walk,
+[data-act="walk"] #game,
+[data-act="game"] #walk {
+  /* #walk manages its own fade; see css/walk.css. */
+  pointer-events: none;
+}
+
+[data-act="story"] #game,
+[data-act="walk"] #game {
   display: none;
 }
 
-[data-act="game"] #story,
+[data-act="story"] #walk {
+  display: none;
+}
+
+[data-act="walk"] #transition,
 [data-act="game"] #transition {
   display: none;
 }
 
-/* The game's beats read themselves and its interactions are on the board, so
-   the storybook furniture — narration, page dots, the page-turn target — has
-   nothing to do here. Skip and the sound toggle stay. */
+/* The storybook furniture — narration, page dots, the page-turn target — has
+   nothing to do in either of the later acts. Skip and the sound toggle stay. */
+[data-act="walk"] .beat,
+[data-act="walk"] .dots,
+[data-act="walk"] .tap,
 [data-act="game"] .beat,
 [data-act="game"] .dots,
 [data-act="game"] .tap {

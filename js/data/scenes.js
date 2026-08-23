@@ -394,9 +394,7 @@ export const manifest = [
     ])
       .filter((layer) => layer.src)
       .map((layer) => layer.src)
-      // Not in any scene, but needed the moment they are asked for: the
-      // firefly transition builds its own sprite, and js/handoff.js closes
-      // the chapter with the two mist images.
-      .concat(`${IMG}firefly.webp`, `${IMG}bg_mist_full.webp`, `${IMG}mist_band.webp`)
+      // Built at runtime by the firefly transition, so not in any scene.
+      .concat(`${IMG}firefly.webp`)
   )
 ];

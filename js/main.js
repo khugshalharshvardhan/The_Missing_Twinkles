@@ -1,9 +1,13 @@
 // Entry point for the chapter.
 //
-// One document, two acts. The story reads, the mist closes over the town, and
-// the counting game opens underneath the same cover — no navigation, so the
-// audio context, the stage and every decoded image carry straight through.
-// js/handoff.js has the detail on why that matters.
+// One document, three acts: the story reads, the pair walk down the path, and
+// the counting game opens at the end of it. Nothing navigates, so the audio
+// context, the stage and every decoded image carry straight through — which is
+// what makes the three read as one thing rather than three.
+//
+// Every change between acts is a cross-fade. The stage frame does change from
+// the story's 1920x1080 to the game's 1882x1059, but that is a 2% resize
+// happening underneath a fade, so it is not something you can see.
 
 import { manifest, FRAME_W as STORY_W, FRAME_H as STORY_H } from "./data/scenes.js";
 import {
@@ -16,7 +20,9 @@ import { watchStage, setFrame } from "./stage.js";
 import { preload } from "./preload.js";
 import { initStory, startStory, advance, skip as skipStory } from "./story.js";
 import { initGame, startGame, skipGame, releaseHold } from "./game.js";
-import { closeMist, openMist, RISE as MIST_FADE } from "./handoff.js";
+import { initWalk, startWalk, endWalk } from "./walk.js";
+import { layers as walkLayers, foreground as walkFore, cast as walkCast,
+         guide as walkGuide, SPARK_SHEET, HAND_OVER_MS } from "./data/walk.js";
 import {
   initAudio,
   loadAudio,
@@ -54,6 +60,8 @@ paintSound();
 
 initStory({ onComplete: handOver });
 
+initWalk({ onArrive: arrive });
+
 initGame({
   onComplete: () => endcard.classList.add("is-active"),
   // Arriving from the story, the first screen is built behind the mist and
@@ -72,6 +80,25 @@ let gameArt = null;
 function prefetchGame() {
   gameArt ??= preload(gameManifest);
   return gameArt;
+}
+
+// Everything the walk puts on screen. Fetched alongside the game's art, since
+// the two run back to back.
+const walkManifest = [
+  ...new Set([
+    ...[...walkLayers, ...walkFore, ...walkCast, walkGuide]
+      .map((l) => l.src)
+      .filter(Boolean),
+    // Not a layer — the sheet the drifting fireflies are cut from.
+    SPARK_SHEET
+  ])
+];
+
+let walkArt = null;
+
+function prefetchWalk() {
+  walkArt ??= preload(walkManifest);
+  return walkArt;
 }
 
 // Going straight to act two, its art is needed up front instead.
@@ -103,28 +130,44 @@ Promise.all([
   // and fetch the game's art now since any screen is one click away.
   if (devMode) {
     loader.classList.remove("is-active");
+    prefetchWalk();
     prefetchGame();
   }
 });
 
 /* ---- the hand-over ---- */
 
-// Story to game, behind one continuous wipe.
+// Story, then the walk down the path, then the game. Both changes are plain
+// cross-fades: the outgoing act stays on screen at falling opacity while the
+// incoming one comes up, which is why neither needs a cover over it.
 async function handOver() {
   // Still raised for anything outside the chapter that wants to know.
   document.dispatchEvent(new CustomEvent("story:complete"));
 
-  await closeMist(); // the town goes under the mist
-  await prefetchGame(); // normally long since resolved
-  enterGame();
-  openMist(); // the mist clears onto the game
+  await Promise.all([prefetchWalk(), prefetchGame()]);
+  enterWalk();
+}
 
-  window.setTimeout(releaseHold, MIST_FADE);
+function enterWalk() {
+  document.body.dataset.act = "walk";
+  // The walk borrows the game's frame, so arriving is a cross-fade, not a cut.
+  setFrame(GAME_W, GAME_H);
+  hud.classList.remove("is-waiting");
+  hud.classList.add("is-active");
+  startWalk();
+}
+
+// They have arrived: bring the game up underneath and fade the path out over it.
+function arrive() {
+  enterGame();
+  endWalk();
+  window.setTimeout(releaseHold, HAND_OVER_MS);
 }
 
 function enterGame(at = 0) {
   document.body.dataset.act = "game";
-  // The game was drawn at its own size; the stage takes that frame on.
+  // The game was drawn at its own size; the stage takes that frame on. Coming
+  // from the walk this is already the frame, so nothing moves.
   setFrame(GAME_W, GAME_H);
   hud.classList.remove("is-waiting");
   startGame(at);
@@ -133,7 +176,9 @@ function enterGame(at = 0) {
 function enterStory() {
   document.body.dataset.act = "story";
   setFrame(STORY_W, STORY_H);
+  endWalk();
   startStory();
+  prefetchWalk();
   prefetchGame();
 }
 
@@ -169,7 +214,9 @@ const actions = {
   // game: it is one chapter, not two things to opt out of separately.
   skip: () => {
     playUi(UI_ADVANCE, 0.5);
-    if (document.body.dataset.act === "game") skipGame();
+    const act = document.body.dataset.act;
+    if (act === "game") skipGame();
+    else if (act === "walk") arrive();
     else skipStory();
   },
   replay: () => {
