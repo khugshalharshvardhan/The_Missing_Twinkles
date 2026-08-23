@@ -1,0 +1,313 @@
+/* =========================================================
+   Dev tools — scaffolding for laying the chapter out. Loaded
+   only when the URL carries ?dev, so none of this reaches a
+   normal run. Delete this folder and the guarded import in
+   js/main.js to remove it entirely.
+
+   Sizes here are CSS pixels, NOT stage pixels: the panel sits
+   outside #stage so it never scales or letterboxes with the
+   artwork.
+   ========================================================= */
+
+.dv {
+  --dv-bg: #12141c;
+  --dv-panel: #1a1d27;
+  --dv-line: #2c3040;
+  --dv-ink: #e8eaf2;
+  --dv-dim: #8d93a8;
+  --dv-hot: #ff7a3d;
+  --dv-ok: #3ddc97;
+
+  position: fixed;
+  inset: 0;
+  z-index: 2147483000;
+  pointer-events: none;
+  font: 12px/1.45 ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  color: var(--dv-ink);
+}
+
+.dv * { box-sizing: border-box; }
+.dv button { font: inherit; color: inherit; cursor: pointer; }
+
+/* ---- the hamburger ---- */
+.dv__burger {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-content: center;
+  gap: 4px;
+  border: 1px solid var(--dv-line);
+  border-radius: 9px;
+  background: var(--dv-bg);
+  pointer-events: auto;
+}
+
+.dv__burger i {
+  display: block;
+  width: 18px;
+  height: 2px;
+  background: var(--dv-ink);
+}
+
+.dv__burger:hover { border-color: var(--dv-hot); }
+
+/* ---- the drawer ---- */
+.dv__panel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 336px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--dv-line);
+  background: var(--dv-bg);
+  pointer-events: auto;
+  transform: translateX(-100%);
+  transition: transform 180ms ease;
+}
+
+.dv.is-open .dv__panel { transform: none; }
+
+/* The drawer covers where the burger was, so the close button in the header
+   takes over while it is open. */
+.dv.is-open .dv__burger { opacity: 0; pointer-events: none; }
+
+.dv__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--dv-line);
+}
+
+.dv__close {
+  width: 26px;
+  height: 26px;
+  border: 1px solid var(--dv-line);
+  border-radius: 6px;
+  background: var(--dv-panel);
+  font-size: 16px;
+  line-height: 1;
+}
+
+.dv__close:hover { border-color: var(--dv-hot); color: var(--dv-hot); }
+
+.dv__title { font-weight: 700; letter-spacing: 0.04em; }
+.dv__title b { color: var(--dv-hot); }
+
+.dv__body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px 14px 20px;
+}
+
+.dv__section { margin: 14px 0 6px; }
+
+.dv__label {
+  color: var(--dv-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 10px;
+  margin-bottom: 6px;
+}
+
+/* ---- controls ---- */
+.dv__row { display: flex; gap: 6px; flex-wrap: wrap; }
+
+.dv__btn {
+  padding: 6px 10px;
+  border: 1px solid var(--dv-line);
+  border-radius: 7px;
+  background: var(--dv-panel);
+}
+
+.dv__btn:hover { border-color: var(--dv-hot); }
+.dv__btn.is-on { border-color: var(--dv-hot); background: #2a1d16; color: #ffd0b8; }
+.dv__btn--wide { flex: 1; text-align: center; }
+
+/* ---- page / screen tree ---- */
+.dv__group { margin-bottom: 4px; }
+
+.dv__groupName {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  padding: 6px 8px;
+  border: 0;
+  border-radius: 6px;
+  background: #21242f;
+  color: var(--dv-dim);
+  text-align: left;
+}
+
+.dv__groupName:hover { color: var(--dv-ink); }
+.dv__groupName span { color: #5d6478; }
+
+.dv__steps {
+  display: none;
+  padding: 4px 0 6px 10px;
+  border-left: 1px solid var(--dv-line);
+  margin-left: 8px;
+}
+
+.dv__group.is-open .dv__steps { display: block; }
+
+.dv__step {
+  display: block;
+  width: 100%;
+  padding: 4px 8px;
+  border: 0;
+  border-radius: 5px;
+  background: none;
+  color: var(--dv-dim);
+  text-align: left;
+}
+
+.dv__step:hover { background: #23262f; color: var(--dv-ink); }
+.dv__step.is-on { background: #2a1d16; color: var(--dv-hot); }
+
+/* ---- the element list ---- */
+.dv__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.dv__part {
+  padding: 3px 8px;
+  border: 1px solid var(--dv-line);
+  border-radius: 999px;
+  background: var(--dv-panel);
+  color: var(--dv-dim);
+}
+
+.dv__part:hover { color: var(--dv-ink); border-color: var(--dv-hot); }
+.dv__part.is-on { border-color: var(--dv-hot); background: #2a1d16; color: var(--dv-hot); }
+
+/* ---- selection readout ---- */
+.dv__pick {
+  padding: 8px 10px;
+  border: 1px solid var(--dv-line);
+  border-radius: 8px;
+  background: var(--dv-panel);
+}
+
+.dv__pickName { color: var(--dv-ok); word-break: break-all; }
+.dv__pickNone { color: var(--dv-dim); }
+
+.dv__fields {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.dv__field { display: flex; flex-direction: column; gap: 3px; }
+.dv__field span { color: var(--dv-dim); font-size: 10px; }
+
+.dv__field input {
+  width: 100%;
+  padding: 4px 6px;
+  border: 1px solid var(--dv-line);
+  border-radius: 5px;
+  background: #0e1017;
+  color: var(--dv-ink);
+  font: inherit;
+}
+
+.dv__field input:focus { outline: 1px solid var(--dv-hot); }
+.dv__field input:disabled { opacity: 0.35; }
+
+.dv__hint { color: var(--dv-dim); margin-top: 8px; font-size: 11px; }
+
+/* ---- export ---- */
+.dv__out {
+  width: 100%;
+  height: 190px;
+  padding: 8px;
+  border: 1px solid var(--dv-line);
+  border-radius: 7px;
+  background: #0e1017;
+  color: #b6f5d6;
+  font: inherit;
+  resize: vertical;
+  white-space: pre;
+}
+
+.dv__count { color: var(--dv-hot); }
+
+/* =========================================================
+   On the stage itself
+   ========================================================= */
+
+/* Edit mode has to be able to hit the artwork, which the player otherwise
+   keeps inert. Only the marked boxes become clickable: the containers stay
+   transparent, because .overlays spans the whole frame and would otherwise
+   intercept every click before it ever reached a layer. A child with
+   pointer-events:auto is still hittable inside a parent set to none. */
+[data-dev-edit] .scene,
+[data-dev-edit] .layers,
+[data-dev-edit] .overlays,
+[data-dev-edit] #game .scene.is-active { pointer-events: none; }
+
+[data-dev-edit] .dv-hit { pointer-events: auto; }
+
+/* Pick the box, never the picture inside it. */
+[data-dev-edit] #stage img,
+[data-dev-edit] #stage video { pointer-events: none; }
+
+/* The HUD's page-turn target is a full-stage button sitting above the artwork,
+   and story.css re-enables it with a more specific selector than anything
+   scoped here can be. In edit mode it has to lose outright, or it swallows
+   every click meant for a layer — hence the only !important in this file. */
+[data-dev-edit] #game button,
+[data-dev-edit] .hud,
+[data-dev-edit] .hud .tap,
+[data-dev-edit] .hud .skip { pointer-events: none !important; }
+
+[data-dev-edit] .dv-hit { cursor: move; }
+[data-dev-edit] .dv-hit:hover { outline: 1px dashed rgba(255, 122, 61, 0.65); }
+
+/* The selected box, and the handle that resizes it. Outlines are drawn with
+   box-shadow so they do not take part in layout or clip against overflow. */
+.dv-sel {
+  outline: 1px solid var(--dv-hot, #ff7a3d) !important;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.85) !important;
+}
+
+.dv-grip {
+  position: absolute;
+  right: -7px;
+  bottom: -7px;
+  width: 14px;
+  height: 14px;
+  border: 1px solid #12141c;
+  border-radius: 3px;
+  background: #ff7a3d;
+  cursor: nwse-resize;
+  z-index: 9;
+}
+
+/* Paused: freeze the artwork, and say so. */
+.dv__flag {
+  position: absolute;
+  left: 50%;
+  top: 12px;
+  transform: translateX(-50%);
+  padding: 5px 12px;
+  border: 1px solid var(--dv-hot);
+  border-radius: 999px;
+  background: #2a1d16;
+  color: #ffd0b8;
+  letter-spacing: 0.08em;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 140ms ease;
+}
+
+.dv__flag.is-on { opacity: 1; }

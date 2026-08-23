@@ -179,6 +179,47 @@ function setWaiting(on) {
   hud.classList.toggle("is-waiting", on);
 }
 
+/* ---- dev hook (devtools/, only reached with ?dev) ---- */
+
+// Jump to a step and carry on playing from there, exactly as arriving at it
+// normally would. The layers are rebuilt from nothing first so the step looks
+// as it does on arrival rather than inheriting whatever was on screen. Only
+// devPause() stops the clock — jumping never does.
+export function devGoto(index) {
+  clearTimers();
+  endTransition();
+  setWaiting(false);
+  clearCues();
+
+  const at = Math.max(0, Math.min(index, timeline.length - 1));
+  const entry = timeline[at];
+  cursor = at;
+  busy = false;
+
+  mounted.clear();
+  layerHost.replaceChildren();
+  hud.classList.add("is-active");
+  paint(entry);
+
+  return entry;
+}
+
+// Hold the chapter where it is, or set it going again. Pausing only cancels
+// what was queued; releasing re-arms the current step from the top, which is
+// predictable in a way that trying to resume a part-elapsed timer is not.
+export function devPause(on) {
+  if (on) return clearTimers();
+
+  const entry = timeline[cursor];
+  if (!entry) return;
+
+  if (entry.last) {
+    revealTimer = window.setTimeout(() => setWaiting(true), entry.step.reveal ?? 0);
+  } else {
+    holdTimer = window.setTimeout(next, entry.step.hold ?? 2400);
+  }
+}
+
 /* ---- layer diffing ---- */
 
 function diffLayers(want) {
@@ -275,10 +316,20 @@ function overlays(step) {
   const frag = document.createDocumentFragment();
 
   if (step.say) {
-    frag.append(image(step.say.bubble, "layer say__bubble"));
-    frag.append(line(step.say));
+    const bubble = image(step.say.bubble, "layer say__bubble");
+    bubble.dataset.role = "say.bubble";
+    frag.append(bubble);
+
+    const text = line(step.say);
+    text.dataset.role = "say.text";
+    frag.append(text);
   }
-  (step.voices ?? []).forEach((voice) => frag.append(spoken(voice)));
+  (step.voices ?? []).forEach((voice, i) => {
+    const el = spoken(voice);
+    el.dataset.role = "voice";
+    el.dataset.index = String(i);
+    frag.append(el);
+  });
   (step.sfx ?? []).forEach((cue) =>
     frag.append(cue.kind === "laugh" ? laugh(cue) : shout(cue))
   );
@@ -293,6 +344,8 @@ function image(layer, className) {
   const box = document.createElement("div");
 
   box.className = layer.fx ? `${className} fx-${layer.fx}` : className;
+  // Names what this is, so devtools/ can report edits against the data.
+  if (layer.key) box.dataset.key = layer.key;
   box.style.left = `${layer.x}px`;
   box.style.top = `${layer.y}px`;
   box.style.width = `${layer.w}px`;
@@ -435,6 +488,7 @@ function ribbonPath({
 function effect(layer) {
   const el = document.createElement("div");
   el.className = `fxlayer fxlayer--${layer.kind}`;
+  if (layer.key) el.dataset.key = layer.key;
 
   switch (layer.kind) {
     // A faint light blinking in a distant hiding place.

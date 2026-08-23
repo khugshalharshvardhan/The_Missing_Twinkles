@@ -91,6 +91,26 @@ export function next() {
   go(index + 1);
 }
 
+// Dev hooks (devtools/, only reached with ?dev). Jumping to a screen carries on
+// playing from it; only devPause() stops the clock.
+export function devGoto(at) {
+  clearTimeout(timer);
+  hold = false;
+  const i = Math.min(Math.max(at, 0), screens.length - 1);
+  if (i > 5) guess = 10;
+  go(i);
+  return screens[i];
+}
+
+export function devPause(on) {
+  clearTimeout(timer);
+  hold = on;
+  if (on) return;
+
+  const screen = screens[index];
+  if (screen && !screen.interact) advanceIn(readingTime(screen));
+}
+
 // "Skip" leaves the whole act, not one screen.
 export function skipGame() {
   clearTimeout(timer);
@@ -186,6 +206,8 @@ function imageLayer(layer, className = "layer") {
   const box = document.createElement("div");
 
   box.className = layer.fx ? `${className} fx-${layer.fx}` : className;
+  // Names what this is, so devtools/ can report edits against the data.
+  if (layer.src) box.dataset.key = layer.src.split("/").pop().replace(/\.\w+$/, "");
   place(box, layer);
   if (layer.flipX) box.classList.add("is-flipped");
 
@@ -423,6 +445,7 @@ function bubble(spec) {
   const box = document.createElement("div");
 
   box.className = "bubble";
+  box.dataset.role = "bubble";
   place(box, spec);
 
   // The art sits in its own inset box so the image can fill that box exactly;

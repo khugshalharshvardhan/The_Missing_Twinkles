@@ -40,6 +40,11 @@ const params = new URLSearchParams(location.search);
 const straightToGame = params.get("act") === "game";
 const jumpTo = params.get("beat");
 
+// Dev tooling for laying the chapter out. It is fetched only when the URL
+// carries ?dev, so a normal run never loads or runs a byte of it — and
+// deleting devtools/ plus this block removes it completely.
+const devMode = params.has("dev");
+
 watchStage();
 
 // The context starts suspended, which is enough to decode the soundtrack while
@@ -93,6 +98,13 @@ Promise.all([
   loaderCta.textContent = straightToGame ? "Start the game" : "Begin";
   loaderCta.hidden = false;
   loaderCta.focus();
+
+  // The tools pick the moment to show, so skip straight past the title card,
+  // and fetch the game's art now since any screen is one click away.
+  if (devMode) {
+    loader.classList.remove("is-active");
+    prefetchGame();
+  }
 });
 
 /* ---- the hand-over ---- */
@@ -123,6 +135,16 @@ function enterStory() {
   setFrame(STORY_W, STORY_H);
   startStory();
   prefetchGame();
+}
+
+// Dev only: put an act on stage without starting it playing. The tools pick
+// the moment themselves, so kicking off a run first would only be undone.
+function devSetAct(act) {
+  const game = act === "game";
+  document.body.dataset.act = act;
+  setFrame(game ? GAME_W : STORY_W, game ? GAME_H : STORY_H);
+  hud.classList.add("is-active");
+  hud.classList.remove("is-waiting");
 }
 
 /* ---- actions ---- */
@@ -173,6 +195,16 @@ function paintSound() {
   soundBtn.setAttribute("aria-pressed", String(!off));
   soundBtn.setAttribute("aria-label", off ? "Turn sound on" : "Turn sound off");
   soundBtn.disabled = !hasAudio;
+}
+
+if (devMode) {
+  import("../devtools/devtools.js")
+    .then(({ initDevTools }) =>
+      initDevTools({
+        act: () => document.body.dataset.act,
+        setAct: devSetAct
+      }))
+    .catch((err) => console.warn("dev tools failed to load", err));
 }
 
 document.addEventListener("click", (event) => {
