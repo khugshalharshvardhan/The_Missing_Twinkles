@@ -52,7 +52,7 @@ const LINES = [
     text: 'Hee-hee-hee-hee!',                            rate: 1.1,  pitch: '+38%', volume: 100 },
 
   { id: 'vo_agni_giggles', who: 'agni',     mood: 'dawning realisation',
-    text: 'I think Mr. Giggles has scared the little light-keepers!',
+    text: 'I think Mr. Giggles has scared the little twinkles!',
                                                          rate: 1.0,  pitch: '+10%', volume: 98 },
 
   { id: 'vo_agni_light',   who: 'agni',     mood: 'brave, rallying',

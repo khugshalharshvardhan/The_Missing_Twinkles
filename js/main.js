@@ -120,9 +120,11 @@ Promise.all([
 ]).then(() => {
   loaderBar.style.width = "100%";
   loaderNote.textContent = straightToGame
-    ? "The light keepers are waiting."
+    ? "The twinkles are waiting."
     : "The lamps are lit — for now.";
-  loaderCta.textContent = straightToGame ? "Start the game" : "Begin";
+  // The button is an icon, so there is no label to swap; `is-ready` takes the
+  // bar and the note off and leaves the cover with one thing to press.
+  loader.classList.add("is-ready");
   loaderCta.hidden = false;
   loaderCta.focus();
 
@@ -192,11 +194,36 @@ function devSetAct(act) {
   hud.classList.remove("is-waiting");
 }
 
+/* ---- full screen ---- */
+
+// Asked for from the click that starts the chapter, because that is the only
+// time a browser will grant it. Prefixed spellings are still what Safari
+// answers to, and the promise rejects rather than throws when the user or the
+// platform says no — a phone browser that only allows it on video, an iframe
+// without the permission — so both paths are swallowed. Nothing about the
+// chapter depends on it: the stage letterboxes itself either way.
+function goFullscreen() {
+  const el = document.documentElement;
+  const ask =
+    el.requestFullscreen ||
+    el.webkitRequestFullscreen ||
+    el.msRequestFullscreen;
+  if (!ask || document.fullscreenElement) return;
+
+  try {
+    const r = ask.call(el, { navigationUI: "hide" });
+    if (r && typeof r.catch === "function") r.catch(() => {});
+  } catch {
+    /* not permitted here — the chapter plays windowed */
+  }
+}
+
 /* ---- actions ---- */
 
 const actions = {
   begin: () => {
     unlockAudio();
+    goFullscreen();
     loader.classList.remove("is-active");
 
     if (straightToGame) {
@@ -221,6 +248,8 @@ const actions = {
   },
   replay: () => {
     unlockAudio();
+    // Same as play: if they left full screen between chapters, go back in.
+    goFullscreen();
     endcard.classList.remove("is-active");
 
     if (straightToGame) {

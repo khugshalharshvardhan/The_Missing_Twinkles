@@ -31,7 +31,7 @@ const SVG_NS = "http://www.w3.org/2000/svg";
 const LAYER_FADE = 700;   // must track .layer's opacity transition in story.css
 const SETTLE = 380;       // how long a step is protected from a double-tap
 
-// The lone light keeper's crossing. Both must track .firefly in story.css:
+// The lone twinkle's crossing. Both must track .firefly in story.css:
 // FLIGHT_MS its animation-duration, FLIGHT_TOP the lane she flies down.
 const FLIGHT_MS = 2600;
 const FLIGHT_TOP = 470;
@@ -706,7 +706,7 @@ function effect(layer) {
       break;
     }
 
-    // One light keeper crosses the dark, shedding glitter as she goes. The
+    // One twinkle crosses the dark, shedding glitter as she goes. The
     // sparks are laid along her flight path rather than parented to her, so
     // they stay where they fell and wink out behind her.
     case "firefly-trail": {

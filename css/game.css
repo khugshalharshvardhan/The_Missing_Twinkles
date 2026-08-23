@@ -105,7 +105,7 @@
 }
 
 /* =========================================================
-   Light keepers
+   Twinkles
    ========================================================= */
 
 #game .swarm {
@@ -267,7 +267,7 @@
    Tap hint — retires once the player has the idea
    ========================================================= */
 
-/* The hand overlaps the first light keeper, so it must never take the tap
+/* The hand overlaps the first twinkle, so it must never take the tap
    that was meant for the firefly underneath it. */
 #game .hint {
   pointer-events: none;

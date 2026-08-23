@@ -190,7 +190,7 @@ export const cues = {
    ========================================================= */
 
 export const gameCues = {
-  // Agni and Neel spot the light keepers.
+  // Agni and Neel spot the twinkles.
   "1.1": { bed: "bed_main", sfx: [{ id: "bubble", at: 200, gain: 0.6 }, { id: "twinkle", at: 700, gain: 0.4 }] },
   "1.2": { bed: "bed_main", sfx: [{ id: "bubble", at: 200, gain: 0.6 }] },
   "1.3": { sfx: [{ id: "bubble", at: 200, gain: 0.6 }] },

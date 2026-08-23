@@ -757,7 +757,77 @@
   visibility: visible;
 }
 
-.loader__title,
+/* The cover. The art is 1672x941 — exactly 16:9, like the frame — so `cover`
+   fits it edge to edge with nothing cropped. Contents sit at the bottom, over
+   the cobbles, because the title sign and both characters are above that. */
+.loader {
+  align-content: end;
+  gap: 30px;
+  /* Deep bottom padding puts the button on the cobbles in the gap between the
+     two characters, rather than against the edge of the frame. */
+  padding: 0 80px 128px;
+  background: #05060d url("../assets/images/cover.webp") center / cover no-repeat;
+}
+
+/* Once the art is in, the loading furniture goes: the cover should be the cover,
+   with one thing to press on it. */
+.loader.is-ready .loader__track,
+.loader.is-ready .loader__note {
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity var(--speed) var(--ease), visibility var(--speed);
+}
+
+/* Icon only — the label lives on aria-label. */
+.play {
+  display: grid;
+  place-items: center;
+  width: 172px;
+  height: 172px;
+  border-radius: 50%;
+  background: var(--ember);
+  box-shadow: 0 12px 0 #b83c12, 0 26px 54px rgba(0, 0, 0, 0.5),
+    0 0 0 10px rgba(253, 246, 230, 0.14);
+  transition: transform 140ms var(--ease), box-shadow 140ms var(--ease);
+  animation: play-beckon 2.6s var(--ease) infinite;
+}
+
+.play__icon {
+  width: 86px;
+  height: 86px;
+  /* Nudged right: the triangle's visual centre sits left of its box centre. */
+  margin-left: 10px;
+  fill: #fff;
+}
+
+.play:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 0 #b83c12, 0 32px 60px rgba(0, 0, 0, 0.55),
+    0 0 0 14px rgba(253, 246, 230, 0.2);
+}
+
+.play:active {
+  transform: translateY(9px);
+  box-shadow: 0 3px 0 #b83c12, 0 10px 20px rgba(0, 0, 0, 0.45),
+    0 0 0 8px rgba(253, 246, 230, 0.12);
+  animation: none;
+}
+
+/* The button is focused as soon as it appears, so a keyboard lands on it with
+   nothing to hunt for. A ring rather than an outline: on a circle Chrome draws
+   the outline as a rounded rectangle, which reads as a rendering artefact
+   sitting behind the button rather than as focus. */
+.play:focus-visible {
+  outline: none;
+  box-shadow: 0 12px 0 #b83c12, 0 26px 54px rgba(0, 0, 0, 0.5),
+    0 0 0 8px rgba(253, 246, 230, 0.22), 0 0 0 14px rgba(253, 246, 230, 0.85);
+}
+
+@keyframes play-beckon {
+  0%, 68%, 100% { scale: 1; }
+  80% { scale: 1.055; }
+}
+
 .endcard__title {
   font-size: 132px;
   line-height: 1;
@@ -836,6 +906,8 @@
    ========================================================= */
 
 @media (prefers-reduced-motion: reduce) {
+  .play { animation: none; }
+
   .fx-shiver,
   .fx-float,
   .fx-flicker,

@@ -319,7 +319,7 @@ export const pages = [
 
   {
     id: "page-3",
-    name: "The Light-Keepers",
+    name: "The Twinkles",
     // Fireflies carry us out of the dark and into the last page.
     enter: { id: "3.4", fx: "fireflies", hold: 2800 },
     // Only the street belongs to the page. Everything else sits above the dim,
@@ -330,7 +330,7 @@ export const pages = [
       // Figma 4.2 — Agni's spark picks out the two of them.
       {
         id: "4.1",
-        hold: 5200, // "…the little light-keepers!" ends at 4.02s
+        hold: 5200, // "…the little twinkles!" ends at 3.83s (VO at 560 + 3.27s)
         layers: [
           { key: "cast", src: `${IMG}scene_shock.webp`, x: 239, y: 191, w: 1276, h: 851 },
           DIM,
@@ -341,7 +341,7 @@ export const pages = [
         say: {
           bubble: { src: `${IMG}bubble_agni.webp`, x: 118, y: 96, w: 586, h: 294, flipX: true },
           text: { x: 169, y: 153, w: 482 },
-          lines: ["I think Mr. Giggles", "has scared the little", "light-keepers!"]
+          lines: ["I think Mr. Giggles", "has scared the little", "twinkles!"]
         }
       },
 

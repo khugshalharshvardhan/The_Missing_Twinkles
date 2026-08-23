@@ -96,7 +96,7 @@ export const screens = [
     bubble: {
       art: `${IMG}bub_11.webp`, mirror: true,
       x: 213, y: 291, w: 416, h: 229,
-      text: "Look, light keepers!"
+      text: "Look, twinkles!"
     }
   },
 
@@ -127,7 +127,7 @@ export const screens = [
       art: `${IMG}bub_13.webp`, mirror: true,
       x: 234, y: 130, w: 596, h: 314,
       artInset: [8.7, 0, 0, 3.23],
-      text: "We need to find how many lightkeepers were there."
+      text: "We need to find how many twinkles were there."
     }
   },
 
@@ -174,7 +174,7 @@ export const screens = [
     bubble: {
       art: `${IMG}bub_15.webp`, mirror: true,
       x: 0, y: 202, w: 514, h: 277,
-      text: "How many light keepers were there?"
+      text: "How many twinkles were there?"
     }
   },
 
@@ -225,7 +225,7 @@ export const screens = [
     bubble: {
       art: `${IMG}bub_32.webp`, mirror: true,
       x: 220, y: 242, w: 489, h: 256,
-      text: "Tap each light keeper to count."
+      text: "Tap each twinkle to count."
     }
   },
 
@@ -242,7 +242,7 @@ export const screens = [
     bubble: {
       art: `${IMG}bub_4.webp`, mirror: true,
       x: 254, y: 280, w: 417, h: 201,
-      text: "There are {total} lightkeepers"
+      text: "There are {total} twinkles"
     }
   },
 

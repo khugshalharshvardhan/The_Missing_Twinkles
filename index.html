@@ -14,6 +14,9 @@
 
   <link rel="preload" href="assets/fonts/FredokaOne-Regular.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="preload" href="assets/fonts/Creepster-Regular.woff2" as="font" type="font/woff2" crossorigin />
+  <!-- The cover is the first thing on screen, so it is fetched ahead of the
+       story art the loader is filling the bar for. -->
+  <link rel="preload" href="assets/images/cover.webp" as="image" />
   <link rel="preload" href="assets/images/bg_town_lit.webp" as="image" />
 </head>
 <!-- Both acts live in this one document. data-act says which is on stage;
@@ -75,14 +78,20 @@
         </svg>
       </button>
 
-      <!-- ===== Loader ===== -->
+      <!-- ===== Loader — the cover ===== -->
+      <!-- The cover art carries the title, so there is no title text here; the
+           bar and the note are the only things the art does not already say. -->
       <div class="loader is-active" id="loader">
-        <p class="loader__title">Lights Out</p>
         <div class="loader__track"><i class="loader__bar" id="loader-bar"></i></div>
         <p class="loader__note" id="loader-note">Waking the town…</p>
         <!-- One way in. The story runs, the pair walk down the path, and the
-             counting game opens at the end of it. -->
-        <button class="cta" id="loader-cta" data-action="begin" hidden>Begin</button>
+             counting game opens at the end of it. The label is on aria-label
+             only: the button is the icon. -->
+        <button class="play" id="loader-cta" data-action="begin" aria-label="Play" hidden>
+          <svg class="play__icon" viewBox="0 0 48 48" aria-hidden="true">
+            <path d="M18 14.4v19.2L34 24z" />
+          </svg>
+        </button>
       </div>
 
       <!-- ===== End card — the chapter closes after the game ===== -->

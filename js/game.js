@@ -7,7 +7,7 @@
 //
 // Dialogue beats read themselves and move on: each one waits long enough for
 // its line to be read, then advances. The three interactive beats wait for the
-// player instead — the keypad for a guess, the swarm for every light keeper to
+// player instead — the keypad for a guess, the swarm for every twinkle to
 // be tapped, the lamp for a tap — and advance once that is done.
 
 import { screens, keypad, counter, FIREFLIES, FIREFLY_SRC, TOTAL } from "./data/screens.js";
@@ -29,7 +29,7 @@ const READ_PER_CHAR = 58;
 const READ_MIN = 1900;
 const READ_MAX = 6200;
 
-const AFTER_COUNT = 950; // let the last light keeper land before moving on
+const AFTER_COUNT = 950; // let the last twinkle land before moving on
 const AFTER_LAMP = 900; // hold on the lit lamp for a moment
 
 let index = -1;
@@ -43,7 +43,7 @@ let hold = false; // dev: freeze on the current beat instead of reading on
 
 let guess = null; // what the player typed on the keypad
 let entry = ""; // digits mid-typing
-let counted = 0; // light keepers tapped on screen 3.2
+let counted = 0; // twinkles tapped on screen 3.2
 
 export function initGame(handlers) {
   onComplete = handlers.onComplete;
@@ -247,7 +247,7 @@ function swarm(screen) {
   group.style.top = `${screen.fireflies.y}px`;
 
   FIREFLIES.forEach((spot, i) => {
-    // A countable light keeper is a real button; a decorative one is not.
+    // A countable twinkle is a real button; a decorative one is not.
     const el = document.createElement(countable ? "button" : "div");
 
     el.className = countable ? "firefly is-countable" : "firefly";
@@ -261,7 +261,7 @@ function swarm(screen) {
 
     if (countable) {
       el.type = "button";
-      el.setAttribute("aria-label", `Light keeper ${i + 1}`);
+      el.setAttribute("aria-label", `Twinkle ${i + 1}`);
       el.addEventListener("click", () => tally(el));
     }
 
