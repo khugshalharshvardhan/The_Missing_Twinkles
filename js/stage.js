@@ -1,19 +1,35 @@
-// Keeps the fixed 1920x1080 design frame fitted to whatever the browser
-// window happens to be. Scaling one element means every scene can keep its
-// literal Figma coordinates.
+// Keeps the design frame fitted to whatever the browser window happens to be.
+// Scaling one element means every scene can keep its literal Figma
+// coordinates.
+//
+// The two acts were drawn at different sizes — the story at 1920 x 1080, the
+// counting game at 1882 x 1059 — so the frame is a pair of variables on #stage
+// rather than a constant. Handing over swaps them and re-fits the same
+// element, which is what lets both halves live in one document without either
+// one giving up its coordinates.
 
 const stage = document.getElementById("stage");
 const root = getComputedStyle(document.documentElement);
 
-const FRAME_W = parseFloat(root.getPropertyValue("--frame-w")) || 1920;
-const FRAME_H = parseFloat(root.getPropertyValue("--frame-h")) || 1080;
+let frameW = parseFloat(root.getPropertyValue("--frame-w")) || 1920;
+let frameH = parseFloat(root.getPropertyValue("--frame-h")) || 1080;
 
 export function fitStage() {
   const scale = Math.min(
-    window.innerWidth / FRAME_W,
-    window.innerHeight / FRAME_H
+    window.innerWidth / frameW,
+    window.innerHeight / frameH
   );
   stage.style.setProperty("--scale", scale);
+}
+
+// Resize the frame itself. #stage sizes off these variables, so this is all it
+// takes to move from one act's coordinate space to the other's.
+export function setFrame(w, h) {
+  frameW = w;
+  frameH = h;
+  stage.style.setProperty("--frame-w", w);
+  stage.style.setProperty("--frame-h", h);
+  fitStage();
 }
 
 export function watchStage() {

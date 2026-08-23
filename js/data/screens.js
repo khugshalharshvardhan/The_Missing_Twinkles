@@ -20,7 +20,7 @@
 // resolution than the source) and firefly.png (its export kept its alpha and
 // arrives already cropped, so it needs no transform).
 
-const IMG = "assets/images/";
+const IMG = "assets/game/";
 
 export const FRAME_W = 1882;
 export const FRAME_H = 1059;
@@ -385,6 +385,8 @@ export const manifest = [
     keypad.display.src,
     keypad.keyArt,
     keypad.clearArt,
+    keypad.confirmArt,
+    keypad.tick.src,
     counter.src
   ])
 ];

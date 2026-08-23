@@ -33,6 +33,11 @@
 //   fx       motion hook -> .fx-* in css/story.css
 // ...or an effect, keyed by `kind` (see effect() in story.js).
 
+// The story was drawn at 1920 x 1080. The counting game uses its own frame
+// (see js/data/screens.js); js/stage.js swaps between them.
+export const FRAME_W = 1920;
+export const FRAME_H = 1080;
+
 const IMG = "assets/images/";
 
 /* ---- shared marks ---------------------------------------------------- */

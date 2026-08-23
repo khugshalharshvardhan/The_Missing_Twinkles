@@ -1,6 +1,9 @@
-// The game player. Builds each beat from js/data/screens.js into one of two
-// panes and cross-fades between them, so the outgoing screen is still on
+// The game player — act two. Builds each beat from js/data/screens.js into one
+// of two panes and cross-fades between them, so the outgoing screen is still on
 // display while the incoming one paints.
+//
+// It shares the page, the stage and the audio context with the story, so the
+// ambience the story ends on simply keeps playing under the first screen.
 //
 // Dialogue beats read themselves and move on: each one waits long enough for
 // its line to be read, then advances. The three interactive beats wait for the
@@ -8,14 +11,16 @@
 // be tapped, the lamp for a tap — and advance once that is done.
 
 import { screens, keypad, counter, FIREFLIES, FIREFLY_SRC, TOTAL } from "./data/screens.js";
+import { gameCues, UI_ADVANCE } from "./data/audio.js";
+import { clearCues, playCues, playSfx, playUi } from "./audio.js";
 
 const panes = [
-  document.getElementById("scene-a"),
-  document.getElementById("scene-b")
+  document.getElementById("game-a"),
+  document.getElementById("game-b")
 ];
 const hud = document.getElementById("hud");
 
-const CROSSFADE = 620; // must track --speed-slow in css/stage.css
+const CROSSFADE = 620; // must track --speed-slow in css/game.css
 
 // Reading pace for a dialogue beat: a beat to take in the picture, plus time
 // per character, held between a comfortable floor and ceiling.
@@ -59,6 +64,7 @@ export function releaseHold() {
 // `at` jumps straight to a beat — see the ?beat= dev shortcut in main.js.
 export function startGame(at = 0) {
   clearTimeout(timer);
+  clearCues();
   index = -1;
   front = 0;
   guess = null;
@@ -85,6 +91,13 @@ export function next() {
   go(index + 1);
 }
 
+// "Skip" leaves the whole act, not one screen.
+export function skipGame() {
+  clearTimeout(timer);
+  index = screens.length - 1;
+  finish();
+}
+
 // Queue the next beat. Any new beat cancels whatever was pending.
 function advanceIn(ms) {
   clearTimeout(timer);
@@ -104,6 +117,9 @@ function go(target) {
   back.classList.add("is-active");
   front = 1 - front;
 
+  clearCues();
+  playCues(gameCues[screen.id]);
+
   // Dialogue reads itself; an interactive beat waits for the player, and its
   // own handler queues the advance once the player is done.
   if (!screen.interact && !hold) advanceIn(readingTime(screen));
@@ -120,6 +136,8 @@ function readingTime(screen) {
 
 function finish() {
   clearTimeout(timer);
+  clearCues();
+  playSfx({ id: "cheer_swell", gain: 0.9 });
   hud.classList.remove("is-active");
   onComplete();
 }
@@ -238,6 +256,10 @@ function tally(el) {
   el.disabled = true;
   counted += 1;
 
+  // Each one rings a step higher than the last, so counting up is audible as
+  // well as visible.
+  playSfx({ id: "twinkle", gain: 0.75, rate: 1 + (counted - 1) * 0.07 });
+
   // Scope the lookups to this beat's own pane — the outgoing pane can still
   // be on screen mid-fade, holding a stale counter of its own.
   const pane = el.closest(".scene");
@@ -248,7 +270,10 @@ function tally(el) {
   // The tap hint has done its job once the player gets the idea.
   pane?.querySelector(".hint")?.classList.add("is-done");
 
-  if (counted === TOTAL) advanceIn(AFTER_COUNT);
+  if (counted === TOTAL) {
+    playSfx({ id: "sparkle", at: 140, gain: 0.85 });
+    advanceIn(AFTER_COUNT);
+  }
 }
 
 /* ---- the lamp ---- */
@@ -265,6 +290,7 @@ function lamp(spec) {
   const strike = () => {
     if (el.classList.contains("is-struck")) return;
     el.classList.add("is-struck");
+    playSfx({ id: "spark_ignite", gain: 0.9 });
     advanceIn(AFTER_LAMP);
   };
 
@@ -350,12 +376,14 @@ function keypadPanel() {
     btn.addEventListener("click", () => {
       if (key.confirm) {
         if (!entry.length) return;
+        playSfx({ id: "sparkle", gain: 0.8 });
         guess = Number(entry);
         return next();
       }
 
       if (key.clear) entry = "";
       else if (entry.length < 2) entry = (entry + key.label).replace(/^0+(?=\d)/, "");
+      playUi(UI_ADVANCE, 0.45);
       paint();
     });
 

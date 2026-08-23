@@ -9,27 +9,40 @@
   <link rel="stylesheet" href="css/reset.css" />
   <link rel="stylesheet" href="css/stage.css" />
   <link rel="stylesheet" href="css/story.css" />
+  <link rel="stylesheet" href="css/game.css" />
   <link rel="stylesheet" href="css/handoff.css" />
 
   <link rel="preload" href="assets/fonts/FredokaOne-Regular.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="preload" href="assets/images/bg_town_lit.jpg" as="image" />
 </head>
-<body>
+<!-- Both acts live in this one document. data-act says which is on stage;
+     js/main.js flips it behind the mist, so nothing ever navigates. -->
+<body data-act="story">
 
-  <!-- The viewport letterboxes a fixed 1920x1080 stage so every Figma
-       coordinate can be used verbatim. See js/stage.js. -->
+  <!-- The viewport letterboxes the stage so every Figma coordinate can be used
+       verbatim. The frame is 1920x1080 for the story and 1882x1059 for the
+       game; js/stage.js resizes it when the act changes. -->
   <div id="viewport">
     <div id="stage">
 
-      <!-- Three pages, built from js/data/scenes.js. Layers persist across the
+      <!-- ===== Act one: the story =====
+           Three pages, built from js/data/scenes.js. Layers persist across the
            steps within a page; overlays are rebuilt each step. -->
-      <div class="scene">
+      <div class="scene" id="story">
         <div class="layers" id="layers"></div>
         <div class="overlays" id="overlays"></div>
       </div>
 
       <!-- Covers a page change — the fireflies out of the dark -->
       <div class="transition" id="transition"></div>
+
+      <!-- ===== Act two: the counting game =====
+           Sixteen screens, built from js/data/screens.js into two panes that
+           cross-fade. Empty until the story hands over. -->
+      <div id="game">
+        <div class="scene" id="game-a"></div>
+        <div class="scene" id="game-b"></div>
+      </div>
 
 
       <!-- ===== HUD ===== -->
@@ -65,20 +78,20 @@
         <button class="cta" id="loader-cta" data-action="begin" hidden>Begin</button>
       </div>
 
-      <!-- ===== End card — the seam where the puzzle takes over ===== -->
+      <!-- ===== End card — the chapter closes after the game ===== -->
       <div class="endcard" id="endcard">
         <p class="endcard__kicker">Chapter 1</p>
-        <p class="endcard__title">Lights Out</p>
-        <p class="endcard__note">The little light-keepers are out there somewhere.</p>
+        <p class="endcard__title">Well counted</p>
+        <p class="endcard__note">Guess, then count to check. That is the whole trick.</p>
         <div class="endcard__row">
-          <button class="cta" data-action="replay">Watch again</button>
+          <button class="cta" data-action="replay">Play again</button>
         </div>
       </div>
 
     </div>
   </div>
 
-  <!-- Closes the chapter: the mist that carries us into the game. It sits
+  <!-- The mist that carries us from the story into the game. It sits
        outside the stage on purpose — the stage is letterboxed and carries a
        transform, so a cover inside it would leave the bars showing and could
        not be fixed to the viewport. -->

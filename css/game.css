@@ -1,106 +1,68 @@
-/* An author `display` beats the UA rule for [hidden], so restore it. */
-[hidden] {
-  display: none !important;
-}
-
 /* =========================================================
-   Arrival from the story — the mist we came in under
+   The counting game — act two.
 
-   The story closes by going fully opaque with these same two
-   images, then loads this page. Holding the mist here until
-   the art is ready turns the page change into one continuous
-   wipe, and covers the preload while it runs.
+   Every rule here is scoped under #game. The story and the game were drawn
+   separately and share a lot of vocabulary (.scene, .layer, .fill, .firefly,
+   .fx-breathe), so without the scope the two stylesheets would fight over the
+   same elements. Where story.css declares something this act must not inherit,
+   it is neutralised explicitly below rather than left to specificity luck.
+
+   Sizes are in stage pixels — the game's frame is 1882 x 1059, set on #stage
+   by js/stage.js when the act changes.
    ========================================================= */
 
-.mist {
-  position: fixed;
-  inset: 0;
-  z-index: 9;
-  overflow: hidden;
-  background: #131a2b;
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-  transition: opacity 900ms var(--ease), visibility 900ms;
-}
-
-/* Up until main.js says the game is ready. */
-.from-story .mist {
-  opacity: 1;
-  visibility: visible;
-}
-
-.mist__wall {
+#game {
   position: absolute;
   inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  animation: mist-drift 9s var(--ease) infinite alternate;
-}
 
-.mist__band {
-  position: absolute;
-  left: -3%;
-  bottom: -8%;
-  width: 106%;
-  height: 78%;
-  object-fit: cover;
-  opacity: 0.85;
-  animation: mist-settle 1400ms var(--ease) both;
-}
-
-@keyframes mist-drift {
-  from { transform: scale(1.12) translateX(18px); }
-  to { transform: scale(1.04) translateX(-18px); }
-}
-
-/* Picks up where the story's rise left off and sinks back down. */
-@keyframes mist-settle {
-  from { transform: translateY(0) scaleX(1.04); }
-  to { transform: translateY(34%) scaleX(1.04); }
-}
-
-/* Coming in from the story, the title card is not wanted — the mist is the
-   only cover, and the game starts itself. */
-.from-story .loader {
-  display: none;
+  /* This act's own tokens. The story's values stay on :root for its own half:
+     a warmer ink for text on cream art, a lamp glow, and a faster cross-fade
+     than the storybook pages use. */
+  --ink: #332a2a;
+  --glow: #ffd166;
+  --speed: 260ms;
+  --speed-slow: 620ms;
 }
 
 /* =========================================================
    Scenes — two panes that cross-fade
    ========================================================= */
 
-.scene {
+#game .scene {
   position: absolute;
   inset: 0;
   opacity: 0;
   transition: opacity var(--speed-slow) var(--ease);
 }
 
-.scene.is-active {
+#game .scene.is-active {
   opacity: 1;
+  /* story.css keeps its own scene inert; this act's panes hold real buttons. */
+  pointer-events: auto;
 }
 
 /* The outgoing pane must not swallow taps meant for the incoming one. */
-.scene:not(.is-active) {
+#game .scene:not(.is-active) {
   pointer-events: none;
 }
 
 /* A layer is a clipping box at the designed size, holding the image fill —
    the same shape Figma stores, so a cropped fill lands on the same pixels. */
-.layer {
+#game .layer {
   position: absolute;
   overflow: hidden;
+  /* story.css cross-fades its layers individually; this act cross-fades whole
+     panes, so a per-layer transition would only smear the swap. */
+  transition: none;
 }
 
 /* Mirrored layers flip the whole clipped box, matching Figma's wrapper. */
-.layer.is-flipped {
+#game .layer.is-flipped {
   transform: scaleX(-1);
 }
 
 /* Default: the fill covers the box, which is Figma's "fill" scale mode. */
-.fill {
+#game .fill {
   position: absolute;
   left: 0;
   top: 0;
@@ -112,7 +74,7 @@
 
 /* Cropped: left/top/width/height come from Figma, set inline, so the image is
    stretched to exactly the transform it has on the canvas. */
-.fill--crop {
+#game .fill--crop {
   object-fit: fill;
 }
 
@@ -120,17 +82,17 @@
    Speech bubbles
    ========================================================= */
 
-.bubble {
+#game .bubble {
   position: absolute;
 }
 
 /* Balloon art and text are siblings so the art can be mirrored on its own —
    Figma mirrors the balloon on most screens, never the words. */
-.bubble__art {
+#game .bubble__art {
   position: absolute;
 }
 
-.bubble__text {
+#game .bubble__text {
   position: absolute;
   display: flex;
   align-items: center;
@@ -146,47 +108,50 @@
    Light keepers
    ========================================================= */
 
-.swarm {
+#game .swarm {
   position: absolute;
   width: 0;
   height: 0;
 }
 
-.firefly {
+#game .firefly {
   position: absolute;
   padding: 0;
   border: 0;
   background: none;
-  animation: bob 3.4s ease-in-out infinite;
+  /* story.css gives its own fireflies a permanent glow and flies them across
+     the frame; this swarm sits still and only glows when it can be tapped. */
+  filter: none;
+  animation: g-bob 3.4s ease-in-out infinite;
 }
 
 /* Stagger the drift so the swarm never pulses in unison. */
-.firefly:nth-child(2n) { animation-duration: 4.1s; animation-delay: -0.7s; }
-.firefly:nth-child(3n) { animation-duration: 3.8s; animation-delay: -1.5s; }
-.firefly:nth-child(5n) { animation-duration: 4.6s; animation-delay: -2.2s; }
+#game .firefly:nth-child(2n) { animation-duration: 4.1s; animation-delay: -0.7s; }
+#game .firefly:nth-child(3n) { animation-duration: 3.8s; animation-delay: -1.5s; }
+#game .firefly:nth-child(5n) { animation-duration: 4.6s; animation-delay: -2.2s; }
 
-.firefly.is-countable {
+#game .firefly.is-countable {
   cursor: pointer;
   border-radius: 50%;
 }
 
-.firefly.is-countable:hover .fill,
-.firefly.is-countable:focus-visible .fill {
+#game .firefly.is-countable:hover .fill,
+#game .firefly.is-countable:focus-visible .fill {
   filter: drop-shadow(0 0 18px var(--glow));
 }
 
-.firefly.is-countable:focus-visible {
+#game .firefly.is-countable:focus-visible {
   outline: 4px solid var(--paper);
   outline-offset: 4px;
 }
 
 /* Counted ones dim and settle, so the player can see what is left. */
-.firefly.is-counted {
+#game .firefly.is-counted {
   animation: none;
   cursor: default;
 }
 
-.firefly.is-counted .fill {
+#game .firefly.is-counted .fill {
   opacity: 0.38;
   filter: saturate(0.35);
   transition: opacity var(--speed) var(--ease), filter var(--speed) var(--ease);
@@ -196,22 +161,22 @@
    The lamp
    ========================================================= */
 
-.lamp {
+#game .lamp {
   cursor: pointer;
 }
 
-.lamp:hover .fill,
-.lamp:focus-visible .fill {
+#game .lamp:hover .fill,
+#game .lamp:focus-visible .fill {
   filter: drop-shadow(0 0 26px rgba(255, 209, 102, 0.65));
 }
 
-.lamp:focus-visible {
+#game .lamp:focus-visible {
   outline: 4px solid var(--paper);
   outline-offset: 6px;
   border-radius: 18px;
 }
 
-.lamp.is-struck .fill {
+#game .lamp.is-struck .fill {
   filter: drop-shadow(0 0 60px var(--glow));
   transition: filter var(--speed) var(--ease);
 }
@@ -220,12 +185,12 @@
    Keypad
    ========================================================= */
 
-.keypad {
+#game .keypad {
   position: absolute;
   inset: 0;
 }
 
-.keypad__value {
+#game .keypad__value {
   position: absolute;
   inset: 0;
   display: flex;
@@ -237,7 +202,7 @@
   letter-spacing: 0.06em;
 }
 
-.key {
+#game .key {
   position: absolute;
   padding: 0;
   border: 0;
@@ -246,7 +211,7 @@
   transition: transform 90ms var(--ease);
 }
 
-.key__label {
+#game .key__label {
   position: absolute;
   inset: 0;
   display: flex;
@@ -258,24 +223,24 @@
 }
 
 /* The tick is art at its designed size, positioned inside its key. */
-.key__tick {
+#game .key__tick {
   position: absolute;
   pointer-events: none;
 }
 
 /* Nothing typed yet — the tick is there, but plainly not ready. */
-.key.is-off {
+#game .key.is-off {
   cursor: default;
   filter: saturate(0.25) brightness(0.72);
 }
 
-.key:hover { transform: translateY(-2px); }
-.key:active { transform: translateY(3px); }
+#game .key:hover { transform: translateY(-2px); }
+#game .key:active { transform: translateY(3px); }
 
-.key.is-off:hover,
-.key.is-off:active { transform: none; }
+#game .key.is-off:hover,
+#game .key.is-off:active { transform: none; }
 
-.key:focus-visible {
+#game .key:focus-visible {
   outline: 4px solid var(--paper);
   outline-offset: 3px;
   border-radius: 14px;
@@ -285,7 +250,7 @@
    Counter
    ========================================================= */
 
-.counter__value {
+#game .counter__value {
   position: absolute;
   left: 0;
   right: 0;
@@ -304,204 +269,55 @@
 
 /* The hand overlaps the first light keeper, so it must never take the tap
    that was meant for the firefly underneath it. */
-.hint {
+#game .hint {
   pointer-events: none;
   transition: opacity var(--speed-slow) var(--ease);
 }
 
-.hint.is-done {
+#game .hint.is-done {
   opacity: 0;
-}
-
-/* =========================================================
-   HUD
-   ========================================================= */
-
-.hud {
-  position: absolute;
-  inset: 0;
-  z-index: 4;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity var(--speed) var(--ease);
-}
-
-.hud.is-active { opacity: 1; }
-
-.hud.is-active .home { pointer-events: auto; }
-
-.home {
-  position: absolute;
-  left: 44px;
-  bottom: 52px;
-  padding: 12px 30px;
-  border-radius: 999px;
-  background: rgba(5, 6, 13, 0.42);
-  color: rgba(253, 246, 230, 0.72);
-  font-size: 26px;
-  letter-spacing: 0.08em;
-}
-
-.home:hover,
-.home:focus-visible {
-  color: var(--paper);
-  background: rgba(239, 90, 36, 0.6);
-}
-
-/* =========================================================
-   Loader + end card (shared cover styling)
-   ========================================================= */
-
-.loader,
-.endcard {
-  position: absolute;
-  inset: 0;
-  z-index: 5;
-  display: grid;
-  place-content: center;
-  justify-items: center;
-  gap: 26px;
-  padding: 80px;
-  background: radial-gradient(120% 100% at 50% 40%, #16203c 0%, #05060d 78%);
-  text-align: center;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity var(--speed-slow) var(--ease), visibility var(--speed-slow);
-}
-
-.loader.is-active,
-.endcard.is-active {
-  opacity: 1;
-  visibility: visible;
-}
-
-/* Once dismissed, a cover must stop taking clicks immediately — `visibility`
-   is still transitioning, so it would otherwise swallow the first tap or two
-   meant for the scene underneath. */
-.loader:not(.is-active),
-.endcard:not(.is-active) {
-  pointer-events: none;
-}
-
-.loader__title,
-.endcard__title {
-  font-size: 124px;
-  line-height: 1;
-  color: var(--paper);
-  text-shadow: 0 0 64px rgba(239, 90, 36, 0.55);
-}
-
-.loader__track {
-  width: 620px;
-  height: 16px;
-  border-radius: 999px;
-  background: rgba(253, 246, 230, 0.16);
-  overflow: hidden;
-}
-
-.loader__bar {
-  display: block;
-  width: 0;
-  height: 100%;
-  border-radius: 999px;
-  background: linear-gradient(90deg, #ffb347, var(--ember));
-  transition: width 220ms linear;
-}
-
-.loader__note,
-.endcard__note {
-  font-size: 32px;
-  color: rgba(253, 246, 230, 0.66);
-}
-
-.endcard__kicker {
-  font-size: 30px;
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
-  color: var(--ember);
-}
-
-.endcard__row {
-  display: flex;
-  gap: 22px;
-  flex-wrap: wrap;
-  justify-content: center;
-  margin-top: 16px;
-}
-
-.cta {
-  padding: 22px 60px;
-  border-radius: 999px;
-  background: var(--ember);
-  color: #fff;
-  font-size: 34px;
-  letter-spacing: 0.04em;
-  box-shadow: 0 12px 0 #b83c12, 0 24px 48px rgba(0, 0, 0, 0.45);
-  transition: transform 140ms var(--ease), box-shadow 140ms var(--ease);
-}
-
-.cta--ghost {
-  background: transparent;
-  color: var(--paper);
-  box-shadow: inset 0 0 0 4px rgba(253, 246, 230, 0.45);
-}
-
-.cta:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 15px 0 #b83c12, 0 28px 54px rgba(0, 0, 0, 0.5);
-}
-
-.cta--ghost:hover {
-  box-shadow: inset 0 0 0 4px var(--paper);
-}
-
-.cta:active {
-  transform: translateY(9px);
-  box-shadow: 0 3px 0 #b83c12, 0 10px 20px rgba(0, 0, 0, 0.45);
-}
-
-.cta:focus-visible {
-  outline: 5px solid rgba(253, 246, 230, 0.8);
-  outline-offset: 5px;
 }
 
 /* =========================================================
    Idle motion
    ========================================================= */
 
-.fx-breathe,
-.fx-breathe-slow {
+#game .fx-breathe,
+#game .fx-breathe-slow {
   transform-origin: 50% 100%;
-  animation: breathe 4.4s ease-in-out infinite;
+  animation: g-breathe 4.4s ease-in-out infinite;
 }
 
-.fx-breathe-slow {
+#game .fx-breathe-slow {
   animation-duration: 5.6s;
   animation-delay: -1.4s;
 }
 
-.fx-flicker { animation: flicker 2.4s ease-in-out infinite; }
-.fx-lamp-glow { animation: lamp-glow 3.2s ease-in-out infinite; }
+#game .fx-flicker { animation: g-flicker 2.4s ease-in-out infinite; }
+#game .fx-lamp-glow { animation: g-lamp-glow 3.2s ease-in-out infinite; }
+
+/* Keyframes are global whatever the scope, so this act's carry a g- prefix —
+   story.css already owns `breathe`, `flicker` and `float`. */
 
 /* Animates the independent `scale` property, not `transform` — a mirrored
    layer carries its flip in `transform`, and animating that would wipe it. */
-@keyframes breathe {
+@keyframes g-breathe {
   0%, 100% { scale: 1; }
   50% { scale: 1.014; }
 }
 
-@keyframes bob {
+@keyframes g-bob {
   0%, 100% { transform: translateY(0) rotate(-2deg); }
   50% { transform: translateY(-14px) rotate(2deg); }
 }
 
-@keyframes flicker {
+@keyframes g-flicker {
   0%, 100% { opacity: 1; }
   45% { opacity: 0.45; }
   70% { opacity: 0.85; }
 }
 
-@keyframes lamp-glow {
+@keyframes g-lamp-glow {
   0%, 100% { filter: drop-shadow(0 0 26px rgba(255, 209, 102, 0.55)); }
   50% { filter: drop-shadow(0 0 46px rgba(255, 209, 102, 0.85)); }
 }
@@ -511,17 +327,15 @@
    ========================================================= */
 
 @media (prefers-reduced-motion: reduce) {
-  .fx-breathe,
-  .fx-breathe-slow,
-  .fx-flicker,
-  .fx-lamp-glow,
-  .firefly {
+  #game .fx-breathe,
+  #game .fx-breathe-slow,
+  #game .fx-flicker,
+  #game .fx-lamp-glow,
+  #game .firefly {
     animation: none !important;
   }
 
-  .scene,
-  .loader,
-  .endcard {
+  #game .scene {
     transition-duration: 1ms;
   }
 }

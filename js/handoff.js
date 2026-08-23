@@ -1,31 +1,28 @@
-// Closes the chapter. The mist comes up over the town, and once it is thick
-// enough to hide the change, the counting game opens underneath it.
+// The mist that carries the chapter from the story into the counting game.
 //
-// The game is its own page — it keeps a different design frame (1882 x 1059,
-// against the story's 1920 x 1080) and its own stylesheet, so merging the two
-// documents would mean renaming a great deal on one side. The mist is what
-// makes the page change invisible: game/ opens under the same two images and
-// clears them once it has its art, so the player sees one continuous wipe.
+// This used to be a page change, which is exactly what made the two halves
+// feel like two products: the browser tore down the document, so the ambience
+// stopped dead, the audio context needed a fresh gesture to unlock, the stage
+// was rebuilt and every image was fetched again. The mist hid the seam but
+// could not hide the hitch.
+//
+// Now both acts live in one document (see index.html) and the mist covers a
+// swap of body[data-act] instead. Nothing reloads: the same AudioContext, the
+// same stage and the same decoded art carry straight through, so the bed the
+// story ends on is still playing under the game's first screen.
 
-import { playSfx, stopAudio } from "./audio.js";
+import { playSfx } from "./audio.js";
 
 const IMG = "assets/images/";
 
-// `from=story` tells the game to open under the mist rather than on its
-// title card, and to start itself.
-const GAME_URL = "game/index.html?from=story";
+const host = document.getElementById("handoff");
 
-const RISE = 1500; // must track --handoff-rise in css/handoff.css
-const HOLD = 520; // sit in the thick of it before the page turns
+// must track --handoff-rise in css/handoff.css
+export const RISE = 1500;
+const THICK = 420; // sit in the thick of it while the acts change underneath
 
-let running = false;
-
-export function playHandoff() {
-  if (running) return;
-  running = true;
-
-  const host = document.getElementById("handoff");
-
+// Resolves once the mist is opaque enough to work behind.
+export function closeMist() {
   host.replaceChildren(
     mistLayer(`${IMG}bg_mist_full.jpg`, "handoff__wall"),
     mistLayer(`${IMG}mist_band.png`, "handoff__band")
@@ -38,11 +35,16 @@ export function playHandoff() {
 
   playSfx({ id: "mist_rush", gain: 1 });
 
-  // The story's soundtrack should not still be playing under the game.
-  window.setTimeout(stopAudio, RISE);
+  return new Promise((resolve) => window.setTimeout(resolve, RISE + THICK));
+}
+
+export function openMist() {
+  host.classList.remove("is-active");
+  // Take the cover out of the page once it has faded, so a stalled transition
+  // can never leave a dead full-screen layer over the game.
   window.setTimeout(() => {
-    location.href = GAME_URL;
-  }, RISE + HOLD);
+    if (!host.classList.contains("is-active")) host.replaceChildren();
+  }, RISE);
 }
 
 function mistLayer(src, className) {

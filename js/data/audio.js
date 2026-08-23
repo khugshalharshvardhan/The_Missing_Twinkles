@@ -1,4 +1,7 @@
-// The soundtrack, beat by beat. Keys are the scene `id` values in scenes.js.
+// The soundtrack, beat by beat, for both acts of the chapter.
+//
+// `cues` keys are the story step ids in scenes.js; `gameCues` keys are the
+// game screen ids in screens.js.
 //
 // `at` is milliseconds from the moment the beat starts, and the numbers here
 // deliberately line up with the animation delays in scenes.js / story.css:
@@ -137,14 +140,63 @@ export const cues = {
   }
 };
 
-// Every clip the soundtrack needs, for the preloader.
+/* =========================================================
+   Act two — the counting game. Keys are the screen `id` values in screens.js,
+   which is why this is a separate map: several ids ("1.1", "3.2", "4.2") exist
+   in both halves and mean different beats.
+
+   `bed_hope` is deliberately the same bed the story's last page ends on.
+   playBed() ignores a request for the bed already running, so the ambience
+   simply carries on under the hand-over instead of restarting — the clearest
+   single signal that this is still one product.
+   ========================================================= */
+
+export const gameCues = {
+  // Agni and Neel spot the light keepers.
+  "1.1": { bed: "bed_hope", sfx: [{ id: "bubble", at: 200, gain: 0.6 }, { id: "twinkle", at: 700, gain: 0.4 }] },
+  "1.2": { bed: "bed_hope", sfx: [{ id: "bubble", at: 200, gain: 0.6 }] },
+  "1.3": { sfx: [{ id: "bubble", at: 200, gain: 0.6 }] },
+  "1.4": { sfx: [{ id: "bubble", at: 200, gain: 0.6 }, { id: "grin_boing", at: 120, gain: 0.5, pan: 0.4 }] },
+  "1.5": { sfx: [{ id: "bubble", at: 200, gain: 0.6 }, { id: "twinkle", at: 800, gain: 0.35, pan: 0.2 }] },
+
+  // The keypad. Key presses and the tick are played from js/game.js, on the tap.
+  "2": { sfx: [{ id: "bubble", at: 200, gain: 0.6 }, { id: "sparkle", at: 520, gain: 0.4 }] },
+  "2.2": { sfx: [{ id: "bubble", at: 200, gain: 0.6 }] },
+
+  // "Let us count them together."
+  "3": { sfx: [{ id: "bubble", at: 200, gain: 0.6 }] },
+  // Counting itself is scored per tap in js/game.js, so this screen stays quiet
+  // under the player.
+  "3.2": { sfx: [{ id: "bubble", at: 200, gain: 0.6 }] },
+
+  // The total, and how the guess did.
+  "4": { sfx: [{ id: "bubble", at: 200, gain: 0.6 }, { id: "sparkle", at: 420, gain: 0.5 }] },
+  "16": { sfx: [{ id: "bubble", at: 200, gain: 0.6 }] },
+  "4.2": { sfx: [{ id: "bubble", at: 200, gain: 0.6 }] },
+
+  // The lamp. Striking it is played on the tap.
+  "5.1": { sfx: [{ id: "bubble", at: 200, gain: 0.6 }] },
+  "5.2": { sfx: [{ id: "bubble", at: 200, gain: 0.6 }, { id: "twinkle", at: 500, gain: 0.45 }] },
+
+  // The town is lit again.
+  "6.1": { sfx: [{ id: "bubble", at: 200, gain: 0.6 }, { id: "cheer_swell", at: 240, gain: 0.7 }] },
+  "6.2": { sfx: [{ id: "bubble", at: 200, gain: 0.6 }, { id: "sparkle", at: 400, gain: 0.5 }] }
+};
+
+// Every clip the soundtrack needs, for the preloader — both acts, one list, so
+// the game never has to stop and load a sound mid-chapter.
 export const audioManifest = [
   ...new Set([
     UI_ADVANCE,
-    ...Object.values(cues).flatMap((c) => [
+    ...[...Object.values(cues), ...Object.values(gameCues)].flatMap((c) => [
       ...(typeof c.bed === "string" ? [c.bed] : c.bed?.id ? [c.bed.id] : []),
       ...(c.sfx ?? []).map((s) => s.id),
       ...(c.vo ? [c.vo.id] : [])
-    ])
+    ]),
+    // Played straight from js/game.js on a tap, not from a cue table.
+    "twinkle",
+    "sparkle",
+    "spark_ignite",
+    "cheer_swell"
   ])
 ];

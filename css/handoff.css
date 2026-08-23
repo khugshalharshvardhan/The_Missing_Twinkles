@@ -2,11 +2,11 @@
    Chapter handoff — the mist closes over the town, and the
    counting game opens on the other side of it.
 
-   The game lives on its own page (game/), which keeps its
-   1882 x 1059 frame and its own stylesheet clear of this
-   one. This cover is what hides the page change: it goes
-   fully opaque before the navigation, and game/ opens under
-   the same mist and clears it.
+   Both acts live in one document, so this cover is hiding a
+   swap of body[data-act] and a resize of the stage frame,
+   not a page change. It goes fully opaque, the acts change
+   underneath, and it clears onto the game — one continuous
+   wipe, with the soundtrack playing straight through it.
    ========================================================= */
 
 .handoff {
@@ -16,7 +16,8 @@
      #stage carries a transform, which would capture a fixed descendant. */
   position: fixed;
   inset: 0;
-  /* Above the HUD (4) and the loader / end card (5). */
+  /* Over everything: the stage carries a transform, so it is its own
+     stacking context and this cover clears all of it in one go. */
   z-index: 6;
   background: #131a2b;
   overflow: hidden;
