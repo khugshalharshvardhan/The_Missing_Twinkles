@@ -124,15 +124,8 @@
    keeps the 67% opacity the design gives it. */
 .fx-mist-rise { animation: mist-rise 3.2s var(--ease) both; }
 
-/* Three frames of the same shot, hard-cut like the source video. */
-.fx-blink-1,
-.fx-blink-2,
-.fx-blink-3 {
-  opacity: 0;
-  animation: blink-cycle 2.4s steps(1, end) infinite;
-}
-.fx-blink-2 { animation-delay: 0.8s; }
-.fx-blink-3 { animation-delay: 1.6s; }
+/* The wider, higher pass of the same mist art thickening over the lane. */
+.fx-mist-swell { animation: mist-swell 5.5s var(--ease) both; }
 
 @keyframes pop {
   0%   { opacity: 0; transform: scale(0.62) translateY(24px); }
@@ -186,10 +179,9 @@
   to   { transform: translateY(0) scaleX(1.06); }
 }
 
-@keyframes blink-cycle {
-  0%      { opacity: 1; }
-  33.333% { opacity: 0; }
-  100%    { opacity: 0; }
+@keyframes mist-swell {
+  from { opacity: 0; transform: translateY(150px) scale(1.02); }
+  to   { opacity: 1; transform: translateY(-20px) scale(1.1); }
 }
 
 /* =========================================================
@@ -204,23 +196,58 @@
   background: #04050c;
 }
 
-/* The lanterns going out from the far end in. The street recedes upwards, so
-   "far to near" is a soft-edged darkness falling down the frame — sliding a
-   gradient is interpolatable, where animating its colour stops is not. */
-.fxlayer--wave {
-  left: 0;
-  top: 0;
-  width: 1920px;
-  height: 2400px;
-  background: linear-gradient(
-    to bottom,
-    #04050c 0%,
-    #04050c 55%,
-    rgba(4, 5, 12, 0.6) 78%,
-    rgba(4, 5, 12, 0) 100%
+/* ---- the lamps going out, one at a time ----
+   They are painted into the background, so each is put out in place: a warm
+   flare as the filament goes, then a multiply blob over the pool of light it
+   was throwing. Geometry and timing come from LAMPS in js/data/scenes.js. */
+/* The blend goes on the container, never on the blobs. The player gives every
+   layer a z-index, which makes it a stacking context — a blend mode inside one
+   has no backdrop to work against, and the blob just paints as a flat grey
+   shape instead of taking light out of the street. */
+.fxlayer--lamps { inset: 0; }
+.fxlayer--lamps.is-flare { mix-blend-mode: screen; }
+.fxlayer--lamps.is-out { mix-blend-mode: multiply; }
+
+.lamp__flare,
+.lamp__out {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0;
+}
+
+/* The filament flaring the instant before it dies. */
+.lamp__flare {
+  background: radial-gradient(
+    closest-side,
+    rgba(255, 226, 160, 0.95) 0%,
+    rgba(255, 186, 88, 0.45) 34%,
+    rgba(255, 170, 60, 0) 72%
   );
-  transform: translateY(-2400px);
-  animation: wave-out 2s ease-in 400ms forwards;
+  animation: lamp-flare 380ms ease-out both;
+}
+
+/* Multiplied down to almost nothing at the core, so the pool of light goes but
+   the cobbles and leaves under it keep their texture. */
+.lamp__out {
+  background: radial-gradient(
+    closest-side,
+    rgba(14, 16, 30, 1) 0%,
+    rgba(18, 20, 38, 0.92) 40%,
+    rgba(28, 30, 54, 0.55) 70%,
+    rgba(40, 42, 70, 0) 100%
+  );
+  animation: lamp-out 820ms ease-in both;
+}
+
+@keyframes lamp-flare {
+  0%   { opacity: 0; scale: 0.82; }
+  30%  { opacity: 1; scale: 1.14; }
+  100% { opacity: 0; scale: 0.92; }
+}
+
+@keyframes lamp-out {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
 /* The last lamp overhead: two flickers, then out for good. */
@@ -228,7 +255,7 @@
   inset: 0;
   background: #04050c;
   opacity: 0;
-  animation: lamp-die 1.4s ease-in-out 2.4s forwards;
+  animation: lamp-die 1.5s ease-in-out 4s forwards;
 }
 
 /* A faint light blinking in a distant hiding place. */
@@ -306,6 +333,16 @@
   to   { transform: translateY(-13px) scaleY(1.01); }
 }
 
+/* The supplied footage, filling its box. */
+.fxlayer--video video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+
 .fxlayer--fireflies,
 .fxlayer--firefly-trail { inset: 0; }
 
@@ -339,10 +376,6 @@
   12% { opacity: 1; transform: translate(-190px, -2px) scale(1.35); }
   40% { opacity: 0.85; transform: translate(-190px, 8px) scale(1); }
   100% { opacity: 0; transform: translate(-190px, 40px) scale(0.2); }
-}
-
-@keyframes wave-out {
-  to { transform: translateY(0); }
 }
 
 @keyframes lamp-die {
@@ -744,6 +777,7 @@
   .fx-flicker,
   .fx-drift,
   .fx-drift-slow,
+  .lamp__flare,
   .fxlayer--aroma svg,
   .aroma__spark,
   .tap__chevron {

@@ -444,6 +444,52 @@ function effect(layer) {
       el.style.animationDelay = `${layer.delay ?? 0}ms`;
       break;
 
+    // The lamps going out, one at a time. They are painted into the
+    // background, so each one is put out by taking the light back out of the
+    // picture where it stands: a warm flare as the filament goes, then a
+    // multiply blob over the pool of light it was throwing. Multiply rather
+    // than a flat patch is the whole trick — it darkens the cobbles and the
+    // leaves while keeping their texture, where a solid shape reads as a smudge.
+    case "lamps":
+      // One pass per blend direction — see LAMPS_FLARE / LAMPS_OUT in the data
+      // for why the mode cannot just be a class on the blobs.
+      el.classList.add(`is-${layer.mode}`);
+      layer.lamps.forEach((lamp) => {
+        const blob = document.createElement("i");
+        blob.className = `lamp__${layer.mode}`;
+        blob.style.left = `${lamp.x - lamp.rx}px`;
+        blob.style.top = `${lamp.y - lamp.ry}px`;
+        blob.style.width = `${lamp.rx * 2}px`;
+        blob.style.height = `${lamp.ry * 2}px`;
+        // The flare fires on the beat; the darkness follows it in.
+        blob.style.animationDelay = `${lamp.at + (layer.mode === "out" ? 170 : 0)}ms`;
+        el.append(blob);
+      });
+      break;
+
+    // A silent, looping video layer — the darkness with the eyes in it.
+    case "video": {
+      el.style.left = `${layer.x}px`;
+      el.style.top = `${layer.y}px`;
+      el.style.width = `${layer.w}px`;
+      el.style.height = `${layer.h}px`;
+
+      const film = document.createElement("video");
+      film.src = layer.src;
+      film.loop = true;
+      film.autoplay = true;
+      // Muted and inline are what let it start without a gesture of its own.
+      // The clip carries no audio track either way.
+      film.muted = true;
+      film.playsInline = true;
+      film.preload = "auto";
+      film.setAttribute("aria-hidden", "true");
+      el.append(film);
+      // Autoplay can still be refused; ask once more now it is in the page.
+      film.play?.().catch(() => {});
+      break;
+    }
+
     // Cake on the air: a warm ribbon of scent that unfurls out of the bakery
     // and sweeps the lane, spiralling as it goes, with sparks caught in it.
     // Each ribbon is drawn twice — a wide blurred pass for the glow, a thin

@@ -74,18 +74,20 @@ export const cues = {
   // flickers and dies, then Mr. Giggles is heard. Pops get louder, lower and
   // further left as they come nearer, tracking the POP! positions.
   "2.2": {
-    bed: { id: "bed_dark", at: 2600 },
+    bed: { id: "bed_dark", at: 3200 },
     sfx: [
       { id: "mist_rush", at: 0, gain: 1 },
-      { id: "lantern_pop", at: 800, gain: 0.5, rate: 1.25, pan: 0 },
-      { id: "lantern_pop", at: 1200, gain: 0.64, rate: 1.14, pan: -0.08 },
-      { id: "lantern_pop", at: 1600, gain: 0.8, rate: 1.04, pan: -0.38 },
-      { id: "lantern_pop", at: 2000, gain: 1, rate: 0.92, pan: -0.69 },
-      { id: "lamp_flicker", at: 2400, gain: 0.8, pan: -0.69 },
-      { id: "lamp_out", at: 3000, gain: 0.9, pan: -0.69 },
-      { id: "blackout_hit", at: 3050, gain: 1 }
+      // One pop per lamp in LAMP_LIST, panned to where each one stands and
+      // pitched down as they come nearer. Change one, change the other.
+      { id: "lantern_pop", at: 400, gain: 0.5, rate: 1.25, pan: 0 },
+      { id: "lantern_pop", at: 1000, gain: 0.64, rate: 1.14, pan: -0.24 },
+      { id: "lantern_pop", at: 1600, gain: 0.8, rate: 1.04, pan: -0.36 },
+      { id: "lantern_pop", at: 2300, gain: 1, rate: 0.92, pan: -0.69 },
+      { id: "lamp_flicker", at: 3300, gain: 0.8, pan: -0.69 },
+      { id: "lamp_out", at: 4000, gain: 0.9, pan: -0.69 },
+      { id: "blackout_hit", at: 4100, gain: 1 }
     ],
-    vo: { id: "vo_giggles_1", at: 3700, gain: 0.95 }
+    vo: { id: "vo_giggles_1", at: 5200, gain: 0.95 }
   },
 
   /* ---------- Screen 3 ---------- */

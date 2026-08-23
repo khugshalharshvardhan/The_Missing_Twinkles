@@ -39,6 +39,7 @@ export const FRAME_W = 1920;
 export const FRAME_H = 1080;
 
 const IMG = "assets/images/";
+const VID = "assets/videos/";
 
 /* ---- shared marks ---------------------------------------------------- */
 
@@ -71,12 +72,53 @@ const AGNI_TALKING = {
   key: "agni", src: `${IMG}agni_talking.webp`, x: 358, y: 443, w: 550, h: 557
 };
 
-// The three eye frames are one shot, hard-cut like the source video.
-const EYES = [
-  { key: "eyes-1", src: `${IMG}eyes_1.webp`, x: 0, y: 0, w: 1920, h: 1080, fx: "blink-1" },
-  { key: "eyes-2", src: `${IMG}eyes_2.webp`, x: 0, y: 0, w: 1920, h: 1080, fx: "blink-2" },
-  { key: "eyes-3", src: `${IMG}eyes_3.webp`, x: 0, y: 0, w: 1920, h: 1080, fx: "blink-3" }
+// The darkness. Trimmed out of the supplied footage, played forward then
+// reversed so the loop seam is pixel-identical, and silent. It replaces the
+// three eye stills that used to be hard-cut in their place.
+const EYES = {
+  key: "eyes",
+  kind: "video",
+  src: `${VID}darkness_with_eyes.webm`,
+  x: 0, y: 0, w: 1920, h: 1080
+};
+
+/* ---- page 2: shared marks, so nothing re-dissolves between its steps ---- */
+
+const TOWN_MOONLIT = { key: "bg-moonlit", src: `${IMG}bg_town_moonlit.webp`, x: 0, y: 0, w: 1920, h: 1080 };
+
+const AGNI_DOWN = { key: "agni", src: `${IMG}agni_looking_down.webp`, x: 297, y: 461, w: 613, h: 566 };
+
+const NEEL_SCARED = {
+  key: "neel", src: `${IMG}neel_scared.webp`, x: 945, y: 403, w: 489, h: 624,
+  fill: { left: "-15.02%", top: "0%", width: "152.56%", height: "104.64%" },
+  fx: "shiver"
+};
+
+const MIST_LOW = { key: "mist-band", src: `${IMG}mist_band.webp`, x: 0, y: 510, w: 1920, h: 640, opacity: 0.67, fx: "mist-rise" };
+
+// A second, wider pass of the same mist art sitting further up the frame, so
+// the street can thicken over without cutting to a different render.
+const MIST_HIGH = { key: "mist-high", src: `${IMG}mist_band.webp`, x: -160, y: 250, w: 2240, h: 760, opacity: 0.28, fx: "mist-swell" };
+
+// The lamps are painted into the background, so putting them out means taking
+// the light back out of the picture where each one stands. Positions were
+// measured off bg_town_moonlit.webp: every entry is one lamp — or a cluster of
+// distant ones — and the pool of light it throws, ordered from the far end of
+// the lane in towards the pair's feet. `at` is when it pops, ms into the step.
+const LAMP_LIST = [
+  { x: 965, y: 578, rx: 205, ry: 100, at: 400 },  // the two farthest lamps
+  { x: 733, y: 607, rx: 145, ry: 85, at: 1000 },  // the receding row behind them
+  { x: 615, y: 570, rx: 160, ry: 205, at: 1600 }, // the mid lamp
+  { x: 300, y: 520, rx: 345, ry: 475, at: 2300 }  // the near lamp and its pool
 ];
+
+// Two layers over the same list, because the two halves of putting a lamp out
+// blend in opposite directions: the flare screens light on, the extinguish
+// multiplies it off. The blend mode has to sit on the container — the player
+// gives every layer a z-index, which makes it a stacking context, so a blend
+// mode on the blobs inside would have no backdrop to work against.
+const LAMPS_FLARE = { key: "lamp-flare", kind: "lamps", mode: "flare", lamps: LAMP_LIST };
+const LAMPS_OUT = { key: "lamp-out", kind: "lamps", mode: "out", lamps: LAMP_LIST };
 
 const NIGHT_PROPS = [
   { key: "ghost", src: `${IMG}ghost.webp`, x: -113, y: 487, w: 271, h: 181, fx: "float" },
@@ -192,16 +234,7 @@ export const pages = [
       {
         id: "2.1",
         hold: 4400, // lets the mist finish rising
-        layers: [
-          { key: "bg-moonlit", src: `${IMG}bg_town_moonlit.webp`, x: 0, y: 0, w: 1920, h: 1080 },
-          { key: "agni", src: `${IMG}agni_looking_down.webp`, x: 297, y: 461, w: 613, h: 566 },
-          {
-            key: "neel", src: `${IMG}neel_scared.webp`, x: 945, y: 403, w: 489, h: 624,
-            fill: { left: "-15.02%", top: "0%", width: "152.56%", height: "104.64%" },
-            fx: "shiver"
-          },
-          { key: "mist-band", src: `${IMG}mist_band.webp`, x: 0, y: 510, w: 1920, h: 640, opacity: 0.67, fx: "mist-rise" }
-        ],
+        layers: [TOWN_MOONLIT, AGNI_DOWN, NEEL_SCARED, MIST_LOW],
         say: {
           bubble: BUBBLE_NEEL,
           text: { x: 777, y: 265, w: 342 },
@@ -209,18 +242,20 @@ export const pages = [
         }
       },
 
-      // Figma 2.2 — the mist rushes the street and the lanterns go out from
-      // the far end in, then the last one flickers and dies.
+      // Figma 2.2 — the mist thickens and the lamps go out one at a time, far
+      // end of the lane first, in towards the pair. The street is the same
+      // layer it was in 2.1 and never cross-fades: only the light leaves it,
+      // lamp by lamp, and the last of it drains away after the near one.
       {
         id: "2.2",
-        hold: 6400,
+        hold: 7600,
         layers: [
-          { key: "bg-mist", src: `${IMG}bg_mist_full.webp`, x: 0, y: 0, w: 1920, h: 1080, fx: "drift-slow" },
-          { key: "wave", kind: "wave" },
+          TOWN_MOONLIT,
+          // Over the street they light, under the faces they must not stain.
+          LAMPS_FLARE, LAMPS_OUT,
+          AGNI_DOWN, NEEL_SCARED, MIST_LOW, MIST_HIGH,
           { key: "lamp-die", kind: "lamp-die" }
         ]
-        // The lanterns going out and the laugh are carried by their sound
-        // cues; the shouted words that used to sit over the art are gone.
       },
 
       // Figma 2.3 / 2.4 / 3 — pitch dark, two pairs of eyes. A bubble would
@@ -228,14 +263,14 @@ export const pages = [
       {
         id: "3.1",
         hold: 3800, // "Neil?", then the eyes blink on their own
-        layers: [{ key: "night", kind: "night" }, ...EYES],
+        layers: [{ key: "night", kind: "night" }, EYES],
         voices: [{ x: 355, y: 700, w: 400, tone: "agni", text: "Neil?" }]
       },
 
       {
         id: "3.2",
         hold: 3600, // "I am here… I think."
-        layers: [{ key: "night", kind: "night" }, ...EYES],
+        layers: [{ key: "night", kind: "night" }, EYES],
         voices: [{ x: 1040, y: 690, w: 560, tone: "neel", text: "I am here… I think." }]
       },
 
@@ -244,7 +279,7 @@ export const pages = [
         // Last step of the page: chevron in once the laugh has passed.
         id: "3.3",
         reveal: 3400,
-        layers: [{ key: "night", kind: "night" }, ...EYES]
+        layers: [{ key: "night", kind: "night" }, EYES]
       }
     ]
   },
