@@ -26,6 +26,8 @@ const hud = document.getElementById("hud");
 const beatLine = document.getElementById("beat");
 const dots = document.getElementById("dots");
 
+const SVG_NS = "http://www.w3.org/2000/svg";
+
 const LAYER_FADE = 700;   // must track .layer's opacity transition in story.css
 const SETTLE = 380;       // how long a step is protected from a double-tap
 
@@ -383,6 +385,53 @@ function laugh(cue) {
 
 /* ---- effect layers ---- */
 
+// Sample a ribbon of scent: a long sweep from `from` to `to` that undulates
+// `waves` times with amplitude `amp`, and turns one full spiral at each
+// fraction in `loops`.
+//
+// Sampling this analytically rather than hand-authoring beziers keeps the curls
+// round and leaves the shape as tunable numbers. The trick for a spiral that
+// actually closes is the weighting below: the sweep almost stops while a curl is
+// being drawn, so the circular offset laps the forward travel instead of being
+// stretched out into a bump.
+function ribbonPath({
+  from, to, waves = 2, amp = 40, loops = [], radius = 30,
+  phase = 0, window: win = 0.11, samples = 340
+}) {
+  const [x1, y1] = from;
+  const [x2, y2] = to;
+  const inLoop = (t) => loops.some((at) => t >= at && t <= at + win);
+
+  // Pass one: how fast the sweep travels at each sample.
+  const speed = [];
+  for (let i = 0; i <= samples; i++) speed.push(inLoop(i / samples) ? 0.12 : 1);
+  const total = speed.reduce((a, b) => a + b, 0);
+
+  // Pass two: place each sample, adding the spiral offset where one is due.
+  const points = [];
+  let travelled = 0;
+
+  for (let i = 0; i <= samples; i++) {
+    const t = i / samples;
+    travelled += speed[i];
+    const s = travelled / total;
+
+    let x = x1 + (x2 - x1) * s;
+    let y = y1 + (y2 - y1) * s + amp * Math.sin(s * waves * Math.PI * 2 + phase);
+
+    for (const at of loops) {
+      if (t < at || t > at + win) continue;
+      const a = ((t - at) / win) * Math.PI * 2;
+      x += radius * Math.sin(a);
+      y -= radius * (1 - Math.cos(a));
+    }
+
+    points.push([Number(x.toFixed(1)), Number(y.toFixed(1))]);
+  }
+
+  return { d: `M ${points.map(([x, y]) => `${x},${y}`).join(" L ")}`, points };
+}
+
 function effect(layer) {
   const el = document.createElement("div");
   el.className = `fxlayer fxlayer--${layer.kind}`;
@@ -394,6 +443,84 @@ function effect(layer) {
       el.style.top = `${layer.y}px`;
       el.style.animationDelay = `${layer.delay ?? 0}ms`;
       break;
+
+    // Cake on the air: a warm ribbon of scent that unfurls out of the bakery
+    // and sweeps the lane, spiralling as it goes, with sparks caught in it.
+    // Each ribbon is drawn twice — a wide blurred pass for the glow, a thin
+    // crisp pass for the filament — which is what makes it read as luminous
+    // rather than as a line.
+    case "aroma": {
+      const uid = `aroma-${++ids}`;
+
+      el.style.left = `${layer.x}px`;
+      el.style.top = `${layer.y}px`;
+      el.style.width = `${layer.w}px`;
+      el.style.height = `${layer.h}px`;
+
+      el.innerHTML = `
+        <svg viewBox="0 0 ${layer.w} ${layer.h}" aria-hidden="true">
+          <defs>
+            <filter id="${uid}-glow" x="-15%" y="-25%" width="130%" height="150%">
+              <feGaussianBlur stdDeviation="12" />
+            </filter>
+            <!-- Brightest at the bakery, thinning as it travels down the lane. -->
+            <linearGradient id="${uid}-halo" gradientUnits="userSpaceOnUse"
+                            x1="${layer.w}" y1="0" x2="0" y2="0">
+              <stop offset="0"    stop-color="#ffa22e" stop-opacity="1" />
+              <stop offset="0.55" stop-color="#ffb347" stop-opacity="0.8" />
+              <stop offset="1"    stop-color="#ffc46b" stop-opacity="0.3" />
+            </linearGradient>
+            <linearGradient id="${uid}-core" gradientUnits="userSpaceOnUse"
+                            x1="${layer.w}" y1="0" x2="0" y2="0">
+              <stop offset="0"    stop-color="#fff6df" stop-opacity="1" />
+              <stop offset="0.55" stop-color="#ffe7b0" stop-opacity="0.92" />
+              <stop offset="1"    stop-color="#ffdb96" stop-opacity="0.45" />
+            </linearGradient>
+          </defs>
+          <g class="aroma__halo" filter="url(#${uid}-glow)"></g>
+          <g class="aroma__core"></g>
+        </svg>`;
+
+      const halo = el.querySelector(".aroma__halo");
+      const core = el.querySelector(".aroma__core");
+      const sparks = [];
+
+      layer.ribbons.forEach((spec, i) => {
+        const { d, points } = ribbonPath(spec);
+
+        // The same geometry twice: haze underneath, filament on top.
+        [halo, core].forEach((group) => {
+          const path = document.createElementNS(SVG_NS, "path");
+          path.setAttribute("class", "aroma__ribbon");
+          path.setAttribute("d", d);
+          path.setAttribute("stroke", `url(#${uid}-${group === halo ? "halo" : "core"})`);
+          // Normalised, so one dash can unfurl the whole ribbon whatever its
+          // real length, and all three unfurl at the same rate.
+          path.setAttribute("pathLength", "1000");
+          path.style.animationDelay = `${i * 220}ms`;
+          group.append(path);
+        });
+
+        // Sparks sit on the ribbon itself, so they always look carried by it.
+        if (i === 0) {
+          for (let k = 0; k < 6; k++) {
+            sparks.push(points[Math.round(((k + 0.5) / 6) * (points.length - 1))]);
+          }
+        }
+      });
+
+      sparks.forEach(([x, y], k) => {
+        const spark = document.createElement("i");
+        spark.className = "aroma__spark";
+        spark.style.left = `${x}px`;
+        spark.style.top = `${y}px`;
+        spark.style.width = spark.style.height = `${5 + (k % 3) * 3}px`;
+        // Staggered so the ribbon twinkles along its length rather than at once.
+        spark.style.animationDelay = `${1100 + k * 420}ms`;
+        el.append(spark);
+      });
+      break;
+    }
 
     // One light keeper crosses the dark, shedding glitter as she goes. The
     // sparks are laid along her flight path rather than parented to her, so

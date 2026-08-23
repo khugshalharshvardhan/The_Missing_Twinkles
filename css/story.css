@@ -108,17 +108,9 @@
 .fx-walk-in-left  { animation: walk-in-left  var(--speed-slow) var(--ease) both; }
 .fx-walk-in-right { animation: walk-in-right var(--speed-slow) var(--ease) both; }
 
-.fx-breathe,
-.fx-breathe-slow {
-  transform-origin: 50% 100%;
-  animation: breathe 4.2s ease-in-out infinite;
-}
-.fx-breathe-slow { animation-duration: 5.6s; animation-delay: -1.4s; }
-
-.fx-grin {
-  transform-origin: 50% 100%;
-  animation: grin 1s var(--ease) both;
-}
+/* Agni and Neel hold still. They used to breathe and bob on every beat, which
+   read as hovering rather than as life — a pose change now carries the
+   performance instead. Their entrances and the scared shiver stay. */
 
 .fx-shiver { animation: shiver 220ms ease-in-out infinite alternate; }
 .fx-float  { animation: float 5s ease-in-out infinite; }
@@ -161,18 +153,6 @@
 @keyframes walk-in-right {
   from { opacity: 0; transform: translateX(170px); }
   to   { opacity: 1; transform: none; }
-}
-
-@keyframes breathe {
-  0%, 100% { transform: translateY(0) scale(1); }
-  50%      { transform: translateY(-9px) scale(1.008); }
-}
-
-@keyframes grin {
-  0%   { transform: scale(1) rotate(0); }
-  30%  { transform: scale(1.06) rotate(-1.8deg); }
-  62%  { transform: scale(1.02) rotate(1.2deg); }
-  100% { transform: scale(1) rotate(0); }
 }
 
 @keyframes shiver {
@@ -265,6 +245,65 @@
   );
   opacity: 0;
   animation: glimmer 4.2s ease-in-out infinite;
+}
+
+/* Cake on the air — a warm ribbon of scent unfurling out of the bakery.
+   Each ribbon is painted twice: a wide blurred halo pass and a thin bright
+   filament on top. That pairing is what makes it glow instead of looking like
+   a drawn line. Geometry comes from ribbonPath() in js/story.js. */
+.fxlayer--aroma svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  /* The whole ribbon breathes on the air, very slowly. */
+  animation: aroma-sway 16s ease-in-out infinite alternate;
+}
+
+.aroma__ribbon {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  /* Unfurls from the bakery outward: at offset 1000 the dash sits entirely
+     before the start, at 0 it covers the whole normalised length. */
+  stroke-dasharray: 1000 1000;
+  stroke-dashoffset: 1000;
+  animation: aroma-unfurl 4.2s ease-out both;
+}
+
+/* Weight only — the colour and the taper come from the gradients. */
+.aroma__halo .aroma__ribbon { stroke-width: 19; opacity: 0.62; }
+.aroma__core .aroma__ribbon { stroke-width: 4.2; }
+
+/* A thinner strand for the ribbon riding above the main one. */
+.aroma__halo .aroma__ribbon:nth-child(2) { stroke-width: 14; opacity: 0.5; }
+.aroma__core .aroma__ribbon:nth-child(2) { stroke-width: 3.2; }
+
+/* A spark caught in the ribbon. */
+.aroma__spark {
+  position: absolute;
+  margin: -4px 0 0 -4px;
+  border-radius: 50%;
+  background: #fff8e6;
+  box-shadow: 0 0 14px 5px rgba(255, 176, 62, 0.9);
+  opacity: 0;
+  animation: aroma-spark 5s ease-in-out infinite;
+}
+
+@keyframes aroma-unfurl {
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes aroma-spark {
+  0%, 100% { opacity: 0; scale: 0.5; }
+  22%      { opacity: 1; scale: 1.25; }
+  55%      { opacity: 0.35; scale: 0.9; }
+}
+
+@keyframes aroma-sway {
+  from { transform: translateY(7px) scaleY(0.99); }
+  to   { transform: translateY(-13px) scaleY(1.01); }
 }
 
 .fxlayer--fireflies,
@@ -700,18 +739,18 @@
    ========================================================= */
 
 @media (prefers-reduced-motion: reduce) {
-  .fx-breathe,
-  .fx-breathe-slow,
   .fx-shiver,
   .fx-float,
   .fx-flicker,
   .fx-drift,
   .fx-drift-slow,
-  .fx-grin,
+  .fxlayer--aroma svg,
+  .aroma__spark,
   .tap__chevron {
     animation: none;
   }
 
+  .aroma__ribbon,
   .say__bubble,
   .say__text,
   .voice,

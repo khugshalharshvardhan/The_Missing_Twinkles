@@ -56,6 +56,12 @@ const NEEL_WALKING = {
   key: "neel", src: `${IMG}neel_walking.png`, x: 835, y: 388, w: 510, h: 627
 };
 
+// Figma-matched mark for the walking box's centre (1090) and ground line
+// (1015), so the pose change reads as a reaction rather than a reposition.
+const NEEL_SMELLING = {
+  key: "neel", src: `${IMG}neel_smelling.png`, x: 836, y: 388, w: 508, h: 627
+};
+
 const NEEL_CHEEKY = {
   key: "neel", src: `${IMG}neel_cheeky.png`, x: 908, y: 371, w: 472, h: 622,
   fill: { left: "-16.4%", top: "-0.06%", width: "126.88%", height: "100.13%" }
@@ -92,6 +98,28 @@ const GLIMMERS = [
   { key: "glim-5", kind: "glimmer", x: 1500, y: 220, delay: 3400 }
 ];
 
+// Cake on the air, drawn as a warm ribbon of scent that unfurls out of the
+// bakery and sweeps the length of the street. Figma has no art for this — it is
+// the cartoon beat the script asks for.
+//
+// The ribbons are specified as numbers rather than bezier strings so the curls
+// stay perfectly round and the shape is tunable: `waves` is how many times it
+// undulates across the sweep, `amp` how far, `loops` the fractions along it
+// that turn a full spiral, and `radius` how big those spirals are. See
+// ribbonPath() in js/story.js. Coordinates are local to the box below.
+const AROMA = {
+  key: "aroma",
+  kind: "aroma",
+  x: 300, y: 100, w: 1400, h: 640,
+  ribbons: [
+    // The main ribbon: out of the shop doorway, up past the cupcake sign, then
+    // the length of the lane to the tree at the far end.
+    { from: [1270, 450], to: [60, 250], waves: 1.6, amp: 62, loops: [0.28, 0.68], radius: 42 },
+    // One strand riding above it, curling once on the offbeat.
+    { from: [1240, 360], to: [200, 220], waves: 2, amp: 40, loops: [0.5], radius: 30, phase: 2 }
+  ]
+};
+
 const BUBBLE_NEEL = { src: `${IMG}bubble_neel.png`, x: 732, y: 182, w: 420, h: 226, flipX: true };
 
 /* ---- the pages ------------------------------------------------------- */
@@ -118,11 +146,10 @@ export const pages = [
       // Neel catches the bakery on the air.
       {
         id: "1.2",
-        hold: 3800, // "do I smell cake?" ends at 2.58s
-        layers: [
-          { ...AGNI_WALKING, fx: "breathe" },
-          { ...NEEL_WALKING, fx: "breathe-slow" }
-        ],
+        hold: 5200, // "do I smell cake?" ends at 2.58s; the swirl needs 4.2s
+        // Agni holds her mark exactly; Neel takes the sniffing pose on the
+        // same centre and ground line, so only his drawing changes.
+        layers: [AROMA, AGNI_WALKING, NEEL_SMELLING],
         say: {
           bubble: BUBBLE_NEEL,
           text: { x: 777, y: 224, w: 342 },
@@ -130,15 +157,12 @@ export const pages = [
         }
       },
 
-      // Figma 1.3 — Agni is unimpressed. The pair changes mark, so these
-      // cross-fade over the same street.
+      // Figma 1.3 — Agni is unimpressed. Only she changes mark: Neel holds the
+      // walking pose all the way through her line, and reacts after it.
       {
         id: "1.3",
-        hold: 4900, // "…had a cookie!" ends at 3.68s
-        layers: [
-          { ...NEEL_CHEEKY, fx: "breathe-slow" },
-          { ...AGNI_TALKING, fx: "breathe" }
-        ],
+        hold: 3800, // "…had a cookie!" ends at 3.68s — his pose turns on that beat
+        layers: [NEEL_SMELLING, AGNI_TALKING],
         say: {
           bubble: { src: `${IMG}bubble_agni.png`, x: 128, y: 190, w: 586, h: 294, flipX: true },
           text: { x: 179, y: 265.95, w: 482 },
@@ -146,15 +170,13 @@ export const pages = [
         }
       },
 
-      // …and Neil is unrepentant.
+      // Her line has landed, and now Neil answers it with a face. This is the
+      // one place his pose changes on this page.
       {
         // Last step of the page: waits for the reader, chevron in at 2.1s.
         id: "1.4",
         reveal: 2100,
-        layers: [
-          { ...NEEL_CHEEKY, fx: "grin" },
-          { ...AGNI_TALKING, fx: "breathe" }
-        ]
+        layers: [NEEL_CHEEKY, AGNI_TALKING]
       }
     ]
   },
@@ -172,7 +194,7 @@ export const pages = [
         hold: 4400, // lets the mist finish rising
         layers: [
           { key: "bg-moonlit", src: `${IMG}bg_town_moonlit.jpg`, x: 0, y: 0, w: 1920, h: 1080 },
-          { key: "agni", src: `${IMG}agni_looking_down.png`, x: 297, y: 461, w: 613, h: 566, fx: "breathe" },
+          { key: "agni", src: `${IMG}agni_looking_down.png`, x: 297, y: 461, w: 613, h: 566 },
           {
             key: "neel", src: `${IMG}neel_scared.png`, x: 945, y: 403, w: 489, h: 624,
             fill: { left: "-15.02%", top: "0%", width: "152.56%", height: "104.64%" },
@@ -240,7 +262,7 @@ export const pages = [
       {
         id: "4.1",
         hold: 5200, // "…the little light-keepers!" ends at 4.02s
-        layers: [{ key: "cast", src: `${IMG}scene_shock.png`, x: 239, y: 191, w: 1276, h: 851, fx: "breathe" }],
+        layers: [{ key: "cast", src: `${IMG}scene_shock.png`, x: 239, y: 191, w: 1276, h: 851 }],
         say: {
           bubble: { src: `${IMG}bubble_agni.png`, x: 118, y: 96, w: 586, h: 294, flipX: true },
           text: { x: 169, y: 153, w: 482 },
@@ -253,7 +275,7 @@ export const pages = [
         // Last step of the chapter: chevron in, then the end card.
         id: "4.2",
         reveal: 3100,
-        layers: [{ key: "cast", src: `${IMG}scene_cheer.png`, x: 273, y: 241, w: 1258, h: 839, fx: "breathe" }],
+        layers: [{ key: "cast", src: `${IMG}scene_cheer.png`, x: 273, y: 241, w: 1258, h: 839 }],
         say: {
           bubble: { src: `${IMG}bubble_agni.png`, x: 54, y: 78, w: 606, h: 326, flipX: true },
           text: { x: 117, y: 169, w: 481 },
