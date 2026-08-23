@@ -22,19 +22,11 @@
   visibility: visible;
 }
 
-/* The finish: the frame edges fall away and the near ground goes to shadow, so
-   the light in the scene reads as coming from the fireflies rather than from
-   everywhere. Paints above every layer — the strips are plain positioned
-   elements with no z-index, so ::after, being last, wins. */
-#walk::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background:
-    linear-gradient(to bottom, transparent 62%, rgba(6, 10, 26, 0.42) 100%),
-    radial-gradient(120% 92% at 50% 44%, transparent 40%, rgba(6, 10, 26, 0.5) 100%);
-}
+/* No vignette here on purpose. One was added when this act was a dark forest
+   corridor, and it now fights the thing the walk is trying to be: bg_night has
+   its own falloff painted in — its clearing is brightest at y 920 and shades off
+   both ways — and the earth gradient below reproduces exactly that. A second
+   darkening on top measured the dirt 24% below the screen it hands over to. */
 
 /* One scrolling layer. The art was measured to tile horizontally, so this is a
    repeating background moved by background-position — no duplicated nodes, and
@@ -54,55 +46,71 @@
   will-change: background-position;
 }
 
-/* Solid earth under the two ground planes. It has to have no visible edge of
-   its own, so it fades in from nothing across the top — by the time it is
-   opaque it is well inside the path's own texture. Colours sampled from the
-   cores of the layers it backs: rgb(57,56,99) on the path, rgb(69,64,99) at its
-   near edge, rgb(24,72,88) in the grass. */
+/* Solid earth under the two ground planes, which are semi-transparent texture
+   rather than surface. The stops are bg_night's own centre-column colours,
+   sampled at y 800 / 824 / 872 / 920 / 968 / 1016 / 1059 and converted to
+   percentages of this layer's 780..1059 span — so where the moving texture
+   thins out, what shows through is the game's ground, exactly. It fades in from
+   nothing across the top: any hard horizontal edge here reads as a ledge. */
 .pw__earth {
   background: linear-gradient(
     to bottom,
-    rgba(57, 56, 99, 0) 0%,
-    rgb(60, 58, 99) 22%,
-    rgb(69, 64, 99) 42%,
-    rgb(38, 70, 92) 66%,
-    rgb(24, 72, 88) 100%
+    rgba(0, 0, 21, 0) 0%,
+    rgb(51, 66, 156) 7%,
+    rgb(69, 61, 150) 16%,
+    rgb(97, 81, 168) 33%,
+    rgb(133, 106, 188) 50%,
+    rgb(85, 66, 144) 67%,
+    rgb(32, 26, 91) 85%,
+    rgb(27, 17, 40) 100%
   );
 }
 
-/* Planted, not pasted on. Tightens as the weight lands, on the stride's clock. */
+/* Planted, not pasted on. Position and squash come from js/walk.js on the
+   stride's own clock, so it stays under the soles as they spread out and grow. */
 .pw__shadow {
   position: absolute;
   border-radius: 50%;
+  transform-origin: 50% 50%;
   background: radial-gradient(
     closest-side,
     rgba(6, 8, 20, 0.72) 0%,
     rgba(6, 8, 20, 0.4) 52%,
     rgba(6, 8, 20, 0) 100%
   );
-  animation: pw-plant var(--step-ms, 1040ms) ease-in-out infinite;
-}
-
-@keyframes pw-plant {
-  0%, 100% { transform: scale(1); opacity: 1; }
-  25%, 75% { transform: scale(0.88); opacity: 0.72; }
 }
 
 /* ---- the pair ---- */
 
-/* One cell of a nine-frame strip at a time. steps() is set inline per walker,
-   from the sheet's own frame count. */
+/* Laid out at the arrival mark; the approach across the frame and the growth
+   towards the viewer are one transform, set per frame from js/walk.js. The
+   origin is the soles, so growing does not lift them off the ground. */
 .pw__walker {
   position: absolute;
-  background-repeat: no-repeat;
-  animation-name: pw-walk;
-  animation-duration: var(--step-ms, 900ms);
-  animation-iteration-count: infinite;
+  transform-origin: 50% 100%;
+  will-change: transform;
 }
 
-@keyframes pw-walk {
-  from { background-position-x: 0; }
-  to { background-position-x: var(--sheet-end, 0); }
+/* Two of these per walker, stacked: the current sprite cell and the next one.
+   js/walk.js fades the upper one in over the last part of each frame, which is
+   what stops nine poses reading as a stutter against a 60fps scroll. */
+.pw__cell {
+  position: absolute;
+  inset: 0;
+  display: block;
+  background-repeat: no-repeat;
+  will-change: background-position, opacity;
+}
+
+/* The guide firefly's art fills its box. */
+.pw__fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: cover;
 }
 
 /* ---- fireflies drifting through the scene ---- */
@@ -152,7 +160,7 @@
    ========================================================= */
 
 @media (prefers-reduced-motion: reduce) {
-  /* The stride stays: it is the walk, not a flourish, and freezing it would
-     leave them sliding along the path. Only the flutter comes off. */
+  /* The stride stays: it is the walk, not a flourish, and it is driven from the
+     scroll rather than by an animation. Only the flutter comes off. */
   .pw__guide { animation: pw-weave 9s ease-in-out infinite alternate; }
 }
