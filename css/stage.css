@@ -7,6 +7,15 @@
   font-display: swap;
 }
 
+/* Mr Giggles' laugh, and nothing else. */
+@font-face {
+  font-family: "Creepster";
+  src: url("../assets/fonts/Creepster-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* ---- tokens ---- */
 :root {
   /* Design frame — every scene coordinate is relative to this. */
@@ -20,6 +29,7 @@
   --dusk:      #1b2036;
 
   --font-display: "Fredoka One", "Trebuchet MS", system-ui, sans-serif;
+  --font-creepy: "Creepster", "Trebuchet MS", system-ui, sans-serif;
 
   --speed:      480ms;
   --speed-slow: 900ms;

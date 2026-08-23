@@ -318,11 +318,19 @@ function overlays(step) {
   if (step.say) {
     const bubble = image(step.say.bubble, "layer say__bubble");
     bubble.dataset.role = "say.bubble";
-    frag.append(bubble);
 
     const text = line(step.say);
     text.dataset.role = "say.text";
-    frag.append(text);
+
+    // A step can hold its line back until the scene has settled — page 2 lets
+    // the mist cover the ground before Neel says anything. This adds to the
+    // pop and settle delays the stylesheet already gives them.
+    if (step.say.at) {
+      bubble.style.animationDelay = `${step.say.at + 260}ms`;
+      text.style.animationDelay = `${step.say.at + 520}ms`;
+    }
+
+    frag.append(bubble, text);
   }
   (step.voices ?? []).forEach((voice, i) => {
     const el = spoken(voice);
@@ -417,24 +425,96 @@ function shout(cue) {
 }
 
 // The laugh rides an arc across the top edge, so it reads as travelling past
-// rather than being spoken by anyone on screen.
+// rather than being spoken by anyone on screen. Each letter is placed on that
+// arc as its own element, which is what lets them wave in sequence — a single
+// <textPath> could travel but never ripple.
 function laugh(cue) {
   const wrap = document.createElement("div");
-  const path = `laugh-arc-${++ids}`;
+  const W = 1000;
+  const H = 300;
 
   wrap.className = "sfx-laugh";
   wrap.style.top = `${cue.y}px`;
   wrap.style.animationDelay = `${cue.delay ?? 0}ms`;
-  wrap.innerHTML = `
-    <svg viewBox="0 0 1000 300" width="1000" height="300" aria-hidden="true">
-      <path id="${path}" d="M10,250 Q500,10 990,250" fill="none" />
-      <text><textPath href="#${path}" startOffset="50%" text-anchor="middle"></textPath></text>
-    </svg>`;
-  // Set the text as data, not markup.
-  wrap.querySelector("textPath").textContent = cue.text;
 
+  const svg = document.createElementNS(SVG_NS, "svg");
+  svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+  svg.setAttribute("width", String(W));
+  svg.setAttribute("height", String(H));
+  svg.setAttribute("aria-hidden", "true");
+
+  // The arc the letters sit on, as a quadratic through the top of the box.
+  // It is evaluated here rather than measured off a rendered <path>, so the
+  // laugh can be built before it is ever in the document.
+  const P0 = [20, 250];
+  const P1 = [500, 20];
+  const P2 = [980, 250];
+
+  const at = (t) => {
+    const u = 1 - t;
+    return [
+      u * u * P0[0] + 2 * u * t * P1[0] + t * t * P2[0],
+      u * u * P0[1] + 2 * u * t * P1[1] + t * t * P2[1]
+    ];
+  };
+  const slope = (t) => {
+    const u = 1 - t;
+    return [
+      2 * u * (P1[0] - P0[0]) + 2 * t * (P2[0] - P1[0]),
+      2 * u * (P1[1] - P0[1]) + 2 * t * (P2[1] - P1[1])
+    ];
+  };
+
+  // Walk the curve once for a length table, so the letters come out evenly
+  // spaced along it instead of bunching where it turns.
+  const STEPS = 240;
+  const run = [0];
+  let last = at(0);
+  for (let i = 1; i <= STEPS; i++) {
+    const p = at(i / STEPS);
+    run.push(run[i - 1] + Math.hypot(p[0] - last[0], p[1] - last[1]));
+    last = p;
+  }
+  const total = run[STEPS];
+  const tAtLength = (len) => {
+    const i = run.findIndex((d) => d >= len);
+    if (i <= 0) return 0;
+    const span = run[i] - run[i - 1] || 1;
+    return (i - 1 + (len - run[i - 1]) / span) / STEPS;
+  };
+
+  const chars = [...cue.text];
+  const start = total * 0.06;
+  const width = total * 0.88;
+
+  chars.forEach((ch, i) => {
+    if (ch === " ") return;
+
+    const t = tAtLength(start + (width * (i + 0.5)) / chars.length);
+    const [x, y] = at(t);
+    const [dx, dy] = slope(t);
+    const turn = (Math.atan2(dy, dx) * 180) / Math.PI;
+
+    // The seat carries the placement; the glyph inside it does the waving, so
+    // each letter bobs along its own local up rather than straight up the frame.
+    const seat = document.createElementNS(SVG_NS, "g");
+    seat.setAttribute("transform", `translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${turn.toFixed(1)})`);
+
+    const glyph = document.createElementNS(SVG_NS, "text");
+    glyph.setAttribute("class", "laugh__ch");
+    glyph.setAttribute("text-anchor", "middle");
+    // Staggered, so the ripple runs along the word instead of bobbing as one.
+    glyph.style.animationDelay = `${i * 70}ms`;
+    glyph.textContent = ch;
+
+    seat.append(glyph);
+    svg.append(seat);
+  });
+
+  wrap.append(svg);
   return wrap;
 }
+
 
 /* ---- effect layers ---- */
 

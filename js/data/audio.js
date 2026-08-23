@@ -62,12 +62,15 @@ export const cues = {
     bed: "bed_uneasy",
     sfx: [
       { id: "mist_rise", at: 0, gain: 0.85 },
-      { id: "bubble", at: 260, gain: 0.6 },
-      { id: "heartbeat", at: 1500, gain: 0.5 },
-      { id: "heartbeat", at: 2400, gain: 0.55 },
-      { id: "heartbeat", at: 3300, gain: 0.6 }
+      // The heartbeats carry the rise; he only speaks once it has covered the
+      // ground, so the bubble and the line wait for it. Matches `say.at` on
+      // step 2.1 in scenes.js — change one, change the other.
+      { id: "heartbeat", at: 900, gain: 0.5 },
+      { id: "heartbeat", at: 1700, gain: 0.55 },
+      { id: "heartbeat", at: 2500, gain: 0.6 },
+      { id: "bubble", at: 2860, gain: 0.6 }
     ],
-    vo: { id: "vo_neel_what", at: 560 }
+    vo: { id: "vo_neel_what", at: 3160 }
   },
 
   // The mist rushes, four lanterns pop out from the far end in, the last one
@@ -86,30 +89,32 @@ export const cues = {
       { id: "lamp_flicker", at: 3300, gain: 0.8, pan: -0.69 },
       { id: "lamp_out", at: 4000, gain: 0.9, pan: -0.69 },
       { id: "blackout_hit", at: 4100, gain: 1 }
-    ],
-    vo: { id: "vo_giggles_1", at: 5200, gain: 0.95 }
+    ]
+    // No laugh here: it belongs over the eyes, and there is only ever one.
   },
 
   /* ---------- Screen 3 ---------- */
 
   // Agni calls into the dark. Blinks match the BLINK! captions.
+  // The eyes open, and he crosses overhead. The pan sweeps with the text.
   "3.1": {
     bed: "bed_dark",
     sfx: [
-      { id: "blink", at: 700, gain: 0.55, pan: -0.42 },
-      { id: "blink", at: 1900, gain: 0.55, pan: 0.55 }
+      { id: "blink", at: 900, gain: 0.55, pan: -0.42 },
+      { id: "blink", at: 2100, gain: 0.55, pan: 0.55 }
     ],
-    vo: { id: "vo_agni_neil", at: 420, pan: -0.42 }
+    vo: { id: "vo_giggles_2", at: 500, gain: 0.95, sweep: [-0.9, 0.9] }
   },
 
   "3.2": {
-    sfx: [{ id: "blink", at: 900, gain: 0.55, pan: 0.55 }],
-    vo: { id: "vo_neel_here", at: 420, pan: 0.5 }
+    sfx: [{ id: "blink", at: 700, gain: 0.55, pan: -0.42 }],
+    vo: { id: "vo_agni_neil", at: 420, pan: -0.42 }
   },
 
   // The laugh crosses the frame, so the voice crosses the speakers with it.
   "3.3": {
-    vo: { id: "vo_giggles_2", at: 600, gain: 0.95, sweep: [-0.9, 0.9] }
+    sfx: [{ id: "blink", at: 900, gain: 0.55, pan: 0.55 }],
+    vo: { id: "vo_neel_here", at: 420, pan: 0.5 }
   },
 
   // Firefly transition — bells, and the bed turns hopeful.

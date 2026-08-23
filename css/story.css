@@ -255,7 +255,7 @@
   inset: 0;
   background: #04050c;
   opacity: 0;
-  animation: lamp-die 1.5s ease-in-out 4s forwards;
+  animation: lamp-die 1.2s ease-in-out 3.6s forwards;
 }
 
 /* A faint light blinking in a distant hiding place. */
@@ -333,7 +333,15 @@
   to   { transform: translateY(-13px) scaleY(1.01); }
 }
 
-/* The supplied footage, filling its box. */
+/* The supplied footage, filling its box. Effect layers are not faded in by the
+   player, so the eyes open out of the blackout on their own clock. */
+.fxlayer--video { animation: eyes-open 900ms var(--ease) both; }
+
+@keyframes eyes-open {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
 .fxlayer--video video {
   position: absolute;
   inset: 0;
@@ -439,18 +447,30 @@
   position: absolute;
   left: 0;
   width: 1000px;
+  /* One pass, left to right, and no repeat — he goes past exactly once. */
   animation: laugh-across 2.6s linear both;
+  animation-iteration-count: 1;
+  filter: drop-shadow(0 0 26px rgba(120, 220, 90, 0.45));
 }
 
 .sfx-laugh svg { overflow: visible; }
 
-.sfx-laugh text {
-  font-family: var(--font-display);
-  font-size: 68px;
-  fill: #ffe6a3;
+/* One letter of the laugh. The seat <g> around it holds the placement and the
+   turn of the arc, so this transform waves the letter along its own local up
+   and the ripple follows the curve. */
+.laugh__ch {
+  font-family: var(--font-creepy);
+  font-size: 92px;
+  fill: #d8f6b0;
   paint-order: stroke;
-  stroke: rgba(52, 18, 0, 0.6);
-  stroke-width: 9px;
+  stroke: rgba(8, 22, 6, 0.75);
+  stroke-width: 10px;
+  animation: laugh-wave 1.1s ease-in-out infinite;
+}
+
+@keyframes laugh-wave {
+  0%, 100% { transform: translateY(8px) rotate(-5deg); }
+  50%      { transform: translateY(-14px) rotate(5deg); }
 }
 
 @keyframes laugh-across {

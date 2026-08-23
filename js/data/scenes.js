@@ -233,9 +233,12 @@ export const pages = [
       // Figma 2.1 — mist at their feet.
       {
         id: "2.1",
-        hold: 4400, // lets the mist finish rising
+        hold: 5200,
         layers: [TOWN_MOONLIT, AGNI_DOWN, NEEL_SCARED, MIST_LOW],
         say: {
+          // The mist takes 3.2s to cover the cobbles. He speaks after it has,
+          // not over the top of it — the sound cue is held back to match.
+          at: 2600,
           bubble: BUBBLE_NEEL,
           text: { x: 777, y: 265, w: 342 },
           lines: ["What was that?"]
@@ -248,7 +251,9 @@ export const pages = [
       // lamp by lamp, and the last of it drains away after the near one.
       {
         id: "2.2",
-        hold: 7600,
+        // Ends as the last of the light drains, so the eyes open straight out
+        // of the blackout instead of leaving the screen black and waiting.
+        hold: 4900,
         layers: [
           TOWN_MOONLIT,
           // Over the street they light, under the faces they must not stain.
@@ -258,28 +263,30 @@ export const pages = [
         ]
       },
 
-      // Figma 2.3 / 2.4 / 3 — pitch dark, two pairs of eyes. A bubble would
-      // light the frame, so these lines are spoken in each character's colour.
+      // Figma 2.3 / 2.4 / 3 — pitch dark, two pairs of eyes. The eyes open the
+      // moment the light has gone, and Mr Giggles crosses overhead: once, heard
+      // and read, but never shown. A bubble would light the frame, so the two
+      // lines after him are spoken in each character's own colour.
       {
         id: "3.1",
+        hold: 4200, // he crosses at 500ms and takes 2.6s to pass
+        layers: [{ key: "night", kind: "night" }, EYES],
+        sfx: [{ kind: "laugh", y: 70, text: "Hee-hee-hee-hee!", delay: 500 }]
+      },
+
+      {
+        id: "3.2",
         hold: 3800, // "Neil?", then the eyes blink on their own
         layers: [{ key: "night", kind: "night" }, EYES],
         voices: [{ x: 355, y: 700, w: 400, tone: "agni", text: "Neil?" }]
       },
 
       {
-        id: "3.2",
-        hold: 3600, // "I am here… I think."
+        // Last step of the page: chevron in once his answer has landed.
+        id: "3.3",
+        reveal: 3000,
         layers: [{ key: "night", kind: "night" }, EYES],
         voices: [{ x: 1040, y: 690, w: 560, tone: "neel", text: "I am here… I think." }]
-      },
-
-      // The laugh crosses overhead without ever showing him — heard, not read.
-      {
-        // Last step of the page: chevron in once the laugh has passed.
-        id: "3.3",
-        reveal: 3400,
-        layers: [{ key: "night", kind: "night" }, EYES]
       }
     ]
   },
@@ -348,7 +355,9 @@ export const manifest = [
     ])
       .filter((layer) => layer.src)
       .map((layer) => layer.src)
-      // Built at runtime by the firefly transition.
-      .concat(`${IMG}firefly.webp`)
+      // Not in any scene, but needed the moment they are asked for: the
+      // firefly transition builds its own sprite, and js/handoff.js closes
+      // the chapter with the two mist images.
+      .concat(`${IMG}firefly.webp`, `${IMG}bg_mist_full.webp`, `${IMG}mist_band.webp`)
   )
 ];
