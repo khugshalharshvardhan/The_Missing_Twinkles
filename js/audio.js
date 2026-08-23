@@ -11,8 +11,13 @@ import { clipUrl } from "./data/audio.js";
 
 const STORE_KEY = "mystry.muted";
 
-const BUS_GAIN = { music: 0.5, sfx: 0.85, vo: 1 };
-const DUCK_TO = 0.3;      // ambience level while a line plays
+// Measured, not guessed: bed_main is a mastered track at -17.0 LUFS and the
+// voice lines sit at about -16.5, so at this bus gain the music plays roughly
+// 7 dB under the dialogue — present, never competing.
+const BUS_GAIN = { music: 0.45, sfx: 0.85, vo: 1 };
+// While a line plays, the music drops another ~7 dB. The old value here was
+// tuned for quiet ambience and against a real music bed it left nothing at all.
+const DUCK_TO = 0.45;
 const DUCK_TAIL = 0.35;   // seconds to hold the duck after the line ends
 const BED_FADE = 1.4;
 
@@ -23,6 +28,13 @@ const buffers = new Map();
 let live = [];            // sources scheduled for the current beat
 let bed = null;           // { id, source, gain }
 let muted = false;
+// A multiplier on the music bus that beats can set, so one continuous track can
+// still fall away for the lights-out and come back with the fireflies. Ducking
+// works against this rather than the bus constant, so a line heard during a dip
+// does not pull the music back up afterwards.
+let musicLevel = 1;
+
+const musicBase = () => BUS_GAIN.music * musicLevel;
 
 /* ---- setup ---- */
 
@@ -136,6 +148,16 @@ function fire(cue, bus) {
   src.start(when);
   live.push(src);
 
+  // Some clips outlast the beat that starts them — the walking loop runs 19s
+  // under an 8.6s walk — so they are taken out rather than cut off. This has to
+  // come after start(): stop() on a source that has not been started throws.
+  if (cue.fade) {
+    const out = when + cue.fade.at / 1000;
+    gain.gain.setValueAtTime(gain.gain.value, out);
+    gain.gain.linearRampToValueAtTime(0, out + cue.fade.over);
+    src.stop(out + cue.fade.over + 0.05);
+  }
+
   if (bus === "vo") duck(when, buffer.duration / (cue.rate || 1));
   return src;
 }
@@ -187,16 +209,33 @@ export function playBed(id, at = 0) {
   bed = { id, source: node.src, gain: node.gain };
 }
 
-// Dip the ambience so a line sits on top of it.
+// Dip the music so a line sits on top of it, then bring it back to whatever
+// level the story currently wants — not to the bus constant.
 function duck(when, seconds) {
   const g = buses.music.gain;
   const back = when + seconds + DUCK_TAIL;
+  const to = musicBase() * DUCK_TO;
 
   g.cancelScheduledValues(when);
   g.setValueAtTime(g.value, when);
-  g.linearRampToValueAtTime(BUS_GAIN.music * DUCK_TO, when + 0.18);
-  g.setValueAtTime(BUS_GAIN.music * DUCK_TO, back);
-  g.linearRampToValueAtTime(BUS_GAIN.music, back + 0.5);
+  g.linearRampToValueAtTime(to, when + 0.18);
+  g.setValueAtTime(to, back);
+  g.linearRampToValueAtTime(musicBase(), back + 0.5);
+}
+
+// Where the music sits between lines. `to` is a fraction of the bus level, so
+// the story can pull the track down for the blackout and let it back up for the
+// fireflies without a second track to cross-fade to.
+export function setMusic(to, at = 0, over = 1.2) {
+  if (!ctx) return;
+
+  musicLevel = to;
+  const g = buses.music.gain;
+  const when = ctx.currentTime + at / 1000;
+
+  g.cancelScheduledValues(when);
+  g.setValueAtTime(g.value, when);
+  g.linearRampToValueAtTime(musicBase(), when + over);
 }
 
 /* ---- beat lifecycle ---- */
@@ -214,9 +253,10 @@ export function clearCues() {
   live = [];
 
   if (ctx) {
+    // Drop any pending duck, but leave the level the story asked for alone.
     const g = buses.music.gain;
     g.cancelScheduledValues(ctx.currentTime);
-    g.setValueAtTime(BUS_GAIN.music, ctx.currentTime);
+    g.setValueAtTime(musicBase(), ctx.currentTime);
   }
 }
 
@@ -230,11 +270,16 @@ export function playCues(cues) {
     playBed(b.id, b.at ?? 0);
   }
 
+  // Before the voice, so a dip and a duck on the same beat do not fight over
+  // the one gain node.
+  if (cues.music) setMusic(cues.music.to, cues.music.at ?? 0, cues.music.over);
+
   (cues.sfx ?? []).forEach((cue) => fire(cue, "sfx"));
   if (cues.vo) fire(cues.vo, "vo");
 }
 
 export function stopAudio() {
+  musicLevel = 1;
   clearCues();
   playBed(null);
 }
