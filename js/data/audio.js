@@ -190,35 +190,94 @@ export const cues = {
    ========================================================= */
 
 export const gameCues = {
-  // Agni and Neel spot the twinkles.
-  "1.1": { bed: "bed_main", sfx: [{ id: "bubble", at: 200, gain: 0.6 }, { id: "twinkle", at: 700, gain: 0.4 }] },
-  "1.2": { bed: "bed_main", sfx: [{ id: "bubble", at: 200, gain: 0.6 }] },
-  "1.3": { sfx: [{ id: "bubble", at: 200, gain: 0.6 }] },
-  "1.4": { sfx: [{ id: "bubble", at: 200, gain: 0.6 }, { id: "grin_boing", at: 120, gain: 0.5, pan: 0.4 }] },
-  "1.5": { sfx: [{ id: "bubble", at: 200, gain: 0.6 }, { id: "twinkle", at: 800, gain: 0.35, pan: 0.2 }] },
+  // Each beat: the bubble pops at 200ms and the line starts at 500, the same
+  // 300ms gap the story uses between a bubble and the voice inside it.
+  //
+  // Three lines are not here, because they depend on what the player did:
+  // 2.2 and 16 end in the number they typed and 4.2 is one of four verdicts,
+  // so js/game.js plays the stem's number and picks the verdict.
 
-  // The keypad. Key presses and the tick are played from js/game.js, on the tap.
-  "2": { sfx: [{ id: "bubble", at: 200, gain: 0.6 }, { id: "sparkle", at: 520, gain: 0.4 }] },
-  "2.2": { sfx: [{ id: "bubble", at: 200, gain: 0.6 }] },
+  // ---- they notice the twinkles, and the problem is stated ----
+  "1.1": {
+    bed: "bed_main",
+    sfx: [{ id: "bubble", at: 200, gain: 0.6 }, { id: "twinkle", at: 700, gain: 0.4 }],
+    vo: { id: "vo_g_look", at: 500, pan: -0.55 }
+  },
+  "1.2": {
+    bed: "bed_main",
+    sfx: [{ id: "bubble", at: 200, gain: 0.6 }],
+    vo: { id: "vo_g_gone", at: 500, pan: -0.55 }
+  },
+  "1.3": {
+    sfx: [{ id: "bubble", at: 200, gain: 0.6 }],
+    vo: { id: "vo_g_howmany", at: 500, pan: -0.5 }
+  },
+  // Neel's line, so it comes from his side of the frame.
+  "1.4": {
+    sfx: [{ id: "bubble", at: 200, gain: 0.6 }, { id: "grin_boing", at: 120, gain: 0.5, pan: 0.4 }],
+    vo: { id: "vo_g_catch", at: 500, pan: 0.5 }
+  },
+  "1.5": {
+    sfx: [{ id: "bubble", at: 200, gain: 0.6 }, { id: "twinkle", at: 800, gain: 0.35, pan: 0.2 }],
+    vo: { id: "vo_g_guess", at: 500, pan: -0.5 }
+  },
 
-  // "Let us count them together."
-  "3": { sfx: [{ id: "bubble", at: 200, gain: 0.6 }] },
-  // Counting itself is scored per tap in js/game.js, so this screen stays quiet
-  // under the player.
-  "3.2": { sfx: [{ id: "bubble", at: 200, gain: 0.6 }] },
+  // ---- the keypad. Key presses are played from js/game.js, on the tap ----
+  "2": {
+    sfx: [{ id: "page_air", at: 0, gain: 0.5 }, { id: "bubble", at: 200, gain: 0.6 }],
+    vo: { id: "vo_g_howmany_q", at: 500, pan: -0.6 }
+  },
+  // Stem only: js/game.js says the number after it.
+  "2.2": {
+    sfx: [{ id: "bubble", at: 200, gain: 0.6 }],
+    vo: { id: "vo_g_ithink", at: 500, pan: 0.55 }
+  },
 
-  // The total, and how the guess did.
-  "4": { sfx: [{ id: "bubble", at: 200, gain: 0.6 }, { id: "sparkle", at: 420, gain: 0.5 }] },
-  "16": { sfx: [{ id: "bubble", at: 200, gain: 0.6 }] },
-  "4.2": { sfx: [{ id: "bubble", at: 200, gain: 0.6 }] },
+  // ---- counting ----
+  "3": {
+    sfx: [{ id: "bubble", at: 200, gain: 0.6 }],
+    vo: { id: "vo_g_count", at: 500, pan: -0.5 }
+  },
+  // The counting itself is scored per tap in js/game.js — a pip and the spoken
+  // number — so this beat only sets it up and then stays out of the way.
+  "3.2": {
+    sfx: [{ id: "page_air", at: 0, gain: 0.5 }, { id: "bubble", at: 200, gain: 0.6 }],
+    vo: { id: "vo_g_tapcount", at: 500, pan: -0.5 }
+  },
 
-  // The lamp. Striking it is played on the tap.
-  "5.1": { sfx: [{ id: "bubble", at: 200, gain: 0.6 }] },
-  "5.2": { sfx: [{ id: "bubble", at: 200, gain: 0.6 }, { id: "twinkle", at: 500, gain: 0.45 }] },
+  // ---- the total, and how the guess did ----
+  "4": {
+    sfx: [{ id: "bubble", at: 200, gain: 0.6 }, { id: "sparkle", at: 420, gain: 0.5 }],
+    vo: { id: "vo_g_total", at: 500, pan: -0.5 }
+  },
+  // Stem only: js/game.js says the number after it.
+  "16": {
+    sfx: [{ id: "bubble", at: 200, gain: 0.6 }],
+    vo: { id: "vo_g_youguessed", at: 500, pan: -0.5 }
+  },
+  // The verdict line and its chime are chosen in js/game.js.
+  "4.2": {
+    sfx: [{ id: "bubble", at: 200, gain: 0.6 }]
+  },
 
-  // The town is lit again.
-  "6.1": { sfx: [{ id: "bubble", at: 200, gain: 0.6 }, { id: "cheer_swell", at: 240, gain: 0.7 }] },
-  "6.2": { sfx: [{ id: "bubble", at: 200, gain: 0.6 }, { id: "sparkle", at: 400, gain: 0.5 }] }
+  // ---- the lamp. Striking it is played on the tap ----
+  "5.1": {
+    sfx: [{ id: "page_air", at: 0, gain: 0.5 }, { id: "bubble", at: 200, gain: 0.6 }],
+    vo: { id: "vo_g_taplamp", at: 500, pan: -0.5 }
+  },
+  "5.2": {
+    sfx: [{ id: "catch_pop", at: 120, gain: 0.8 }, { id: "twinkle", at: 500, gain: 0.45 }]
+  },
+
+  // ---- the town is theirs to light ----
+  "6.1": {
+    sfx: [{ id: "bubble", at: 200, gain: 0.6 }, { id: "cheer_swell", at: 240, gain: 0.7 }],
+    vo: { id: "vo_g_yourturn", at: 620 }
+  },
+  "6.2": {
+    sfx: [{ id: "bubble", at: 200, gain: 0.6 }, { id: "sparkle", at: 400, gain: 0.5 }],
+    vo: { id: "vo_g_guesscount", at: 500 }
+  }
 };
 
 // Every clip the soundtrack needs, for the preloader — both acts, one list, so
@@ -231,10 +290,30 @@ export const audioManifest = [
       ...(c.sfx ?? []).map((s) => s.id),
       ...(c.vo ? [c.vo.id] : [])
     ]),
-    // Played straight from js/game.js on a tap, not from a cue table.
+    // Played straight from js/game.js rather than from a cue table: on a tap,
+    // or chosen from what the player did.
     "twinkle",
     "sparkle",
     "spark_ignite",
-    "cheer_swell"
+    "cheer_swell",
+    "key_press",
+    "key_clear",
+    "key_confirm",
+    "count_pip",
+    "count_done",
+    "lamp_strike",
+    "catch_pop",
+    "correct_chime",
+    "near_chime",
+    "try_chime",
+    // The four verdicts on screen 4.2.
+    "vo_g_spoton",
+    "vo_g_close",
+    "vo_g_goodtry",
+    "vo_g_tryagain",
+    // Agni counting, and finishing the two lines that end in a number the
+    // player chose. Zero to twenty covers every count and every guess the
+    // keypad can hold that is worth speaking.
+    ...Array.from({ length: 21 }, (_, n) => `vo_n_${n}`)
   ])
 ];

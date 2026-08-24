@@ -11,8 +11,8 @@
 // be tapped, the lamp for a tap — and advance once that is done.
 
 import { screens, keypad, counter, FIREFLIES, FIREFLY_SRC, TOTAL } from "./data/screens.js";
-import { gameCues, UI_ADVANCE } from "./data/audio.js";
-import { clearCues, playCues, playSfx, playUi } from "./audio.js";
+import { gameCues } from "./data/audio.js";
+import { clearCues, playCues, playSfx, playVo } from "./audio.js";
 
 const panes = [
   document.getElementById("game-a"),
@@ -139,10 +139,11 @@ function go(target) {
 
   clearCues();
   playCues(gameCues[screen.id]);
+  const spoken = dynamicVoice(screen);
 
   // Dialogue reads itself; an interactive beat waits for the player, and its
   // own handler queues the advance once the player is done.
-  if (!screen.interact && !hold) advanceIn(readingTime(screen));
+  if (!screen.interact && !hold) advanceIn(readingTime(screen) + spoken);
 
   window.setTimeout(() => {
     busy = false;
@@ -164,13 +165,59 @@ function finish() {
 
 /* ---- dynamic copy ---- */
 
-function verdict() {
-  if (guess === null) return "Let us try again!";
+// The words, the line and the chime for each outcome, together, so they cannot
+// drift apart. None of them is a buzzer: guessing wrong and then counting is the
+// whole point of the game, so the worst case still sounds like encouragement.
+const VERDICTS = {
+  none: { text: "Let us try again!", vo: "vo_g_tryagain", sfx: "try_chime" },
+  exact: { text: "Spot on!", vo: "vo_g_spoton", sfx: "correct_chime" },
+  near: { text: "That was close!", vo: "vo_g_close", sfx: "near_chime" },
+  far: { text: "Good try — now we know!", vo: "vo_g_goodtry", sfx: "try_chime" }
+};
+
+function verdictKey() {
+  if (guess === null) return "none";
 
   const off = Math.abs(guess - TOTAL);
-  if (off === 0) return "Spot on!";
-  if (off <= 2) return "That was close!";
-  return "Good try — now we know!";
+  if (off === 0) return "exact";
+  if (off <= 2) return "near";
+  return "far";
+}
+
+function verdict() {
+  return VERDICTS[verdictKey()].text;
+}
+
+// Agni counts along, and finishes the two lines that end in a number the player
+// chose. Only zero to twenty were recorded — a larger guess is left to the
+// bubble, which is showing the figure anyway.
+const SPOKEN_MAX = 20;
+
+function sayNumber(n, at, pan) {
+  if (!Number.isInteger(n) || n < 0 || n > SPOKEN_MAX) return false;
+  playVo({ id: `vo_n_${n}`, at, pan });
+  return true;
+}
+
+// The beats whose voice depends on what the player did. Returns how much longer
+// than its reading time the beat has to stay up, so a spoken number is never
+// cut off by the next screen.
+function dynamicVoice(screen) {
+  // "Hmm... I think there were {guess}." — vo_g_ithink starts at 500ms and runs
+  // 1.88s, so the number follows at 2400.
+  if (screen.id === "2.2") return sayNumber(guess, 2400, 0.55) ? 700 : 0;
+
+  // "You guessed {guess}." — vo_g_youguessed starts at 500ms and runs 0.75s.
+  if (screen.id === "16") return sayNumber(guess, 1280, -0.5) ? 400 : 0;
+
+  if (screen.id === "4.2") {
+    const v = VERDICTS[verdictKey()];
+    playSfx({ id: v.sfx, at: 260, gain: 0.85 });
+    playVo({ id: v.vo, at: 560, pan: -0.5 });
+    return 250;
+  }
+
+  return 0;
 }
 
 function fill(text) {
@@ -279,8 +326,9 @@ function tally(el) {
   counted += 1;
 
   // Each one rings a step higher than the last, so counting up is audible as
-  // well as visible.
-  playSfx({ id: "twinkle", gain: 0.75, rate: 1 + (counted - 1) * 0.07 });
+  // well as visible — and Agni says the number, which is the whole lesson.
+  playSfx({ id: "count_pip", gain: 0.8, rate: 1 + (counted - 1) * 0.07 });
+  sayNumber(counted, 90);
 
   // Scope the lookups to this beat's own pane — the outgoing pane can still
   // be on screen mid-fade, holding a stale counter of its own.
@@ -293,7 +341,7 @@ function tally(el) {
   pane?.querySelector(".hint")?.classList.add("is-done");
 
   if (counted === TOTAL) {
-    playSfx({ id: "sparkle", at: 140, gain: 0.85 });
+    playSfx({ id: "count_done", at: 260, gain: 0.85 });
     advanceIn(AFTER_COUNT);
   }
 }
@@ -312,7 +360,7 @@ function lamp(spec) {
   const strike = () => {
     if (el.classList.contains("is-struck")) return;
     el.classList.add("is-struck");
-    playSfx({ id: "spark_ignite", gain: 0.9 });
+    playSfx({ id: "lamp_strike", gain: 0.9 });
     advanceIn(AFTER_LAMP);
   };
 
@@ -396,16 +444,24 @@ function keypadPanel() {
     }
 
     btn.addEventListener("click", () => {
+      // Committing is a rising fourth, not a fanfare: the guess has not been
+      // judged yet, and it will not be until after the count.
       if (key.confirm) {
         if (!entry.length) return;
-        playSfx({ id: "sparkle", gain: 0.8 });
+        playSfx({ id: "key_confirm", gain: 0.85 });
         guess = Number(entry);
         return next();
       }
 
-      if (key.clear) entry = "";
-      else if (entry.length < 2) entry = (entry + key.label).replace(/^0+(?=\d)/, "");
-      playUi(UI_ADVANCE, 0.45);
+      // The keys are wooden rather than electronic, so ten in a row do not turn
+      // into a beeping calculator; clearing goes downwards, and nowhere.
+      if (key.clear) {
+        entry = "";
+        playSfx({ id: "key_clear", gain: 0.7 });
+      } else {
+        if (entry.length < 2) entry = (entry + key.label).replace(/^0+(?=\d)/, "");
+        playSfx({ id: "key_press", gain: 0.75 });
+      }
       paint();
     });
 

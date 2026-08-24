@@ -1,0 +1,150 @@
+// Regenerates the counting game's voice-over. See tools/README.md.
+//   npm i msedge-tts && node tools/gen-vo-game.js <outDir>
+//
+// Separate from gen-vo.js so running it cannot disturb the story's lines, which
+// are already cut and timed. Same casting and the same constraint: the Edge
+// endpoint rejects SSML tags, so emotion is carried entirely by the rate /
+// pitch / volume columns, by how each line is punctuated, and by the
+// post-processing described in the README. The model re-synthesises those
+// prosody values rather than resampling, which is why they read as delivery
+// and not as pitch-shifting.
+
+const { MsEdgeTTS, OUTPUT_FORMAT } = require("msedge-tts");
+const fs = require("fs");
+
+const CAST = {
+  agni: "en-US-AnaNeural",   // the only Cartoon/Cute voice on the endpoint
+  neel: "en-US-BrianNeural"  // warm and casual, pitched up and slowed for a big soft creature
+};
+
+// `text` matches the bubble in js/data/screens.js word for word, so the audio
+// and the reading stay in sync. Two lines are stems: the bubble ends in a
+// number the player chose, and a number clip is played straight after the stem
+// (see NUMBERS below), so the sentence finishes with whatever they typed.
+const LINES = [
+  // ---- 1.1..1.5 — they notice, and the problem is stated ----
+  { id: "vo_g_look", who: "agni", screen: "1.1", mood: "delighted discovery",
+    text: "Look, twinkles!", rate: 1.06, pitch: "+16%", volume: 100 },
+
+  { id: "vo_g_gone", who: "agni", screen: "1.2", mood: "puzzled, the delight draining out",
+    text: "Huh? Where did they go?", rate: 0.94, pitch: "+6%", volume: 92 },
+
+  { id: "vo_g_howmany", who: "agni", screen: "1.3", mood: "working it out, purposeful",
+    text: "We need to find how many twinkles were there.", rate: 0.98, pitch: "+8%", volume: 96 },
+
+  { id: "vo_g_catch", who: "neel", screen: "1.4", mood: "eager, already halfway there",
+    text: "Then we can catch them!", rate: 1.1, pitch: "+30%", volume: 100 },
+
+  { id: "vo_g_guess", who: "agni", screen: "1.5", mood: "inviting, let-us-you-and-me",
+    text: "Look closely and make a guess!", rate: 0.96, pitch: "+12%", volume: 96 },
+
+  // ---- 2, 2.2 — the keypad ----
+  { id: "vo_g_howmany_q", who: "agni", screen: "2", mood: "asking the player, open and unhurried",
+    text: "How many twinkles were there?", rate: 0.92, pitch: "+10%", volume: 94 },
+
+  // Stem: the bubble reads "Hmm... I think there were {guess}."
+  { id: "vo_g_ithink", who: "neel", screen: "2.2", mood: "pondering, thinking aloud",
+    text: "Hmm... I think there were", rate: 0.86, pitch: "+24%", volume: 92 },
+
+  // ---- 3, 3.2 — counting ----
+  { id: "vo_g_count", who: "agni", screen: "3", mood: "encouraging, steady",
+    text: "Let us count to check.", rate: 0.96, pitch: "+8%", volume: 96 },
+
+  { id: "vo_g_tapcount", who: "agni", screen: "3.2", mood: "showing how, kind",
+    text: "Tap each twinkle to count.", rate: 0.94, pitch: "+8%", volume: 96 },
+
+  // ---- 4, 16, 4.2 — the answer and how the guess did ----
+  { id: "vo_g_total", who: "agni", screen: "4", mood: "announcing it, pleased",
+    text: "There are eight twinkles.", rate: 0.98, pitch: "+12%", volume: 98 },
+
+  // Stem: the bubble reads "You guessed {guess}."
+  { id: "vo_g_youguessed", who: "agni", screen: "16", mood: "level, no verdict in it yet",
+    text: "You guessed", rate: 0.96, pitch: "+8%", volume: 94 },
+
+  // The four verdicts in js/game.js. None of them is a buzzer: a wrong guess
+  // here is still the right move, and the delivery has to say so.
+  { id: "vo_g_spoton", who: "agni", screen: "4.2", mood: "thrilled",
+    text: "Spot on!", rate: 1.08, pitch: "+26%", volume: 100 },
+
+  { id: "vo_g_close", who: "agni", screen: "4.2", mood: "warm, nearly-had-it",
+    text: "That was close!", rate: 1.0, pitch: "+16%", volume: 98 },
+
+  { id: "vo_g_goodtry", who: "agni", screen: "4.2", mood: "kind and genuinely pleased, not consoling",
+    text: "Good try, now we know!", rate: 0.98, pitch: "+12%", volume: 96 },
+
+  { id: "vo_g_tryagain", who: "agni", screen: "4.2", mood: "gentle, no disappointment in it",
+    text: "Let us try again!", rate: 0.96, pitch: "+10%", volume: 94 },
+
+  // ---- 5.1 — the lamp ----
+  { id: "vo_g_taplamp", who: "agni", screen: "5.1", mood: "excited, urging them on",
+    text: "Tap the lamp!", rate: 1.06, pitch: "+20%", volume: 100 },
+
+  // ---- 6.1, 6.2 — handing the game over ----
+  { id: "vo_g_yourturn", who: "agni", screen: "6.1", mood: "warm, handing something over",
+    text: "Now, it is your turn.", rate: 0.92, pitch: "+10%", volume: 96 },
+
+  { id: "vo_g_guesscount", who: "agni", screen: "6.2", mood: "bright, rallying",
+    text: "Make a guess, and count to check!", rate: 1.04, pitch: "+16%", volume: 100 }
+];
+
+// Counting out loud is the point of the game, so Agni says each number as the
+// player taps it, and the same clips finish the two stems above. Zero to twenty
+// covers every count in the game and every guess a child is likely to type; a
+// larger guess plays the stem alone.
+//
+// Even and unhurried on purpose: js/game.js raises the playback rate a step per
+// tap, which is what gives the run its rising shape. Baking a rise into the
+// clips as well would compound it.
+const NUMBERS = [
+  "zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine",
+  "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen",
+  "seventeen", "eighteen", "nineteen", "twenty"
+].map((word, n) => ({
+  id: `vo_n_${n}`, who: "agni", screen: "count", mood: "clear and bright",
+  text: word, rate: 1.0, pitch: "+14%", volume: 98
+}));
+
+function speak(voice, text, prosody, out) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const tts = new MsEdgeTTS();
+      await tts.setMetadata(voice, OUTPUT_FORMAT.AUDIO_24KHZ_96KBITRATE_MONO_MP3);
+      const { audioStream } = tts.toStream(text, prosody);
+      const chunks = [];
+      audioStream.on("data", (c) => chunks.push(c));
+      audioStream.on("end", () => {
+        const buf = Buffer.concat(chunks);
+        buf.length ? (fs.writeFileSync(out, buf), resolve(buf.length)) : reject(new Error("empty audio"));
+      });
+      audioStream.on("error", reject);
+    } catch (e) {
+      reject(e);
+    }
+  });
+}
+
+const OUT = process.argv[2] || "vo_game_raw";
+fs.mkdirSync(OUT, { recursive: true });
+
+(async () => {
+  const all = [...LINES, ...NUMBERS];
+  let ok = 0;
+  for (const L of all) {
+    const voice = CAST[L.who];
+    let done = false, bytes = 0, err = "";
+    for (let attempt = 1; attempt <= 3 && !done; attempt++) {
+      try {
+        bytes = await speak(voice, L.text, { rate: L.rate, pitch: L.pitch, volume: L.volume },
+          `${OUT}/${L.id}.mp3`);
+        done = true;
+      } catch (e) {
+        err = String(e.message || e);
+        await new Promise((r) => setTimeout(r, 1200));
+      }
+    }
+    if (done) ok++;
+    console.log(`${done ? "OK  " : "FAIL"} ${L.id.padEnd(18)} ${L.screen.padEnd(6)} ${L.who.padEnd(5)}` +
+      ` ${String(bytes).padStart(6)}B  ${L.mood}${done ? "" : "  :: " + err.slice(0, 70)}`);
+  }
+  console.log(`\n${ok}/${all.length} generated`);
+})();

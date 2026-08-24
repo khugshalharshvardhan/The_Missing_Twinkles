@@ -28,6 +28,52 @@ called into the dark, pitch-shift plus a long tail on Mr. Giggles), then
 read-aloud endpoint. Fine for prototyping. Before shipping, re-record the same
 line list with a licensed provider or real voice talent.
 
+## The counting game's voice-over — `gen-vo-game.js`
+
+```
+npm i msedge-tts && node tools/gen-vo-game.js ./vo_game_raw
+```
+
+Separate from `gen-vo.js` so running it cannot disturb the story's lines, which
+are already cut and timed. Same casting, same constraint: emotion lives in the
+rate / pitch / volume columns and in the punctuation, because the endpoint
+rejects SSML.
+
+Two things about this list are worth knowing before editing it:
+
+- **Two lines are stems.** Screens 2.2 and 16 end in the number the player
+  typed, so the recorded line stops short and `js/game.js` plays a number clip
+  after it. If you re-time those lines, re-check the offsets in `dynamicVoice()`
+  — they are the stem's own length.
+- **Numbers zero to twenty are recorded separately.** Agni says each one as the
+  player taps it, which is the point of the game, and the same clips finish the
+  two stems. A guess above twenty plays the stem alone; the bubble is showing
+  the figure anyway.
+
+Post-process exactly as above, with one addition: **measure loudness on a padded
+copy**. Most of these clips are a single word, and `loudnorm` needs about three
+seconds of programme before its integrated reading means anything — measure a
+one-word clip directly and it comes back `-inf`. Padding to five seconds fixes
+it without changing the answer, because R128 gating drops the silence.
+
+## The counting game's sound effects — `gen-sfx-game.js`
+
+```
+node tools/gen-sfx-game.js assets/audios/sfx
+```
+
+Same ffmpeg synthesis and the same four loudness roles as `gen-sfx.js`, kept in
+its own file so a run cannot overwrite the story's effects. Covers the keypad,
+counting, the three verdict chimes, the lamp, and a breath of air between beats.
+
+Two deliberate choices in there:
+
+- **The keys are wooden, not electronic.** Ten presses in a row on a bright
+  synthetic beep turns the keypad into a calculator.
+- **No verdict is a buzzer.** Guessing wrong and then counting to find out is
+  the whole point of the game, so the worst outcome still resolves warmly.
+
+
 ## Sound effects — `gen-sfx.js`
 
 ```
