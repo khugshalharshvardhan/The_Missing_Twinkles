@@ -10,7 +10,10 @@
 // player instead — the keypad for a guess, the swarm for every twinkle to
 // be tapped, the lamp for a tap — and advance once that is done.
 
-import { screens, keypad, counter, FIREFLIES, FIREFLY_SRC, TOTAL } from "./data/screens.js";
+import {
+  screens, keypad, counter, numberLine,
+  FIREFLIES, FIREFLY_SRC, TOTAL, FRAME_W
+} from "./data/screens.js";
 import { gameCues } from "./data/audio.js";
 import { clearCues, playCues, playSfx, playVo, clipLength } from "./audio.js";
 
@@ -32,6 +35,10 @@ const READ_MAX = 6200;
 const AFTER_COUNT = 950; // let the last twinkle land before moving on
 const AFTER_LAMP = 900; // hold on the lit lamp for a moment
 const VO_TAIL = 650; // breath between the end of a line and the next beat
+const GUESS_LANDS = 900; // watch the tapped number arrive in the counter
+const COUNT_SETTLE = 600; // the last number grows before the line is drawn
+const LINE_WALK = 1500; // both markers travel down onto the number line
+const LINE_HOLD = 2200; // and then stay put long enough to be compared
 
 let index = -1;
 let front = 0;
@@ -44,7 +51,6 @@ let pending = null; // a beat built but not yet begun, waiting on releaseHold()
 /* ---- run state ---- */
 
 let guess = null; // what the player typed on the keypad
-let entry = ""; // digits mid-typing
 let counted = 0; // twinkles tapped on screen 3.2
 
 export function initGame(handlers) {
@@ -73,7 +79,6 @@ export function startGame(at = 0) {
   front = 0;
   pending = null;
   guess = null;
-  entry = "";
   counted = 0;
 
   panes.forEach((pane) => {
@@ -84,9 +89,10 @@ export function startGame(at = 0) {
   hud.classList.add("is-active");
 
   const start = Math.min(Math.max(at, 0), screens.length - 1);
-  // Stand in for the guess the player would have typed, so the beats that
-  // quote it back have something to say.
-  if (start > 5) guess = 10;
+  // Stand in for the guess the player would have typed, so the beats that quote
+  // it back have something to say. Single digit, because that is all the pad can
+  // now produce.
+  if (start > 5) guess = 7;
   go(start);
 }
 
@@ -102,7 +108,7 @@ export function devGoto(at) {
   clearTimeout(timer);
   hold = false;
   const i = Math.min(Math.max(at, 0), screens.length - 1);
-  if (i > 5) guess = 10;
+  if (i > 5) guess = 7;
   go(i);
   return screens[i];
 }
@@ -293,6 +299,7 @@ function render(screen) {
   if (screen.lamp) frag.append(lamp(screen.lamp));
   if (screen.keypad) frag.append(keypadPanel());
   if (screen.counter) frag.append(counterCard(screen.counter));
+  if (screen.numberLine) frag.append(numberLineStrip());
   if (screen.hint) frag.append(imageLayer(screen.hint, "layer hint"));
   if (screen.bubble) frag.append(bubble(screen.bubble));
 
@@ -368,6 +375,14 @@ function swarm(screen) {
     if (countable) {
       el.type = "button";
       el.setAttribute("aria-label", `Twinkle ${i + 1}`);
+
+      // The number each one takes when it is tapped, sitting above it. Built
+      // empty: it is the tap that gives it a value, which is what makes the
+      // count feel like the player's doing rather than a readout.
+      const tag = document.createElement("b");
+      tag.className = "firefly__n";
+      el.append(tag);
+
       el.addEventListener("click", () => tally(el));
     }
 
@@ -384,8 +399,18 @@ function tally(el) {
   el.disabled = true;
   counted += 1;
 
+  // Lit, not dimmed. They start low and come up as they are counted, so the
+  // screen fills with light as the player works rather than emptying out.
+  el.classList.add("is-lit");
+  burst(el);
+
+  // The number this one took. It appears with the tap.
+  const tag = el.querySelector(".firefly__n");
+  if (tag) tag.textContent = counted;
+
   // Each one rings a step higher than the last, so counting up is audible as
   // well as visible — and Agni says the number, which is the whole lesson.
+  playSfx({ id: "magic_tap", gain: 0.7 });
   playSfx({ id: "count_pip", gain: 0.8, rate: 1 + (counted - 1) * 0.07 });
   sayNumber(counted, 90);
 
@@ -393,16 +418,68 @@ function tally(el) {
   // be on screen mid-fade, holding a stale counter of its own.
   const pane = el.closest(".scene");
 
-  const readout = pane?.querySelector(".counter__value");
-  if (readout) readout.textContent = counted;
-
   // The tap hint has done its job once the player gets the idea.
   pane?.querySelector(".hint")?.classList.add("is-done");
 
   if (counted === TOTAL) {
     playSfx({ id: "count_done", at: 260, gain: 0.85 });
-    advanceIn(AFTER_COUNT);
+    finishCount(pane, el);
   }
+}
+
+// The last twinkle is counted. Its number grows and every other number goes,
+// leaving one figure — the answer — against the guess still showing in the
+// counter. Then both walk down onto the number line.
+function finishCount(pane, last) {
+  if (!pane) return advanceIn(AFTER_COUNT);
+
+  pane.classList.add("is-counted-out");
+  last.querySelector(".firefly__n")?.classList.add("is-total");
+
+  window.setTimeout(() => {
+    const box = pane.getBoundingClientRect();
+    const scale = box.width / FRAME_W || 1;
+    const at = (el) => {
+      const r = el.getBoundingClientRect();
+      return { x: (r.left + r.width / 2 - box.left) / scale, y: (r.top + r.height / 2 - box.top) / scale };
+    };
+
+    const wrap = pane.querySelector(".numline");
+    if (wrap) {
+      wrap.classList.add("is-live");
+      const origin = at(wrap);
+      const tag = last.querySelector(".firefly__n");
+      const card = pane.querySelector(".counter__value");
+
+      // Each marker starts from where its number already is, so it reads as
+      // that number moving rather than a new one appearing.
+      if (tag) {
+        const p = at(tag);
+        dropMarker(pane, "total", counted, { x: p.x - origin.x, y: p.y - origin.y });
+      }
+      if (card && guess !== null) {
+        const p = at(card);
+        dropMarker(pane, "guess", guess, { x: p.x - origin.x, y: p.y - origin.y });
+      }
+      playSfx({ id: "sparkle", at: 260, gain: 0.6 });
+    }
+
+    advanceIn(LINE_WALK + LINE_HOLD);
+  }, COUNT_SETTLE);
+}
+
+// A ring of sparks off a twinkle as it lights. Purely decorative, so it is built
+// here rather than in the screen data and removes itself when it is done.
+function burst(el) {
+  const fx = document.createElement("i");
+  fx.className = "spark-burst";
+  for (let i = 0; i < 8; i++) {
+    const s = document.createElement("i");
+    s.style.setProperty("--a", `${i * 45}deg`);
+    fx.append(s);
+  }
+  el.append(fx);
+  window.setTimeout(() => fx.remove(), 900);
 }
 
 /* ---- the lamp ---- */
@@ -435,113 +512,126 @@ function lamp(spec) {
 
 /* ---- the keypad ---- */
 
+// Ten digits and nothing else. The guess is a single number, so tapping one is
+// the whole interaction: it lands in the counter and the beat moves on. There is
+// no panel behind them, no readout above them, and nothing to clear or confirm.
 function keypadPanel() {
   const panel = document.createElement("div");
   panel.className = "keypad";
-
-  panel.append(imageLayer(keypad.frame, "layer"));
-
-  // Display: the art, plus the digits typed so far.
-  const display = imageLayer(keypad.display, "layer");
-  const value = document.createElement("span");
-  value.className = "keypad__value";
-  display.append(value);
-  panel.append(display);
-
-  // The player types, then taps the tick to commit — so nothing advances on a
-  // timer, and a two-digit guess is never cut off halfway.
-  const ticks = [];
-  const paint = () => {
-    value.textContent = entry;
-    // Nothing to confirm until at least one digit is in.
-    ticks.forEach((t) => {
-      t.classList.toggle("is-off", entry.length === 0);
-      t.disabled = entry.length === 0;
-    });
-  };
 
   keypad.keys.forEach((key) => {
     const btn = document.createElement("button");
 
     btn.type = "button";
-    btn.className = `key${key.clear ? " key--clear" : ""}${key.confirm ? " key--confirm" : ""}`;
+    btn.className = "key";
     place(btn, { x: key.x, y: key.y, w: keypad.keyW, h: keypad.keyH });
-    btn.setAttribute("aria-label", key.clear ? "Clear" : key.confirm ? "Confirm guess" : key.label);
+    btn.setAttribute("aria-label", key.label);
 
-    // The number keys carry a crop; the clear and confirm art fills its box.
-    const plain = key.clear || key.confirm;
     const img = document.createElement("img");
-    img.src = key.clear ? keypad.clearArt : key.confirm ? keypad.confirmArt : keypad.keyArt;
+    img.className = "fill fill--crop";
+    img.src = keypad.keyArt;
     img.alt = "";
-
-    if (plain) {
-      img.className = "fill";
-    } else {
-      img.className = "fill fill--crop";
-      img.style.left = keypad.keyFill.left;
-      img.style.top = keypad.keyFill.top;
-      img.style.width = keypad.keyFill.width;
-      img.style.height = keypad.keyFill.height;
-    }
-
+    img.style.left = keypad.keyFill.left;
+    img.style.top = keypad.keyFill.top;
+    img.style.width = keypad.keyFill.width;
+    img.style.height = keypad.keyFill.height;
     btn.append(img);
 
-    if (key.confirm) {
-      // The tick is art, not a glyph, and keeps its designed box.
-      const tick = document.createElement("img");
-      tick.className = "key__tick";
-      tick.src = keypad.tick.src;
-      tick.alt = "";
-      place(tick, keypad.tick);
-      btn.append(tick);
-      ticks.push(btn);
-    } else {
-      const label = document.createElement("span");
-      label.className = "key__label";
-      label.textContent = key.label;
-      btn.append(label);
-    }
+    const label = document.createElement("span");
+    label.className = "key__label";
+    label.textContent = key.label;
+    btn.append(label);
 
     btn.addEventListener("click", () => {
-      // Committing is a rising fourth, not a fanfare: the guess has not been
-      // judged yet, and it will not be until after the count.
-      if (key.confirm) {
-        if (!entry.length) return;
-        playSfx({ id: "key_confirm", gain: 0.85 });
-        guess = Number(entry);
-        return next();
-      }
+      if (guess !== null) return; // one guess; ignore a second tap mid-advance
 
-      // The keys are wooden rather than electronic, so ten in a row do not turn
-      // into a beeping calculator; clearing goes downwards, and nowhere.
-      if (key.clear) {
-        entry = "";
-        playSfx({ id: "key_clear", gain: 0.7 });
-      } else {
-        if (entry.length < 2) entry = (entry + key.label).replace(/^0+(?=\d)/, "");
-        playSfx({ id: "key_press", gain: 0.75 });
+      guess = Number(key.label);
+      playSfx({ id: "key_confirm", gain: 0.85 });
+
+      // Show it landing in the counter before the beat turns over, so the
+      // number is seen going where it is going.
+      const pane = panel.closest(".scene");
+      pane?.querySelectorAll(".key").forEach((k) => { k.disabled = true; });
+      const readout = pane?.querySelector(".counter__value");
+      if (readout) {
+        readout.textContent = guess;
+        readout.classList.add("is-landing");
       }
-      paint();
+      advanceIn(GUESS_LANDS);
     });
 
     panel.append(btn);
   });
 
-  paint();
   return panel;
 }
 
 /* ---- the counter ---- */
 
+// `guess` follows what the player typed and carries it through every beat from
+// the pad to the count; `live` tracks the running tally; `total` is the answer.
 function counterCard(mode) {
   const card = imageLayer(counter, "layer counter");
+  card.dataset.mode = mode;
 
   const value = document.createElement("span");
   value.className = "counter__value";
-  value.textContent = mode === "live" ? counted : TOTAL;
+  value.textContent =
+    mode === "live" ? counted : mode === "guess" ? (guess === null ? "?" : guess) : TOTAL;
   card.append(value);
 
   return card;
+}
+
+/* ---- the number line ---- */
+
+// Eleven marks, 0 to 10. Drawn empty and only filled once the count is in: the
+// two markers slide down from where their numbers already are — the guess from
+// the counter, the answer from the last twinkle — so the comparison is watched
+// being made rather than simply stated.
+function numberLineStrip() {
+  const wrap = document.createElement("div");
+  wrap.className = "numline";
+  place(wrap, { x: numberLine.x, y: numberLine.y, w: numberLine.w, h: 130 });
+
+  const rule = document.createElement("i");
+  rule.className = "numline__rule";
+  wrap.append(rule);
+
+  for (let n = 0; n <= numberLine.max; n++) {
+    const tick = document.createElement("span");
+    tick.className = "numline__tick";
+    tick.style.left = `${(n / numberLine.max) * 100}%`;
+    tick.dataset.n = String(n);
+
+    const dot = document.createElement("i");
+    dot.className = "numline__dot";
+    const num = document.createElement("b");
+    num.textContent = n;
+    tick.append(dot, num);
+    wrap.append(tick);
+  }
+
+  return wrap;
+}
+
+// Send one marker to its mark. `from` is where the number already is on screen,
+// so it looks like that number moving rather than a new one appearing.
+function dropMarker(pane, kind, value, from) {
+  const wrap = pane.querySelector(".numline");
+  if (!wrap || value === null || value > numberLine.max) return;
+
+  const marker = document.createElement("span");
+  marker.className = `numline__marker is-${kind}`;
+  marker.textContent = value;
+  marker.style.left = `${(value / numberLine.max) * 100}%`;
+  // Travelled as a transform from wherever the number is now, so the two
+  // markers arrive from different corners of the screen.
+  marker.style.setProperty("--from-x", `${from.x}px`);
+  marker.style.setProperty("--from-y", `${from.y}px`);
+  wrap.append(marker);
+
+  wrap.querySelector(`.numline__tick[data-n="${value}"]`)?.classList.add("is-hit");
 }
 
 /* ---- speech bubbles ---- */

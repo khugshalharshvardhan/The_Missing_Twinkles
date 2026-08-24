@@ -139,6 +139,19 @@ publish("count_done", mix("cd_raw", [
   { file: bell("cd_4", 1568, 1.1), at: 330, gain: 0.42 }
 ]), "shot", { stereo: true });
 
+// The tap that lights a twinkle. A shimmer rather than a note: a fast rising run
+// of high bells under a breath of air, so eight of them in a row read as one
+// piece of magic instead of eight separate chimes.
+publish("magic_tap", mix("mt_raw", [
+  { file: bell("mt_1", 1568, 0.5, 9), gain: 0.5 },
+  { file: bell("mt_2", 2093, 0.45, 10), at: 45, gain: 0.42 },
+  { file: bell("mt_3", 2637, 0.4, 12), at: 90, gain: 0.34 },
+  { file: bell("mt_4", 3136, 0.35, 14), at: 135, gain: 0.26 },
+  { file: bell("mt_5", 4186, 0.3, 18), at: 180, gain: 0.16 },
+  { file: src("mt_air", `anoisesrc=d=0.7:c=white:r=${SR}:a=1`,
+      "highpass=f=6000,afade=t=in:st=0:d=0.06,afade=t=out:st=0.12:d=0.5:curve=exp"), gain: 0.14 }
+]), "soft", { stereo: true });
+
 /* ---------- how the guess did ---------- */
 
 // Spot on: a full major arpeggio with the octave on top.

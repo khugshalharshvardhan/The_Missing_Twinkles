@@ -300,6 +300,7 @@ export const audioManifest = [
     "key_clear",
     "key_confirm",
     "count_pip",
+    "magic_tap",
     "count_done",
     "lamp_strike",
     "catch_pop",

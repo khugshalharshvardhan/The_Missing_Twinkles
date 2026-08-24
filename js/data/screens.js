@@ -180,6 +180,7 @@ export const screens = [
   {
     id: "2",
     interact: "keypad",
+    counter: "guess",
     layers: [
       BG,
       { src: `${IMG}neel_think.webp`, x: 1369, y: 386, w: 372, h: 617, fill: CROP.neelThink, flipX: true, fx: "breathe-slow" }
@@ -195,6 +196,7 @@ export const screens = [
   // ---- SCREEN 2.2 — Neel reads the guess back (101:642) ----
   {
     id: "2.2",
+    counter: "guess",
     layers: [
       BG,
       { src: `${IMG}agni_c.webp`, x: 23, y: 396, w: 473, h: 651, fill: CROP.agniC, fx: "breathe" },
@@ -210,6 +212,7 @@ export const screens = [
   // ---- SCREEN 3 — the swarm is back, time to count (99:459) ----
   {
     id: "3",
+    counter: "guess",
     layers: [
       BG,
       { src: `${IMG}agni_point.webp`, x: 64, y: 498, w: 525, h: 501, fill: CROP.agniPoint, fx: "breathe" },
@@ -234,7 +237,8 @@ export const screens = [
       { src: `${IMG}neel_c.webp`, x: 1385, y: 484, w: 396, h: 557, fill: CROP.neelC, fx: "breathe-slow" }
     ],
     fireflies: { x: 664, y: 60 },
-    counter: "live",
+    counter: "guess",
+    numberLine: true,
     hint: { src: `${IMG}tap_hint.webp`, x: 568, y: 43, w: 308.396, h: 308.396 },
     bubble: {
       art: `${IMG}bub_32.webp`, mirror: true,
@@ -353,18 +357,17 @@ export const screens = [
 ];
 
 /* The keypad, from the `keypad` group (108:12). Key boxes are 116 x 85 on a
-   120px pitch, which is what the design's 4px gaps work out to. */
+   120px pitch, which is what the design's 4px gaps work out to.
+
+   The panel behind it, the readout above it and both action keys are gone: the
+   guess is one digit, so tapping a number is the whole interaction and there is
+   nothing to clear or confirm. The ten digits keep the positions they had, which
+   is why 0 still sits alone in the middle of the bottom row. */
 export const keypad = {
-  frame: { src: `${IMG}keypad.webp`, x: 665, y: 184, w: 553, h: 691 },
-  display: { src: `${IMG}num_display.webp`, x: 766, y: 289, w: 356, h: 121, fill: CROP.numDisplay },
   keyW: 116,
   keyH: 85,
   keyArt: `${IMG}key.webp`,
   keyFill: CROP.key,
-  clearArt: `${IMG}key_x.webp`,
-  confirmArt: `${IMG}key_ok.webp`,
-  // The tick sits inset inside its key, at the size Figma gives it (146:12).
-  tick: { src: `${IMG}tick.svg`, x: 30, y: 14, w: 56, h: 56 },
   keys: [
     { label: "1", x: 766, y: 421 },
     { label: "2", x: 886, y: 421 },
@@ -375,11 +378,14 @@ export const keypad = {
     { label: "7", x: 766, y: 595 },
     { label: "8", x: 886, y: 595 },
     { label: "9", x: 1006, y: 595 },
-    { label: "X", x: 766, y: 682, clear: true },
-    { label: "0", x: 886, y: 682 },
-    { label: "OK", x: 1006, y: 682, confirm: true }
+    { label: "0", x: 886, y: 682 }
   ]
 };
+
+/* The number line under the count, where the guess and the answer are put side
+   by side. Eleven marks, 0 to 10, kept clear of both characters — Agni's box
+   ends at 634 and Neel's begins at 1385. */
+export const numberLine = { x: 500, y: 866, w: 900, max: 10 };
 
 // The counter card (99:487).
 export const counter = { src: `${IMG}counter.webp`, x: 1490, y: 57, w: 338, h: 190 };
@@ -395,12 +401,7 @@ export const manifest = [
     ]),
     FIREFLY_SRC,
     `${IMG}lamp_on.webp`,
-    keypad.frame.src,
-    keypad.display.src,
     keypad.keyArt,
-    keypad.clearArt,
-    keypad.confirmArt,
-    keypad.tick.src,
     counter.src
   ])
 ];

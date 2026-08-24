@@ -241,9 +241,19 @@
   border-radius: 50%;
 }
 
+/* Waiting to be counted: turned right down, so the screen starts dark and fills
+   with light as the player works. This is the other way round from before, when
+   counting one dimmed it — which made the reward for counting look like loss. */
+#game .firefly.is-countable .fill {
+  opacity: 0.42;
+  filter: saturate(0.5) brightness(0.72);
+  transition: opacity var(--speed) var(--ease), filter var(--speed) var(--ease);
+}
+
 #game .firefly.is-countable:hover .fill,
 #game .firefly.is-countable:focus-visible .fill {
-  filter: drop-shadow(0 0 18px var(--glow));
+  opacity: 0.72;
+  filter: saturate(0.8) brightness(0.95) drop-shadow(0 0 14px var(--glow));
 }
 
 #game .firefly.is-countable:focus-visible {
@@ -251,16 +261,191 @@
   outline-offset: 4px;
 }
 
-/* Counted ones dim and settle, so the player can see what is left. */
+/* Counted: lit. */
 #game .firefly.is-counted {
   animation: none;
   cursor: default;
 }
 
 #game .firefly.is-counted .fill {
-  opacity: 0.38;
-  filter: saturate(0.35);
-  transition: opacity var(--speed) var(--ease), filter var(--speed) var(--ease);
+  opacity: 1;
+  filter: saturate(1.15) brightness(1.12)
+    drop-shadow(0 0 12px var(--glow)) drop-shadow(0 0 30px rgba(255, 176, 66, 0.55));
+}
+
+/* The number it took, above it. */
+#game .firefly__n {
+  position: absolute;
+  left: 50%;
+  bottom: 100%;
+  transform: translate(-50%, 6px) scale(0.6);
+  margin-bottom: 2px;
+  color: var(--paper);
+  font-size: 40px;
+  line-height: 1;
+  opacity: 0;
+  text-shadow: 0 0 12px rgba(255, 176, 66, 0.9), 0 3px 0 rgba(0, 0, 0, 0.45);
+  transition: opacity 220ms var(--ease), transform 220ms var(--ease),
+    font-size 420ms var(--ease);
+  pointer-events: none;
+}
+
+#game .firefly.is-counted .firefly__n {
+  opacity: 1;
+  transform: translate(-50%, 0) scale(1);
+}
+
+/* The last one is the answer, so it grows and the rest of the numbers go. */
+#game .scene.is-counted-out .firefly__n {
+  opacity: 0;
+  transform: translate(-50%, -10px) scale(0.7);
+}
+
+#game .scene.is-counted-out .firefly__n.is-total,
+#game .firefly__n.is-total {
+  font-size: 116px;
+  opacity: 1;
+  transform: translate(-50%, -18px) scale(1);
+  text-shadow: 0 0 26px rgba(255, 190, 74, 1), 0 0 60px rgba(240, 118, 26, 0.7),
+    0 5px 0 rgba(0, 0, 0, 0.4);
+}
+
+/* Sparks off a twinkle as it lights — eight, thrown outward on their own angle.
+   `--a` is set per spark in js/game.js. */
+#game .spark-burst {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+#game .spark-burst i {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 9px;
+  height: 9px;
+  margin: -4.5px 0 0 -4.5px;
+  border-radius: 50%;
+  background: #ffe9a8;
+  box-shadow: 0 0 8px 3px rgba(255, 176, 66, 0.95);
+  transform: rotate(var(--a)) translateY(0) scale(1);
+  animation: spark-out 780ms var(--ease) forwards;
+}
+
+@keyframes spark-out {
+  0% { transform: rotate(var(--a)) translateY(0) scale(0.4); opacity: 0; }
+  18% { opacity: 1; }
+  100% { transform: rotate(var(--a)) translateY(-86px) scale(0.15); opacity: 0; }
+}
+
+/* =========================================================
+   The number line — where the guess and the answer are put
+   side by side. Drawn empty with the counting screen and only
+   filled once the last twinkle is counted; see finishCount()
+   in js/game.js.
+   ========================================================= */
+
+#game .numline {
+  /* place() writes left/top/width/height, which do nothing without this — the
+     strip laid itself out in normal flow across the top of the screen. */
+  position: absolute;
+  opacity: 0;
+  transition: opacity 420ms var(--ease);
+}
+
+#game .numline.is-live {
+  opacity: 1;
+}
+
+#game .numline__rule {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 64px;
+  height: 5px;
+  border-radius: 999px;
+  background: linear-gradient(90deg,
+    rgba(253, 246, 230, 0.15), rgba(253, 246, 230, 0.6) 12%,
+    rgba(253, 246, 230, 0.6) 88%, rgba(253, 246, 230, 0.15));
+}
+
+#game .numline__tick {
+  position: absolute;
+  top: 46px;
+  transform: translateX(-50%);
+  text-align: center;
+}
+
+#game .numline__dot {
+  display: block;
+  width: 14px;
+  height: 14px;
+  margin: 0 auto;
+  border-radius: 50%;
+  background: rgba(253, 246, 230, 0.55);
+  transition: background 300ms var(--ease), box-shadow 300ms var(--ease),
+    transform 300ms var(--ease);
+}
+
+#game .numline__tick b {
+  display: block;
+  margin-top: 10px;
+  color: rgba(253, 246, 230, 0.72);
+  font-size: 30px;
+  line-height: 1;
+}
+
+/* The two marks that were landed on. */
+#game .numline__tick.is-hit .numline__dot {
+  background: #ffd166;
+  box-shadow: 0 0 12px 4px rgba(255, 176, 66, 0.8);
+  transform: scale(1.35);
+}
+
+#game .numline__tick.is-hit b {
+  color: var(--paper);
+}
+
+/* A marker travels from wherever its number already is on screen down to its
+   own mark, so the comparison is watched being made. --from-x / --from-y are
+   set per marker in js/game.js. */
+#game .numline__marker {
+  position: absolute;
+  top: -12px;
+  transform: translate(-50%, 0);
+  padding: 6px 20px;
+  border-radius: 999px;
+  color: #241b12;
+  font-size: 40px;
+  line-height: 1.15;
+  white-space: nowrap;
+  animation: numline-drop 900ms var(--ease) both;
+}
+
+#game .numline__marker.is-total {
+  background: #ffd166;
+  box-shadow: 0 8px 0 #c98a1a, 0 14px 26px rgba(0, 0, 0, 0.45);
+}
+
+/* The guess sits above the answer so the two never cover each other when they
+   land on the same mark — which is exactly what happens when the guess is right. */
+#game .numline__marker.is-guess {
+  top: -84px;
+  background: #cbb6ff;
+  box-shadow: 0 8px 0 #6f56b8, 0 14px 26px rgba(0, 0, 0, 0.45);
+  animation-delay: 260ms;
+}
+
+@keyframes numline-drop {
+  0% {
+    transform: translate(calc(-50% + var(--from-x)), var(--from-y)) scale(0.75);
+    opacity: 0;
+  }
+  20% { opacity: 1; }
+  100% { transform: translate(-50%, 0) scale(1); opacity: 1; }
 }
 
 /* =========================================================
