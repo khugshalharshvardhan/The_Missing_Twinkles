@@ -137,56 +137,104 @@
   animation: g-bob 3.4s ease-in-out infinite;
 }
 
-/* ---- the arrival swarm (screen 1.1 only) ----
-   They come in from off the left of the frame, hang while Agni points them out,
-   and go again — which is what makes the next beat's "Where did they go?" land.
-   One animation per firefly covering all three parts, so nothing has to be
-   scheduled from JS and the beat's own dwell is the only timing to keep in
-   step (see screen 1.1 in js/data/screens.js).
+/* ---- the swarm that arrives and scatters (screens 1.1 and 1.5) ----
 
-   The x distance is generous: the swarm sits about 590px into a 1882px frame,
-   so -1400px starts every one of them well outside it. */
-/* Held at the start of the animation until the beat begins, so the swarm does
-   not fly in behind the hand-over.
+   Two beats use this. On 1.1 they stream in from off the left of frame; on 1.5
+   they converge from every direction. Both end the same way: they burst apart
+   in eight directions at once and vanish, which reads as hiding rather than as
+   flying off somewhere together — and that is what gives "Where did they go?"
+   and the guess that follows something to be about.
 
-   The #game prefix is load-bearing: `#game .firefly` above sets the idle bob at
-   specificity (1,1,1), which outranks a plain `.swarm.is-arriving .firefly`
-   (0,2,1). Without it these rules lose and the swarm just bobs in place. */
-#game .swarm.is-arriving .firefly {
-  animation: ff-arrive 5.3s var(--ease) both;
+   One animation covers all three parts, so nothing has to be scheduled from JS
+   and the beat's own dwell is the only timing to keep in step (see screens 1.1
+   and 1.5 in js/data/screens.js).
+
+   The #game prefix on every rule here is load-bearing: `#game .firefly` above
+   sets the idle bob at specificity (1,1,1), which outranks a plain
+   `.swarm.is-swarming .firefly` (0,2,1). Without it these rules lose and the
+   swarm just bobs in place. */
+#game .swarm.is-swarming .firefly {
+  animation: ff-swarm 5.6s both;
   animation-play-state: paused;
 }
 
-#game .scene.is-begun .swarm.is-arriving .firefly {
+/* Held at the start until the beat begins, so nothing flies in behind the
+   hand-over from the walk. */
+#game .scene.is-begun .swarm.is-swarming .firefly {
   animation-play-state: running;
 }
 
-/* Staggered so they stream in rather than arriving as a block, and so the
-   stragglers are still landing when the first ones have settled. */
-#game .swarm.is-arriving .firefly:nth-child(1) { animation-delay: 0ms; }
-#game .swarm.is-arriving .firefly:nth-child(2) { animation-delay: 90ms; }
-#game .swarm.is-arriving .firefly:nth-child(3) { animation-delay: 250ms; }
-#game .swarm.is-arriving .firefly:nth-child(4) { animation-delay: 160ms; }
-#game .swarm.is-arriving .firefly:nth-child(5) { animation-delay: 330ms; }
-#game .swarm.is-arriving .firefly:nth-child(6) { animation-delay: 60ms; }
-#game .swarm.is-arriving .firefly:nth-child(7) { animation-delay: 220ms; }
-#game .swarm.is-arriving .firefly:nth-child(8) { animation-delay: 300ms; }
+/* The travel is on the box, so the bob can stay on the art inside it — without
+   this they hang perfectly still through the three seconds they are on screen. */
+#game .swarm.is-swarming .firefly > .fill {
+  animation: g-bob 3.4s ease-in-out infinite;
+}
 
-@keyframes ff-arrive {
-  /* in — 0..0.9s, drifting down into place from up and to the left */
-  0% { transform: translate(-1400px, -90px) scale(0.7); opacity: 0; }
-  6% { opacity: 1; }
-  17% { transform: translate(0, 0) scale(1); opacity: 1; }
-  /* held — 0.9..4.4s */
-  83% { transform: translate(0, 0) scale(1); opacity: 1; }
-  /* out — 4.4..5.3s, up and away to the right, which is where the town is */
-  100% { transform: translate(360px, -260px) scale(0.55); opacity: 0; }
+/* Staggered so they stream rather than arrive as a block, and so stragglers are
+   still landing as the first ones settle. */
+#game .swarm.is-swarming .firefly:nth-child(1) { animation-delay: 0ms; }
+#game .swarm.is-swarming .firefly:nth-child(2) { animation-delay: 90ms; }
+#game .swarm.is-swarming .firefly:nth-child(3) { animation-delay: 250ms; }
+#game .swarm.is-swarming .firefly:nth-child(4) { animation-delay: 160ms; }
+#game .swarm.is-swarming .firefly:nth-child(5) { animation-delay: 330ms; }
+#game .swarm.is-swarming .firefly:nth-child(6) { animation-delay: 60ms; }
+#game .swarm.is-swarming .firefly:nth-child(7) { animation-delay: 220ms; }
+#game .swarm.is-swarming .firefly:nth-child(8) { animation-delay: 300ms; }
+
+/* Where each one comes from — off the left of frame on 1.1... */
+#game .swarm.from-left .firefly:nth-child(1) { --in-x: -1400px; --in-y: -120px; }
+#game .swarm.from-left .firefly:nth-child(2) { --in-x: -1500px; --in-y: 40px; }
+#game .swarm.from-left .firefly:nth-child(3) { --in-x: -1350px; --in-y: -200px; }
+#game .swarm.from-left .firefly:nth-child(4) { --in-x: -1600px; --in-y: 120px; }
+#game .swarm.from-left .firefly:nth-child(5) { --in-x: -1450px; --in-y: -60px; }
+#game .swarm.from-left .firefly:nth-child(6) { --in-x: -1550px; --in-y: 180px; }
+#game .swarm.from-left .firefly:nth-child(7) { --in-x: -1380px; --in-y: -160px; }
+#game .swarm.from-left .firefly:nth-child(8) { --in-x: -1500px; --in-y: 90px; }
+
+/* ...and from every side on 1.5. */
+#game .swarm.from-all .firefly:nth-child(1) { --in-x: -780px; --in-y: -360px; }
+#game .swarm.from-all .firefly:nth-child(2) { --in-x: -300px; --in-y: -520px; }
+#game .swarm.from-all .firefly:nth-child(3) { --in-x: 300px; --in-y: -560px; }
+#game .swarm.from-all .firefly:nth-child(4) { --in-x: 760px; --in-y: -220px; }
+#game .swarm.from-all .firefly:nth-child(5) { --in-x: 860px; --in-y: 300px; }
+#game .swarm.from-all .firefly:nth-child(6) { --in-x: 240px; --in-y: 620px; }
+#game .swarm.from-all .firefly:nth-child(7) { --in-x: -400px; --in-y: 600px; }
+#game .swarm.from-all .firefly:nth-child(8) { --in-x: -860px; --in-y: 150px; }
+
+/* Where each one bolts to. Shared by both beats. */
+#game .swarm.is-swarming .firefly:nth-child(1) { --out-x: -620px; --out-y: -300px; }
+#game .swarm.is-swarming .firefly:nth-child(2) { --out-x: -260px; --out-y: -420px; }
+#game .swarm.is-swarming .firefly:nth-child(3) { --out-x: 240px; --out-y: -460px; }
+#game .swarm.is-swarming .firefly:nth-child(4) { --out-x: 620px; --out-y: -180px; }
+#game .swarm.is-swarming .firefly:nth-child(5) { --out-x: 700px; --out-y: 240px; }
+#game .swarm.is-swarming .firefly:nth-child(6) { --out-x: 200px; --out-y: 500px; }
+#game .swarm.is-swarming .firefly:nth-child(7) { --out-x: -320px; --out-y: 480px; }
+#game .swarm.is-swarming .firefly:nth-child(8) { --out-x: -700px; --out-y: 120px; }
+
+@keyframes ff-swarm {
+  /* in — 0..0.9s, easing to a stop as they settle into place */
+  0% {
+    transform: translate(var(--in-x), var(--in-y)) scale(0.65);
+    opacity: 0;
+    animation-timing-function: cubic-bezier(0.2, 0.7, 0.3, 1);
+  }
+  5% { opacity: 1; }
+  16% { transform: translate(0, 0) scale(1); opacity: 1; }
+
+  /* held — 0.9..4.6s, long enough to be looked at and counted by eye */
+  82% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+    /* Accelerating out: a scatter is a bolt, not a drift. */
+    animation-timing-function: cubic-bezier(0.55, 0, 0.9, 0.35);
+  }
+  100% { transform: translate(var(--out-x), var(--out-y)) scale(0.4); opacity: 0; }
 }
 
 /* Stagger the drift so the swarm never pulses in unison. */
-#game .swarm:not(.is-arriving) .firefly:nth-child(2n) { animation-duration: 4.1s; animation-delay: -0.7s; }
-#game .swarm:not(.is-arriving) .firefly:nth-child(3n) { animation-duration: 3.8s; animation-delay: -1.5s; }
-#game .swarm:not(.is-arriving) .firefly:nth-child(5n) { animation-duration: 4.6s; animation-delay: -2.2s; }
+#game .swarm:not(.is-swarming) .firefly:nth-child(2n) { animation-duration: 4.1s; animation-delay: -0.7s; }
+#game .swarm:not(.is-swarming) .firefly:nth-child(3n) { animation-duration: 3.8s; animation-delay: -1.5s; }
+#game .swarm:not(.is-swarming) .firefly:nth-child(5n) { animation-duration: 4.6s; animation-delay: -2.2s; }
 
 #game .firefly.is-countable {
   cursor: pointer;

@@ -12,7 +12,7 @@
 
 import { screens, keypad, counter, FIREFLIES, FIREFLY_SRC, TOTAL } from "./data/screens.js";
 import { gameCues } from "./data/audio.js";
-import { clearCues, playCues, playSfx, playVo } from "./audio.js";
+import { clearCues, playCues, playSfx, playVo, clipLength } from "./audio.js";
 
 const panes = [
   document.getElementById("game-a"),
@@ -31,6 +31,7 @@ const READ_MAX = 6200;
 
 const AFTER_COUNT = 950; // let the last twinkle land before moving on
 const AFTER_LAMP = 900; // hold on the lit lamp for a moment
+const VO_TAIL = 650; // breath between the end of a line and the next beat
 
 let index = -1;
 let front = 0;
@@ -132,6 +133,10 @@ function advanceIn(ms) {
 function go(target) {
   const screen = screens[target];
   const back = panes[1 - front];
+  // An interactive beat is left by the player acting, which they can do while
+  // the line is still going. Let it finish over the next screen rather than
+  // cutting it off to answer them.
+  const leaving = screens[index];
 
   clearTimeout(timer);
   index = target;
@@ -143,7 +148,7 @@ function go(target) {
   back.classList.add("is-active");
   front = 1 - front;
 
-  clearCues();
+  clearCues({ keepVoice: Boolean(leaving?.interact) });
 
   // Held means the beat is built but has not begun. Arriving from the walk that
   // is the whole cross-fade, and firing the cues here put the bubble and the
@@ -167,12 +172,21 @@ function speak(screen) {
   // `front` has already been flipped by go() at this point, so the pane that
   // just became active is panes[front], not panes[1 - front].
   panes[front].classList.add("is-begun");
-  playCues(gameCues[screen.id]);
-  const spoken = dynamicVoice(screen);
+
+  const cue = gameCues[screen.id];
+  playCues(cue);
+  const spokenEnd = dynamicVoice(screen);
+
+  // A beat lasts the longest of three things: long enough to read, long enough
+  // for its own line to finish, and long enough for whatever the player's answer
+  // added. Reading pace alone was cutting lines off — it is counted from the
+  // caption, and a caption is a poor guide to how long it takes to say.
+  const lineEnd = cue?.vo ? (cue.vo.at ?? 0) + clipLength(cue.vo.id) : 0;
+  const wait = Math.max(readingTime(screen), lineEnd + VO_TAIL, spokenEnd + VO_TAIL);
 
   // Dialogue reads itself; an interactive beat waits for the player, and its
   // own handler queues the advance once the player is done.
-  if (!screen.interact) advanceIn(readingTime(screen) + spoken);
+  if (!screen.interact) advanceIn(wait);
 }
 
 function settle() {
@@ -235,22 +249,27 @@ function sayNumber(n, at, pan) {
   return true;
 }
 
-// The beats whose voice depends on what the player did. Returns how much longer
-// than its reading time the beat has to stay up, so a spoken number is never
-// cut off by the next screen.
+// The beats whose voice depends on what the player did. Returns the moment its
+// last clip finishes, in ms from the start of the beat, so speak() can hold the
+// screen until then. Offsets are the stem's own measured length.
 function dynamicVoice(screen) {
-  // "Hmm... I think there were {guess}." — vo_g_ithink starts at 500ms and runs
-  // 1.88s, so the number follows at 2400.
-  if (screen.id === "2.2") return sayNumber(guess, 2400, 0.55) ? 700 : 0;
+  // "Hmm... I think there were {guess}." — vo_g_ithink starts at 500ms.
+  if (screen.id === "2.2") {
+    const at = 500 + clipLength("vo_g_ithink") + 120;
+    return sayNumber(guess, at, 0.55) ? at + clipLength(`vo_n_${guess}`) : 0;
+  }
 
-  // "You guessed {guess}." — vo_g_youguessed starts at 500ms and runs 0.75s.
-  if (screen.id === "16") return sayNumber(guess, 1280, -0.5) ? 400 : 0;
+  // "You guessed {guess}." — vo_g_youguessed starts at 500ms.
+  if (screen.id === "16") {
+    const at = 500 + clipLength("vo_g_youguessed") + 120;
+    return sayNumber(guess, at, -0.5) ? at + clipLength(`vo_n_${guess}`) : 0;
+  }
 
   if (screen.id === "4.2") {
     const v = VERDICTS[verdictKey()];
     playSfx({ id: v.sfx, at: 260, gain: 0.85 });
     playVo({ id: v.vo, at: 560, pan: -0.5 });
-    return 250;
+    return 560 + clipLength(v.vo);
   }
 
   return 0;
@@ -325,10 +344,11 @@ function swarm(screen) {
   const group = document.createElement("div");
   const countable = screen.interact === "count";
 
-  // Screen 1.1 is the arrival: the swarm streams in from off the left of the
-  // frame, is looked at, and leaves again, which is what gives the next beat's
-  // "Where did they go?" something to be about.
-  group.className = screen.fireflies.enter ? "swarm is-arriving" : "swarm";
+  // Two beats bring the swarm in and scatter it again — 1.1 from off the left,
+  // 1.5 from every direction — which is what gives "Where did they go?" and the
+  // guess after it something to be about. The rest just show it, still.
+  const enter = screen.fireflies.enter;
+  group.className = enter ? `swarm is-swarming from-${enter}` : "swarm";
   group.style.left = `${screen.fireflies.x}px`;
   group.style.top = `${screen.fireflies.y}px`;
 

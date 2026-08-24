@@ -25,7 +25,9 @@ let ctx = null;
 let master = null;
 const buses = {};
 const buffers = new Map();
-let live = [];            // sources scheduled for the current beat
+// Sources scheduled for the current beat, each with the window it sounds in so
+// a beat change can tell what is mid-sentence from what has not started.
+let live = [];
 let bed = null;           // { id, source, gain }
 let muted = false;
 // A multiplier on the music bus that beats can set, so one continuous track can
@@ -146,7 +148,7 @@ function fire(cue, bus) {
   }
 
   src.start(when);
-  live.push(src);
+  live.push({ src, bus, from: when, to: when + buffer.duration / (cue.rate || 1) });
 
   // Some clips outlast the beat that starts them — the walking loop runs 19s
   // under an 8.6s walk — so they are taken out rather than cut off. This has to
@@ -173,6 +175,14 @@ export function playUi(id, gain = 0.7) {
   if (!node) return;
   node.gain.gain.value = gain;
   node.src.start();
+}
+
+// How long a clip runs, in ms, once it is decoded. Beats use this to wait for
+// their own line rather than guessing from the length of the caption — the two
+// disagree badly enough that lines were being cut off by the next beat.
+// Returns 0 for anything not loaded, which reads as "nothing to wait for".
+export function clipLength(id) {
+  return (buffers.get(id)?.duration ?? 0) * 1000;
 }
 
 export function playVo(cue) {
@@ -242,15 +252,26 @@ export function setMusic(to, at = 0, over = 1.2) {
 
 // Stop whatever the previous beat had queued but had not yet played, so
 // clicking ahead doesn't fire a POP! over the next scene.
-export function clearCues() {
-  live.forEach((src) => {
+// `keepVoice` lets a line that is already sounding run out over the next beat,
+// instead of being chopped off. Used when the player is what moved the game on:
+// they tapped the keypad or the lamp while Agni was still talking, and cutting
+// her off mid-word to answer is worse than letting her finish.
+export function clearCues({ keepVoice = false } = {}) {
+  const now = ctx ? ctx.currentTime : 0;
+  const spared = [];
+
+  live.forEach((entry) => {
+    if (keepVoice && entry.bus === "vo" && now >= entry.from && now < entry.to) {
+      spared.push(entry);
+      return;
+    }
     try {
-      src.stop();
+      entry.src.stop();
     } catch {
       /* already finished */
     }
   });
-  live = [];
+  live = spared;
 
   if (ctx) {
     // Drop any pending duck, but leave the level the story asked for alone.
