@@ -17,6 +17,7 @@
   <!-- The cover is the first thing on screen, so it is fetched ahead of the
        story art the loader is filling the bar for. -->
   <link rel="preload" href="assets/images/cover.webp" as="image" />
+  <link rel="preload" href="assets/images/play_btn_night.svg" as="image" type="image/svg+xml" />
   <link rel="preload" href="assets/images/bg_town_lit.webp" as="image" />
 </head>
 <!-- Both acts live in this one document. data-act says which is on stage;
@@ -86,11 +87,34 @@
         <p class="loader__note" id="loader-note">Waking the town…</p>
         <!-- One way in. The story runs, the pair walk down the path, and the
              counting game opens at the end of it. The label is on aria-label
-             only: the button is the icon. -->
+             only: the button is the icon.
+
+             The art is play_btn.svg, recoloured. Four versions ship, all the
+             same fourteen paths with seven colour tokens swapped, so switching
+             is one filename here:
+
+               play_btn.svg             amber, as supplied
+               play_btn_lamplight.svg   paler gold, the colour of the town's lamps
+               play_btn_night.svg       violet body, gold rim   <- in use
+               play_btn_night_gold.svg  as night, with a gold play mark
+
+             Night is the one in use because it is the title sign's own palette —
+             dark board, gold edge — and the witch hat's violet, so it belongs to
+             the cover rather than sitting on top of it. The amber versions read
+             as another lamp and compete with the real ones. The white mark stays
+             white in this one: gold on violet is prettier but loses the contrast
+             that makes it obviously a play button.
+
+             The bloom and the twinkles are treatments in CSS, not part of the
+             art, so they survive a change of variant. -->
         <button class="play" id="loader-cta" data-action="begin" aria-label="Play" hidden>
-          <svg class="play__icon" viewBox="0 0 48 48" aria-hidden="true">
-            <path d="M18 14.4v19.2L34 24z" />
-          </svg>
+          <i class="play__bloom" aria-hidden="true"></i>
+          <img class="play__art" src="assets/images/play_btn_night.svg" alt="" />
+          <!-- Three, because that is what the game is about counting. Different
+               periods with one reversed, so they never fall into step. -->
+          <i class="play__orbit" aria-hidden="true"><i class="play__spark"></i></i>
+          <i class="play__orbit play__orbit--b" aria-hidden="true"><i class="play__spark"></i></i>
+          <i class="play__orbit play__orbit--c" aria-hidden="true"><i class="play__spark"></i></i>
         </button>
       </div>
 

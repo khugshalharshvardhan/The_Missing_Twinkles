@@ -765,7 +765,10 @@
   gap: 30px;
   /* Deep bottom padding puts the button on the cobbles in the gap between the
      two characters, rather than against the edge of the frame. */
-  padding: 0 80px 128px;
+  /* Lifted clear of the firefly the cover paints on the cobbles here: the
+     wisp is translucent at its lower edge, and that firefly showed through it
+     as a small unreadable shape. */
+  padding: 0 80px 176px;
   background: #05060d url("../assets/images/cover.webp") center / cover no-repeat;
 }
 
@@ -778,54 +781,143 @@
   transition: opacity var(--speed) var(--ease), visibility var(--speed);
 }
 
-/* Icon only — the label lives on aria-label. */
+/* Icon only — the label lives on aria-label. The art is play_btn.svg
+   recoloured; see index.html for the four variants and which is in use. The
+   bloom and the twinkles are treatments around it rather than part of the file,
+   so they hold whichever variant is picked. */
 .play {
   display: grid;
   place-items: center;
-  width: 172px;
-  height: 172px;
+  width: 250px;
+  height: 250px;
   border-radius: 50%;
-  background: var(--ember);
-  box-shadow: 0 12px 0 #b83c12, 0 26px 54px rgba(0, 0, 0, 0.5),
-    0 0 0 10px rgba(253, 246, 230, 0.14);
-  transition: transform 140ms var(--ease), box-shadow 140ms var(--ease);
-  animation: play-beckon 2.6s var(--ease) infinite;
+  transition: transform 160ms var(--ease), filter 160ms var(--ease);
+  /* On `scale` rather than `transform`, so hover and press can use transform
+     without the two fighting over one property. */
+  animation: play-pulse 1.6s ease-in-out infinite;
 }
 
-.play__icon {
-  width: 86px;
-  height: 86px;
-  /* Nudged right: the triangle's visual centre sits left of its box centre. */
-  margin-left: 10px;
-  fill: #fff;
+/* Everything stacks on the one grid cell. */
+.play > * {
+  grid-area: 1 / 1;
 }
 
+.play__art {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  display: block;
+}
+
+/* Warm, and larger than the button, so what shows is a rim of lamplight around
+   it. Warm rather than violet even under the violet variant: a glow the colour
+   of the thing glowing is just haze, and this has to read as light falling on
+   the button from the town. */
+.play__bloom {
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  scale: 1.84;
+  background: radial-gradient(
+    closest-side,
+    rgba(255, 190, 96, 0.72),
+    rgba(255, 140, 40, 0.3) 48%,
+    transparent 72%
+  );
+  animation: play-breathe 1.6s ease-in-out infinite;
+}
+
+.play__orbit {
+  z-index: 3;
+  width: 100%;
+  height: 100%;
+  scale: 1.4;
+  animation: play-orbit 9s linear infinite;
+}
+
+.play__orbit--b {
+  animation-duration: 13s;
+  animation-direction: reverse;
+}
+
+.play__orbit--c {
+  animation-duration: 16s;
+  animation-delay: -6s;
+}
+
+.play__spark {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 16px;
+  height: 16px;
+  margin-left: -8px;
+  border-radius: 50%;
+  background: #ffdb84;
+  box-shadow: 0 0 8px 3px rgba(255, 170, 50, 1), 0 0 22px 9px rgba(240, 118, 26, 0.6);
+  animation: play-twinkle 2.2s ease-in-out infinite;
+}
+
+.play__orbit--b .play__spark {
+  width: 12px;
+  height: 12px;
+  margin-left: -6px;
+  animation-duration: 1.7s;
+  animation-delay: -0.6s;
+}
+
+.play__orbit--c .play__spark {
+  width: 9px;
+  height: 9px;
+  margin-left: -4.5px;
+  animation-duration: 2.9s;
+  animation-delay: -1.4s;
+}
+
+/* Hover turns the light on it up; press pushes it in. */
 .play:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 16px 0 #b83c12, 0 32px 60px rgba(0, 0, 0, 0.55),
-    0 0 0 14px rgba(253, 246, 230, 0.2);
+  transform: translateY(-5px);
+  filter: brightness(1.08) drop-shadow(0 0 30px rgba(255, 168, 66, 0.5));
 }
 
 .play:active {
-  transform: translateY(9px);
-  box-shadow: 0 3px 0 #b83c12, 0 10px 20px rgba(0, 0, 0, 0.45),
-    0 0 0 8px rgba(253, 246, 230, 0.12);
+  transform: translateY(6px);
+  filter: brightness(0.95);
   animation: none;
 }
 
-/* The button is focused as soon as it appears, so a keyboard lands on it with
-   nothing to hunt for. A ring rather than an outline: on a circle Chrome draws
-   the outline as a rounded rectangle, which reads as a rendering artefact
-   sitting behind the button rather than as focus. */
+/* Only for a keyboard: the button is no longer focused on appearing, because
+   Chrome counts that as focus-visible and drew this ring around it for every
+   viewer. A ring rather than an outline, because on a round button Chrome draws
+   the outline as a rounded rectangle. */
 .play:focus-visible {
   outline: none;
-  box-shadow: 0 12px 0 #b83c12, 0 26px 54px rgba(0, 0, 0, 0.5),
-    0 0 0 8px rgba(253, 246, 230, 0.22), 0 0 0 14px rgba(253, 246, 230, 0.85);
+  box-shadow: 0 0 0 5px rgba(255, 201, 92, 0.45), 0 0 0 10px rgba(253, 246, 230, 0.85);
 }
 
-@keyframes play-beckon {
-  0%, 68%, 100% { scale: 1; }
-  80% { scale: 1.055; }
+/* The one thing to press on the cover, so it says so continuously rather than
+   blinking once every few seconds. The bloom swells on the same clock, which is
+   what carries the pulse at a distance — the scale alone is too small to catch
+   the eye across the frame. */
+@keyframes play-pulse {
+  0%, 100% { scale: 1; }
+  50% { scale: 1.07; }
+}
+
+@keyframes play-breathe {
+  0%, 100% { scale: 1.78; opacity: 0.62; }
+  50% { scale: 2.06; opacity: 1; }
+}
+
+@keyframes play-orbit {
+  from { rotate: 0deg; }
+  to { rotate: 360deg; }
+}
+
+@keyframes play-twinkle {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
 }
 
 .endcard__title {
@@ -906,7 +998,11 @@
    ========================================================= */
 
 @media (prefers-reduced-motion: reduce) {
-  .play { animation: none; }
+  /* The button holds still; the twinkles stop circling. */
+  .play,
+  .play__bloom,
+  .play__orbit,
+  .play__spark { animation: none; }
 
   .fx-shiver,
   .fx-float,

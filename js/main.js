@@ -126,7 +126,11 @@ Promise.all([
   // bar and the note off and leaves the cover with one thing to press.
   loader.classList.add("is-ready");
   loaderCta.hidden = false;
-  loaderCta.focus();
+  // Deliberately not focused. Chrome treats a programmatic focus as
+  // focus-visible, so auto-focusing drew the focus ring as a bright circle
+  // around the button for everyone, not just keyboard users. It is the only
+  // control on the cover, so Tab reaches it immediately and the ring shows then,
+  // which is when it is actually wanted.
 
   // The tools pick the moment to show, so skip straight past the title card,
   // and fetch the game's art now since any screen is one click away.
