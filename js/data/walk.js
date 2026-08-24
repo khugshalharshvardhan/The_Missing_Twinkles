@@ -92,20 +92,32 @@ export const layers = [
   // finished, lit painting and this is the raw element, so at any real opacity it
   // dragged the clearing 38% darker than the screen it hands over to. The earth
   // gradient carries the tone; this supplies the movement over it.
-  { key: "ground", src: `${PX}ground.webp`, speed: 1, opacity: 0.3, y: 371, h: 1100 }
+  { key: "ground", src: `${PX}ground.webp`, speed: 1, opacity: 0.3, y: 371, h: 1100 },
+  // Where the walk arrives: the game's own opening painting, brought up over the
+  // settle so the scrolling pieces dissolve back into the picture they were cut
+  // from. Matching the parallax to bg_night by eye got the tones within a
+  // luminance point or two but never the structure — the hills are a different
+  // shape and the clouds a different size, and at a cross-fade that is exactly
+  // what shows. Fading the painting itself in makes the match exact by
+  // construction, and leaves the hand-over with nothing at all to change.
+  { key: "arrive", kind: "still", src: `${GAME}bg_night.webp`, speed: 0,
+    opacity: 0, settle: 1, y: 0, h: FRAME_H }
 ];
 
 // Drawn after the cast, nearest last, both prop rows with their baselines held
+// below the frame. Both fade to nothing on arrival: they are in front of the
+// cast, so anything left of them would be sitting on top of the game's painting
+// once it lands.
 // below the frame so only the tops are in shot. They close across the pair's
 // soles, which with the contact shadows is what puts the two of them in the
 // scene rather than on top of it — and bg_night has planting in exactly these
 // bottom corners, which is where the pair end up standing.
 export const foreground = [
   // content 0.24..0.82 — baseline at 1230, tops in at 940.
-  { key: "bushes", src: `${PX}bushes.webp`, speed: 1.32, settle: 0.45, y: 820, h: 500, dim: 0.82 },
+  { key: "bushes", src: `${PX}bushes.webp`, speed: 1.32, settle: 0, y: 820, h: 500, dim: 0.82 },
   // content 0.13..0.85 — the nearest thing in shot. Darkened hard: nothing
   // lights it, so it reads as a silhouette framing the scene.
-  { key: "leaves", src: `${PX}dark_leaves.webp`, speed: 1.5, settle: 0.3, y: 884, h: 560, dim: 0.5 }
+  { key: "leaves", src: `${PX}dark_leaves.webp`, speed: 1.5, settle: 0, y: 884, h: 560, dim: 0.5 }
 ];
 
 // fireflies.webp is a sheet: six of them in a row across a 3:1 strip. Tiled as

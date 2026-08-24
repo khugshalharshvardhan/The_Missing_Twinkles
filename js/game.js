@@ -38,6 +38,7 @@ let busy = false;
 let timer = null;
 let onComplete = () => {};
 let hold = false; // dev: freeze on the current beat instead of reading on
+let pending = null; // a beat built but not yet begun, waiting on releaseHold()
 
 /* ---- run state ---- */
 
@@ -50,15 +51,17 @@ export function initGame(handlers) {
   hold = Boolean(handlers.hold);
 }
 
-// Let a held run start reading. Used when arriving from the story: the first
-// screen is built behind the mist, and only starts its clock once the mist has
-// cleared, so none of its reading time is spent under the cover.
+// Let a held run start. Used when arriving from the walk: the first screen is
+// built under the cross-fade and only begins once the pair have stopped and
+// changed pose, so none of its reading time — and none of its voice — is spent
+// under the hand-over.
 export function releaseHold() {
   if (!hold) return;
   hold = false;
 
-  const screen = screens[index];
-  if (screen && !screen.interact) advanceIn(readingTime(screen));
+  const screen = pending ?? screens[index];
+  pending = null;
+  if (screen) speak(screen);
 }
 
 // `at` jumps straight to a beat — see the ?beat= dev shortcut in main.js.
@@ -67,6 +70,7 @@ export function startGame(at = 0) {
   clearCues();
   index = -1;
   front = 0;
+  pending = null;
   guess = null;
   entry = "";
   counted = 0;
@@ -107,7 +111,8 @@ export function devPause(on) {
   hold = on;
   if (on) return;
 
-  const screen = screens[index];
+  const screen = pending ?? screens[index];
+  pending = null;
   if (screen && !screen.interact) advanceIn(readingTime(screen));
 }
 
@@ -132,25 +137,56 @@ function go(target) {
   index = target;
   busy = true;
   back.replaceChildren(render(screen));
+  back.classList.remove("is-begun");
 
   panes[front].classList.remove("is-active");
   back.classList.add("is-active");
   front = 1 - front;
 
   clearCues();
+
+  // Held means the beat is built but has not begun. Arriving from the walk that
+  // is the whole cross-fade, and firing the cues here put the bubble and the
+  // line on screen while the pair were still mid-stride. So a held beat speaks
+  // nothing until releaseHold() lets it.
+  if (hold) {
+    pending = screen;
+    return settle();
+  }
+
+  speak(screen);
+
+  settle();
+}
+
+// Start a beat: what it shows, what it says, and its clock. The class is what
+// lets the bubble in and starts the arriving swarm — both are rendered with the
+// pane, so gating only the cues left them on screen under the hand-over while
+// the pair were still walking.
+function speak(screen) {
+  // `front` has already been flipped by go() at this point, so the pane that
+  // just became active is panes[front], not panes[1 - front].
+  panes[front].classList.add("is-begun");
   playCues(gameCues[screen.id]);
   const spoken = dynamicVoice(screen);
 
   // Dialogue reads itself; an interactive beat waits for the player, and its
   // own handler queues the advance once the player is done.
-  if (!screen.interact && !hold) advanceIn(readingTime(screen) + spoken);
+  if (!screen.interact) advanceIn(readingTime(screen) + spoken);
+}
 
+function settle() {
   window.setTimeout(() => {
     busy = false;
   }, CROSSFADE * 0.45);
 }
 
+// `dwell` overrides the reading pace for a beat that has something to watch as
+// well as something to read — screen 1.1 holds while the swarm arrives, is
+// looked at, and leaves again.
 function readingTime(screen) {
+  if (screen.dwell) return screen.dwell;
+
   const chars = screen.bubble ? screen.bubble.text.length : 0;
   return Math.min(READ_MAX, Math.max(READ_MIN, READ_BASE + chars * READ_PER_CHAR));
 }
@@ -289,7 +325,10 @@ function swarm(screen) {
   const group = document.createElement("div");
   const countable = screen.interact === "count";
 
-  group.className = "swarm";
+  // Screen 1.1 is the arrival: the swarm streams in from off the left of the
+  // frame, is looked at, and leaves again, which is what gives the next beat's
+  // "Where did they go?" something to be about.
+  group.className = screen.fireflies.enter ? "swarm is-arriving" : "swarm";
   group.style.left = `${screen.fireflies.x}px`;
   group.style.top = `${screen.fireflies.y}px`;
 

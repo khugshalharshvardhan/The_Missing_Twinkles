@@ -92,7 +92,16 @@ export const screens = [
       { src: `${IMG}agni_point.webp`, x: 64, y: 498, w: 525, h: 501, fill: CROP.agniPoint, fx: "breathe" },
       { src: `${IMG}neel_point_up.webp`, x: 1382, y: 447, w: 465, h: 559, fill: CROP.neelPointUp, flipX: true, fx: "breathe-slow" }
     ],
-    fireflies: { x: 586, y: 42 },
+    // The arrival. `enter` streams the swarm in from off the left of frame and
+    // takes it away again, and `dwell` holds the beat open long enough to watch
+    // all three parts — in, seen, gone. Without the dwell the beat would run on
+    // its reading pace, which for three words is about two seconds, and the
+    // swarm would still be flying in when the next screen arrived.
+    //
+    // Timing lives in @keyframes ff-arrive in css/game.css: 0.9s in, 3.5s held,
+    // 0.9s out. Change one, change the other.
+    fireflies: { x: 586, y: 42, enter: true },
+    dwell: 6000,
     bubble: {
       art: `${IMG}bub_11.webp`, mirror: true,
       x: 213, y: 291, w: 416, h: 229,

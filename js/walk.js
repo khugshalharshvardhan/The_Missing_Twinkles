@@ -77,12 +77,20 @@ export function startWalk() {
   layers.forEach((layer) => host.append(strip(layer)));
   // Fireflies drifting through the scene, then the pair, then the one they are
   // actually following.
-  sparks.forEach((spec) => host.append(spark(spec)));
+  // These fade out on arrival with everything else that is not in the game's
+  // painting: the swarm the game opens on flies in on its own terms.
+  sparks.forEach((spec) => {
+    const el = spark(spec);
+    fades.push({ el, base: 0.85, to: 0 });
+    host.append(el);
+  });
   // Shadows first, as a group, so neither walker's shadow lands on top of the
   // other one's feet.
   cast.forEach((who) => host.append(shadow(who)));
   cast.forEach((who) => host.append(walker(who)));
-  host.append(flyer(guide));
+  const led = flyer(guide);
+  fades.push({ el: led, base: 1, to: 0 });
+  host.append(led);
   // And the nearest foliage, which passes in front of everything.
   foreground.forEach((layer) => host.append(strip(layer)));
 
@@ -218,6 +226,16 @@ function strip(layer) {
   // The earth is a flat colour under the ground planes, so it neither tiles nor
   // scrolls — nothing about a uniform fill would read as moving anyway.
   if (layer.kind === "earth") return el;
+
+  // A still layer is one whole picture rather than a tile, so it covers the
+  // frame and stays put while everything else slides past underneath it.
+  if (layer.kind === "still") {
+    el.style.backgroundImage = `url("${layer.src}")`;
+    el.style.backgroundSize = "cover";
+    el.style.backgroundRepeat = "no-repeat";
+    if (layer.settle != null) fades.push({ el, base, to: layer.settle });
+    return el;
+  }
 
   el.style.backgroundImage = `url("${layer.src}")`;
   strips.push({ el, speed: layer.speed });

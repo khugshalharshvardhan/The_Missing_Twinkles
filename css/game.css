@@ -84,6 +84,18 @@
 
 #game .bubble {
   position: absolute;
+  /* A beat's bubble waits for the beat to begin. Arriving from the walk that is
+     the whole cross-fade — otherwise the balloon is on screen, and the line is
+     being read, while the pair are still mid-stride behind it. */
+  opacity: 0;
+  transform: scale(0.92);
+  transform-origin: 50% 90%;
+  transition: opacity 260ms var(--ease), transform 260ms var(--ease);
+}
+
+#game .scene.is-begun .bubble {
+  opacity: 1;
+  transform: scale(1);
 }
 
 /* Balloon art and text are siblings so the art can be mirrored on its own —
@@ -125,10 +137,56 @@
   animation: g-bob 3.4s ease-in-out infinite;
 }
 
+/* ---- the arrival swarm (screen 1.1 only) ----
+   They come in from off the left of the frame, hang while Agni points them out,
+   and go again — which is what makes the next beat's "Where did they go?" land.
+   One animation per firefly covering all three parts, so nothing has to be
+   scheduled from JS and the beat's own dwell is the only timing to keep in
+   step (see screen 1.1 in js/data/screens.js).
+
+   The x distance is generous: the swarm sits about 590px into a 1882px frame,
+   so -1400px starts every one of them well outside it. */
+/* Held at the start of the animation until the beat begins, so the swarm does
+   not fly in behind the hand-over.
+
+   The #game prefix is load-bearing: `#game .firefly` above sets the idle bob at
+   specificity (1,1,1), which outranks a plain `.swarm.is-arriving .firefly`
+   (0,2,1). Without it these rules lose and the swarm just bobs in place. */
+#game .swarm.is-arriving .firefly {
+  animation: ff-arrive 5.3s var(--ease) both;
+  animation-play-state: paused;
+}
+
+#game .scene.is-begun .swarm.is-arriving .firefly {
+  animation-play-state: running;
+}
+
+/* Staggered so they stream in rather than arriving as a block, and so the
+   stragglers are still landing when the first ones have settled. */
+#game .swarm.is-arriving .firefly:nth-child(1) { animation-delay: 0ms; }
+#game .swarm.is-arriving .firefly:nth-child(2) { animation-delay: 90ms; }
+#game .swarm.is-arriving .firefly:nth-child(3) { animation-delay: 250ms; }
+#game .swarm.is-arriving .firefly:nth-child(4) { animation-delay: 160ms; }
+#game .swarm.is-arriving .firefly:nth-child(5) { animation-delay: 330ms; }
+#game .swarm.is-arriving .firefly:nth-child(6) { animation-delay: 60ms; }
+#game .swarm.is-arriving .firefly:nth-child(7) { animation-delay: 220ms; }
+#game .swarm.is-arriving .firefly:nth-child(8) { animation-delay: 300ms; }
+
+@keyframes ff-arrive {
+  /* in — 0..0.9s, drifting down into place from up and to the left */
+  0% { transform: translate(-1400px, -90px) scale(0.7); opacity: 0; }
+  6% { opacity: 1; }
+  17% { transform: translate(0, 0) scale(1); opacity: 1; }
+  /* held — 0.9..4.4s */
+  83% { transform: translate(0, 0) scale(1); opacity: 1; }
+  /* out — 4.4..5.3s, up and away to the right, which is where the town is */
+  100% { transform: translate(360px, -260px) scale(0.55); opacity: 0; }
+}
+
 /* Stagger the drift so the swarm never pulses in unison. */
-#game .firefly:nth-child(2n) { animation-duration: 4.1s; animation-delay: -0.7s; }
-#game .firefly:nth-child(3n) { animation-duration: 3.8s; animation-delay: -1.5s; }
-#game .firefly:nth-child(5n) { animation-duration: 4.6s; animation-delay: -2.2s; }
+#game .swarm:not(.is-arriving) .firefly:nth-child(2n) { animation-duration: 4.1s; animation-delay: -0.7s; }
+#game .swarm:not(.is-arriving) .firefly:nth-child(3n) { animation-duration: 3.8s; animation-delay: -1.5s; }
+#game .swarm:not(.is-arriving) .firefly:nth-child(5n) { animation-duration: 4.6s; animation-delay: -2.2s; }
 
 #game .firefly.is-countable {
   cursor: pointer;
