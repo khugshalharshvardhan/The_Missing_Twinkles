@@ -34,7 +34,11 @@ const READ_MIN = 3000;
 const READ_MAX = 6200;
 
 const AFTER_COUNT = 950; // let the last twinkle land before moving on
-const AFTER_LAMP = 900; // hold on the lit lamp for a moment
+// The lamp's whole answer to the tap: the flock takes FLOCK_MS to stream in
+// and pour into the glass, the light comes up under the last of them, and the
+// beat turns once it has been seen lit.
+const FLOCK_MS = 2100;
+const AFTER_LAMP = FLOCK_MS + 1500;
 // The breath between the end of a line and the next beat. This is most of the
 // game's pacing: the next line starts 500ms into its own beat, and the 620ms
 // cross-fade eats into whatever sits between them, so at 650 one line ended and
@@ -369,7 +373,7 @@ function render(screen) {
   screen.layers.forEach((layer) => frag.append(imageLayer(layer, "layer", screen.anchor)));
 
   if (screen.fireflies) frag.append(swarm(screen));
-  if (screen.lamp) frag.append(lamp(screen.lamp));
+  if (screen.lamp) frag.append(lamp(screen));
   if (screen.keypad) frag.append(keypadPanel(screen));
   if (screen.counter) frag.append(counterCard(screen.counter));
   if (screen.numberLine) frag.append(numberLineStrip(screen));
@@ -567,8 +571,8 @@ function burst(el) {
 
 /* ---- the lamp ---- */
 
-function lamp(spec) {
-  const el = imageLayer(spec, "layer lamp");
+function lamp(screen) {
+  const el = imageLayer(screen.lamp, "layer lamp");
 
   // A div, not a button, so it can hold the art box exactly — give it the
   // keyboard affordances a button would have had.
@@ -579,7 +583,15 @@ function lamp(spec) {
   const strike = () => {
     if (el.classList.contains("is-struck")) return;
     el.classList.add("is-struck");
-    playSfx({ id: "lamp_strike", gain: 0.9 });
+    playSfx({ id: "magic_tap", gain: 0.7 });
+
+    const pane = el.closest(".scene");
+    if (pane) {
+      // The line has been answered: the bubble goes, and the twinkles come.
+      pane.classList.add("is-cleared");
+      flock(pane, screen);
+    }
+
     advanceIn(AFTER_LAMP);
   };
 
@@ -593,6 +605,68 @@ function lamp(spec) {
   return el;
 }
 
+// The answer to the tap. Five twinkles stream in from off the left of frame,
+// each trailing the same gold dust as everything else magical here, pour into
+// the lamp's glass one after another, and the lit art fades up under the last
+// of them — light arriving as a thing that was carried in, not as a filter
+// turning on. Geometry is deterministic off the index, so it is the same
+// arrival every run.
+function flock(pane, screen) {
+  const to = screen.lampGlass ?? { x: 902, y: 254 };
+  const FLYERS = 5;
+  const FLY_MS = 1400;
+
+  for (let i = 0; i < FLYERS; i++) {
+    const delay = i * 170;
+    const from = { x: -70 - (i % 3) * 40, y: 150 + ((i * 89) % 330) };
+    // The arc: a straight line lifted at its midpoint, higher for the flyers
+    // that start lower, so the paths fan instead of stacking.
+    const lift = 60 + ((i * 53) % 70);
+
+    const fly = document.createElement("img");
+    fly.className = "lamp-fly";
+    fly.src = FIREFLY_SRC;
+    fly.alt = "";
+    fly.style.left = `${to.x}px`;
+    fly.style.top = `${to.y}px`;
+    fly.style.width = `${44 - (i % 3) * 8}px`;
+    fly.style.setProperty("--fx", `${from.x - to.x}px`);
+    fly.style.setProperty("--fy", `${from.y - to.y}px`);
+    fly.style.animationDuration = `${FLY_MS}ms`;
+    fly.style.animationDelay = `${delay}ms`;
+    pane.append(fly);
+    window.setTimeout(() => fly.remove(), delay + FLY_MS + 200);
+
+    // Its trail, laid along the same arc, each mote lighting as the twinkle
+    // passes it.
+    for (let k = 0; k < 12; k++) {
+      const t = (k + 0.5) / 12;
+      const bit = document.createElement("i");
+      bit.className = "magic-bit";
+      bit.style.left = `${(from.x + (to.x - from.x) * t).toFixed(1)}px`;
+      bit.style.top = `${(from.y + (to.y - from.y) * t - lift * 4 * t * (1 - t) + (((i * 31 + k * 47) % 22) - 11)).toFixed(1)}px`;
+      bit.style.setProperty("--px", `${(((i + k) % 5) - 2) * 7}px`);
+      bit.style.setProperty("--py", `${10 + ((i + k) % 3) * 8}px`);
+      bit.style.width = bit.style.height = `${5 + ((i + k) % 4) * 3}px`;
+      bit.style.animationDelay = `${delay + Math.round(t * FLY_MS) - 120}ms`;
+      pane.append(bit);
+      window.setTimeout(() => bit.remove(), delay + FLY_MS + 1100);
+    }
+  }
+
+  // The light itself: the lit render fading up over the dark one as the flock
+  // pours in, with a burst on the glass as it catches.
+  if (screen.lampLit) {
+    const lit = imageLayer(screen.lampLit, "layer lamp-lit fx-lamp-glow");
+    pane.append(lit);
+    window.setTimeout(() => {
+      lit.classList.add("is-on");
+      sparkleBurst(pane, { x: to.x, y: to.y, spread: 170, count: 14 });
+      playSfx({ id: "lamp_strike", gain: 0.9 });
+      playSfx({ id: "sparkle", at: 120, gain: 0.6 });
+    }, FLOCK_MS - 500);
+  }
+}
 /* ---- the keypad ---- */
 
 // The panel and ten digits. The guess is a single number, so tapping one is the

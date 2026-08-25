@@ -368,6 +368,13 @@ export const screens = [
       { src: `${IMG}neel_f.webp`, x: 1294, y: 412, w: 465, h: 589, fx: "breathe-slow" }
     ],
     lamp: { src: `${IMG}lamp_off.webp`, x: 807, y: 74, w: 272, h: 927, fill: CROP.lampOff },
+    // What the tap turns it into — the exact art screen 5.2 stands on, so the
+    // cut after it changes nothing about the lamp. It fades up as the flock
+    // arrives; see strike() in js/game.js.
+    lampLit: { src: `${IMG}lamp_on.webp`, x: 799, y: 74, w: 287, h: 927, fill: CROP.lampOn },
+    // Where the glass is, in frame coordinates — the point the flock pours
+    // into. Matches the firefly 5.2 draws inside it at (832..857, 263..289).
+    lampGlass: { x: 902, y: 254 },
     bubble: {
       art: `${IMG}bub_51.webp`, who: "agni",
       x: 314, y: 300, w: 383, h: 184,

@@ -549,9 +549,49 @@
   border-radius: 18px;
 }
 
+/* Struck: nothing happens to the dark art itself. The old treatment was a
+   60px drop-shadow here, and on a cropped fill that paints as a glowing
+   rectangle around the layer box — the light now arrives as the lit render
+   fading up (.lamp-lit) under the flock instead. */
+#game .lamp.is-struck {
+  cursor: default;
+}
+
 #game .lamp.is-struck .fill {
-  filter: drop-shadow(0 0 60px var(--glow));
-  transition: filter var(--speed) var(--ease);
+  filter: none;
+}
+
+/* One of the five twinkles answering the tap. Positioned at the glass and
+   flown in from its --fx/--fy start, dipping through the arc its trail is laid
+   on, and swallowed by the lamp at the end — they go into it, not out. */
+#game .lamp-fly {
+  position: absolute;
+  z-index: 6;
+  transform: translate(-50%, -50%) translate(var(--fx), var(--fy));
+  opacity: 0;
+  pointer-events: none;
+  filter: drop-shadow(0 0 14px rgba(255, 214, 120, 0.9));
+  animation: lamp-fly 1400ms cubic-bezier(0.3, 0, 0.35, 1) both;
+}
+
+@keyframes lamp-fly {
+  0% { transform: translate(-50%, -50%) translate(var(--fx), var(--fy)) scale(0.7); opacity: 0; }
+  8% { opacity: 1; }
+  82% { transform: translate(-50%, -50%) translate(0, 0) scale(0.8); opacity: 1; }
+  100% { transform: translate(-50%, -50%) translate(0, 0) scale(0.15); opacity: 0; }
+}
+
+/* The lit render, waiting under the flock. Fades up in place over the dark
+   art — the same file screen 5.2 stands on, so the cut after it changes
+   nothing about the lamp. */
+#game .lamp-lit {
+  opacity: 0;
+  transition: opacity 700ms var(--ease);
+  pointer-events: none;
+}
+
+#game .lamp-lit.is-on {
+  opacity: 1;
 }
 
 /* =========================================================
@@ -848,7 +888,8 @@
   }
 
   #game .poof__bit,
-  #game .magic-bit {
+  #game .magic-bit,
+  #game .lamp-fly {
     animation: none !important;
     opacity: 0;
   }
