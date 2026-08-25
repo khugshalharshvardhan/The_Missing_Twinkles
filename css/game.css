@@ -164,7 +164,8 @@
    `.swarm.is-swarming .firefly` (0,2,1). Without it these rules lose and the
    swarm just bobs in place. */
 #game .swarm.is-swarming .firefly {
-  animation: ff-swarm 5.6s both;
+  animation: ff-swarm 6.6s both;
+  animation-delay: calc(var(--swarm-at, 0ms) + var(--d, 0ms));
   animation-play-state: paused;
 }
 
@@ -181,15 +182,17 @@
 }
 
 /* Staggered so they stream rather than arrive as a block, and so stragglers are
-   still landing as the first ones settle. */
-#game .swarm.is-swarming .firefly:nth-child(1) { animation-delay: 0ms; }
-#game .swarm.is-swarming .firefly:nth-child(2) { animation-delay: 90ms; }
-#game .swarm.is-swarming .firefly:nth-child(3) { animation-delay: 250ms; }
-#game .swarm.is-swarming .firefly:nth-child(4) { animation-delay: 160ms; }
-#game .swarm.is-swarming .firefly:nth-child(5) { animation-delay: 330ms; }
-#game .swarm.is-swarming .firefly:nth-child(6) { animation-delay: 60ms; }
-#game .swarm.is-swarming .firefly:nth-child(7) { animation-delay: 220ms; }
-#game .swarm.is-swarming .firefly:nth-child(8) { animation-delay: 300ms; }
+   still landing as the first ones settle. A var rather than the delay itself,
+   so the twinkle, its bob and its poof all add the same two numbers and can
+   never drift apart. */
+#game .swarm.is-swarming .firefly:nth-child(1) { --d: 0ms; }
+#game .swarm.is-swarming .firefly:nth-child(2) { --d: 90ms; }
+#game .swarm.is-swarming .firefly:nth-child(3) { --d: 250ms; }
+#game .swarm.is-swarming .firefly:nth-child(4) { --d: 160ms; }
+#game .swarm.is-swarming .firefly:nth-child(5) { --d: 330ms; }
+#game .swarm.is-swarming .firefly:nth-child(6) { --d: 60ms; }
+#game .swarm.is-swarming .firefly:nth-child(7) { --d: 220ms; }
+#game .swarm.is-swarming .firefly:nth-child(8) { --d: 300ms; }
 
 /* Where each one comes from — off the left of frame on 1.1... */
 #game .swarm.from-left .firefly:nth-child(1) { --in-x: -1400px; --in-y: -120px; }
@@ -201,25 +204,37 @@
 #game .swarm.from-left .firefly:nth-child(7) { --in-x: -1380px; --in-y: -160px; }
 #game .swarm.from-left .firefly:nth-child(8) { --in-x: -1500px; --in-y: 90px; }
 
-/* ...and from every side on 1.5. */
-#game .swarm.from-all .firefly:nth-child(1) { --in-x: -780px; --in-y: -360px; }
-#game .swarm.from-all .firefly:nth-child(2) { --in-x: -300px; --in-y: -520px; }
-#game .swarm.from-all .firefly:nth-child(3) { --in-x: 300px; --in-y: -560px; }
-#game .swarm.from-all .firefly:nth-child(4) { --in-x: 760px; --in-y: -220px; }
-#game .swarm.from-all .firefly:nth-child(5) { --in-x: 860px; --in-y: 300px; }
-#game .swarm.from-all .firefly:nth-child(6) { --in-x: 240px; --in-y: 620px; }
-#game .swarm.from-all .firefly:nth-child(7) { --in-x: -400px; --in-y: 600px; }
-#game .swarm.from-all .firefly:nth-child(8) { --in-x: -860px; --in-y: 150px; }
+/* ...and out of thin air on 1.5 — the same magic the vanish uses, run forward.
+   Same duration and hold as ff-swarm, so the two beats stay in step; only the
+   opening 0.7s differs: growth from a point instead of travel. */
+#game .swarm.from-magic .firefly {
+  animation-name: ff-magic;
+}
 
-/* Where each one bolts to. Shared by both beats. */
-#game .swarm.is-swarming .firefly:nth-child(1) { --out-x: -620px; --out-y: -300px; }
-#game .swarm.is-swarming .firefly:nth-child(2) { --out-x: -260px; --out-y: -420px; }
-#game .swarm.is-swarming .firefly:nth-child(3) { --out-x: 240px; --out-y: -460px; }
-#game .swarm.is-swarming .firefly:nth-child(4) { --out-x: 620px; --out-y: -180px; }
-#game .swarm.is-swarming .firefly:nth-child(5) { --out-x: 700px; --out-y: 240px; }
-#game .swarm.is-swarming .firefly:nth-child(6) { --out-x: 200px; --out-y: 500px; }
-#game .swarm.is-swarming .firefly:nth-child(7) { --out-x: -320px; --out-y: 480px; }
-#game .swarm.is-swarming .firefly:nth-child(8) { --out-x: -700px; --out-y: 120px; }
+@keyframes ff-magic {
+  0% {
+    transform: translate(0, -22px) scale(0.05);
+    opacity: 0;
+    animation-timing-function: cubic-bezier(0.16, 0.8, 0.32, 1);
+  }
+  /* A touch past full size and back — grown things overshoot, faded things
+     do not, and the overshoot is most of what reads as conjured. */
+  7% { transform: translate(0, 4px) scale(1.14); opacity: 1; }
+  10.6% { transform: translate(0, 0) scale(1); opacity: 1; }
+
+  89.4% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+    animation-timing-function: cubic-bezier(0.5, 0, 0.75, 0.4);
+  }
+  100% { transform: translate(0, -22px) scale(0.05); opacity: 0; }
+}
+
+/* The arrival's burst, on the twinkle's own clock. Overrides the vanish delay
+   below for the --in set only. */
+#game .swarm.is-swarming .firefly .poof__bit--in {
+  animation-delay: calc(var(--swarm-at, 0ms) + var(--d, 0ms) - 60ms) !important;
+}
 
 @keyframes ff-swarm {
   /* in — 0..0.9s, easing to a stop as they settle into place */
@@ -228,17 +243,61 @@
     opacity: 0;
     animation-timing-function: cubic-bezier(0.2, 0.7, 0.3, 1);
   }
-  5% { opacity: 1; }
-  16% { transform: translate(0, 0) scale(1); opacity: 1; }
+  4.5% { opacity: 1; }
+  13.6% { transform: translate(0, 0) scale(1); opacity: 1; }
 
-  /* held — 0.9..4.6s, long enough to be looked at and counted by eye */
-  82% {
+  /* held — 0.9..5.9s: the five seconds they are there to be looked at */
+  89.4% {
     transform: translate(0, 0) scale(1);
     opacity: 1;
-    /* Accelerating out: a scatter is a bolt, not a drift. */
-    animation-timing-function: cubic-bezier(0.55, 0, 0.9, 0.35);
+    animation-timing-function: cubic-bezier(0.5, 0, 0.75, 0.4);
   }
-  100% { transform: translate(var(--out-x), var(--out-y)) scale(0.4); opacity: 0; }
+
+  /* gone — 5.9..6.6s, where they stand. No bolting off across the frame: they
+     shrink to a point and the poof below bursts in their place, which is what
+     reads as magic rather than as fleeing. */
+  100% { transform: translate(0, -22px) scale(0.05); opacity: 0; }
+}
+
+/* The magic each one vanishes on: a ring of gold motes built by swarm() in
+   js/game.js, thrown outward on the same clock as the vanish above — the delay
+   is the same two vars plus the 5.9s the twinkle has been on screen. */
+#game .poof__bit {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  margin: -3px 0 0 -3px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fffdf2 0%, #ffe6a4 45%, rgba(255, 176, 62, 0) 75%);
+  box-shadow: 0 0 14px 5px rgba(255, 199, 102, 0.95);
+  opacity: 0;
+  pointer-events: none;
+}
+
+#game .swarm.is-swarming .firefly .poof__bit {
+  animation: poof-burst 700ms cubic-bezier(0.16, 0.8, 0.32, 1) both;
+  animation-delay: calc(var(--swarm-at, 0ms) + var(--d, 0ms) + 5820ms);
+  animation-play-state: paused;
+}
+
+#game .scene.is-begun .swarm.is-swarming .firefly .poof__bit {
+  animation-play-state: running;
+}
+
+@keyframes poof-burst {
+  0%   { opacity: 0; transform: translate(0, 0) scale(0.2); }
+  14%  { opacity: 1; transform: translate(calc(var(--px) * 0.25), calc(var(--py) * 0.25)) scale(1.25); }
+  55%  { opacity: 0.9; transform: translate(calc(var(--px) * 0.6), calc(var(--py) * 0.6)) scale(1); }
+  100% { opacity: 0; transform: translate(var(--px), var(--py)) scale(0.2); }
+}
+
+/* On the beat that waits for its line, the bubble hands the screen over to the
+   swarm: js/game.js marks the pane once the line has been said. Same
+   specificity as the .is-begun rule that shows it, so order decides — this one
+   is later, and wins. */
+#game .scene.is-cleared .bubble {
+  opacity: 0;
+  transform: scale(0.94);
 }
 
 /* Stagger the drift so the swarm never pulses in unison. */
@@ -499,6 +558,15 @@
 #game .keypad {
   position: absolute;
   inset: 0;
+  transition: opacity 550ms var(--ease), transform 550ms var(--ease);
+}
+
+/* Held while the question is still being asked — see keypadAt on screen 2 in
+   js/data/screens.js. Removing the class is the reveal. */
+#game .keypad.is-waiting {
+  opacity: 0;
+  transform: scale(0.94);
+  pointer-events: none;
 }
 
 #game .keypad__value {
@@ -603,12 +671,15 @@
   position: absolute;
   z-index: 6;
   transform: translate(-50%, -50%);
-  color: #ffe9a8;
-  font-size: 62px;
+  color: #fff3c8;
+  font-size: 74px;
   line-height: 1;
+  font-weight: 700;
   pointer-events: none;
-  text-shadow: 0 0 18px rgba(255, 176, 66, 0.95), 0 4px 0 rgba(0, 0, 0, 0.4);
-  animation: key-flight 620ms var(--ease) forwards;
+  /* Lit from inside: two glows and no dark drop — a shadow under a flying
+     spark reads as print, not light. */
+  text-shadow: 0 0 10px rgba(255, 236, 160, 1), 0 0 30px rgba(255, 176, 66, 0.95);
+  animation: key-flight 1500ms cubic-bezier(0.4, 0, 0.4, 1) forwards; /* must track GUESS_FLIGHT in js/game.js */
 }
 
 @keyframes key-flight {
@@ -642,20 +713,49 @@
   100% { transform: scale(1); }
 }
 
+/* One gold mote — the keypad's arrival burst and the flying digit's trail are
+   both scatterings of these, placed and timed by js/game.js. */
+#game .magic-bit {
+  position: absolute;
+  margin: -3px 0 0 -3px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fffdf2 0%, #ffe6a4 45%, rgba(255, 176, 62, 0) 75%);
+  box-shadow: 0 0 16px 5px rgba(255, 199, 102, 0.95);
+  opacity: 0;
+  pointer-events: none;
+  animation: magic-bit 1000ms cubic-bezier(0.16, 0.8, 0.32, 1) both;
+}
+
+@keyframes magic-bit {
+  0%   { opacity: 0; transform: translate(0, 0) scale(0.2); }
+  12%  { opacity: 1; transform: translate(calc(var(--px, 0px) * 0.2), calc(var(--py, 0px) * 0.2)) scale(1.2); }
+  /* Held bright through the middle of its life — peaking for an instant and
+     then dimming for the rest read as nothing at all. */
+  55%  { opacity: 0.9; transform: translate(calc(var(--px, 0px) * 0.55), calc(var(--py, 0px) * 0.55)) scale(0.95); }
+  100% { opacity: 0; transform: translate(var(--px, 0px), var(--py, 0px)) scale(0.2); }
+}
+
 /* =========================================================
    Counter
    ========================================================= */
 
 #game .counter__value {
   position: absolute;
-  left: 0;
-  right: 0;
-  /* The card's cream oval sits below the wizard hat, not dead centre. */
-  top: 42%;
-  display: block;
+  /* The cream face's own bounds, measured off counter.webp (60px-run filtered,
+     so the wood's tan highlights cannot pollute the box) — the scrolls and the
+     hat make the card bigger than the face, so centring in the box puts the
+     number off the oval. */
+  left: 29.6%;
+  right: 17.2%;
+  /* A hair below the face's true middle: a digit's glyph box carries unused
+     descender space, so geometric centre renders optically high. */
+  top: 44%;
+  bottom: 18.3%;
+  display: grid;
+  place-items: center;
   color: #000;
   font-size: 42px;
-  line-height: 60px;
+  line-height: 1;
   text-align: center;
 }
 
@@ -744,6 +844,12 @@
   #game .fx-lamp-glow,
   #game .firefly {
     animation: none !important;
+  }
+
+  #game .poof__bit,
+  #game .magic-bit {
+    animation: none !important;
+    opacity: 0;
   }
 
   #game .scene {

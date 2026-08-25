@@ -201,7 +201,9 @@ export const gameCues = {
   // ---- they notice the twinkles, and the problem is stated ----
   "1.1": {
     bed: "bed_main",
-    sfx: [{ id: "twinkle", at: 700, gain: 0.4 }],
+    sfx: [{ id: "twinkle", at: 700, gain: 0.4 },
+      // The swarm vanishing on its magic, 5.9s after it set out.
+      { id: "sparkle", at: 5950, gain: 0.6 }],
     vo: { id: "vo_g_look", at: 500, pan: -0.55 }
   },
   "1.2": {
@@ -216,14 +218,20 @@ export const gameCues = {
     sfx: [{ id: "grin_boing", at: 120, gain: 0.5, pan: 0.4 }],
     vo: { id: "vo_g_catch", at: 500, pan: 0.5 }
   },
+  // The swarm waits for her line (fireflies.at 2650 in screens.js): a twinkle
+  // as they arrive, the sparkle as they vanish 5.9s later.
   "1.5": {
-    sfx: [{ id: "twinkle", at: 800, gain: 0.35, pan: 0.2 }],
+    sfx: [{ id: "twinkle", at: 2750, gain: 0.4, pan: 0.2 },
+      { id: "sparkle", at: 8600, gain: 0.6 }],
     vo: { id: "vo_g_guess", at: 500, pan: -0.5 }
   },
 
   // ---- the keypad. Key presses are played from js/game.js, on the tap ----
+  // The pad arrives on its own sparkle once the question is asked — matches
+  // keypadAt on screen 2 in screens.js.
   "2": {
-    sfx: [{ id: "page_air", at: 0, gain: 0.5 }],
+    sfx: [{ id: "page_air", at: 0, gain: 0.5 },
+      { id: "sparkle", at: 2300, gain: 0.55 }],
     vo: { id: "vo_g_howmany_q", at: 500, pan: -0.6 }
   },
   // Stem only: js/game.js says the number after it.

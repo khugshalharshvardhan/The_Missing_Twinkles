@@ -36,8 +36,8 @@ const READ_MAX = 6200;
 const AFTER_COUNT = 950; // let the last twinkle land before moving on
 const AFTER_LAMP = 900; // hold on the lit lamp for a moment
 const VO_TAIL = 650; // breath between the end of a line and the next beat
-const GUESS_FLIGHT = 620; // the tapped digit's trip across to the counter
-const GUESS_LANDS = 1050; // and a beat to see it sitting there before moving on
+const GUESS_FLIGHT = 1500; // the tapped digit's trip across — slow enough to watch
+const GUESS_LANDS = 2200; // and a beat to see it sitting there before moving on
 const COUNT_SETTLE = 600; // the last number grows before the line is drawn
 const LINE_WALK = 1500; // both markers travel down onto the number line
 const LINE_HOLD = 2200; // and then stay put long enough to be compared
@@ -150,7 +150,9 @@ function go(target) {
   index = target;
   busy = true;
   back.replaceChildren(render(screen));
-  back.classList.remove("is-begun");
+  // Both are per-beat states and the pane is reused: is-cleared left behind
+  // would arrive with the next screen and hide a bubble that was never shown.
+  back.classList.remove("is-begun", "is-cleared");
 
   panes[front].classList.remove("is-active");
   back.classList.add("is-active");
@@ -180,6 +182,7 @@ function speak(screen) {
   // `front` has already been flipped by go() at this point, so the pane that
   // just became active is panes[front], not panes[1 - front].
   panes[front].classList.add("is-begun");
+  scheduleReveals(screen, panes[front]);
 
   const cue = gameCues[screen.id];
   playCues(cue);
@@ -195,6 +198,55 @@ function speak(screen) {
   // Dialogue reads itself; an interactive beat waits for the player, and its
   // own handler queues the advance once the player is done.
   if (!screen.interact) advanceIn(wait);
+}
+
+// What a beat holds back until its line has been said. The swarm's own delay
+// lives in CSS (--swarm-at, set by swarm()); these are the parts CSS cannot do:
+// the bubble leaving as the twinkles arrive, and the keypad coming in on its
+// sparkle. Timers are kept so a screen change never fires a reveal into the
+// wrong pane.
+let revealTimers = [];
+
+function scheduleReveals(screen, pane) {
+  revealTimers.forEach(clearTimeout);
+  revealTimers = [];
+
+  // 1.5: her line ends, the bubble goes, and only then do the twinkles come.
+  if (screen.fireflies?.at) {
+    revealTimers.push(window.setTimeout(() => {
+      pane.classList.add("is-cleared");
+    }, screen.fireflies.at - 150));
+  }
+
+  // 2: the pad appears once the question has been asked, on a burst of sparkle.
+  if (screen.keypadAt) {
+    revealTimers.push(window.setTimeout(() => {
+      const panel = pane.querySelector(".keypad");
+      if (!panel) return;
+      panel.classList.remove("is-waiting");
+      // The burst is scattered over the panel's face, not its corner.
+      sparkleBurst(pane, { x: 941, y: 530, spread: 300, count: 18 });
+    }, screen.keypadAt));
+  }
+}
+
+// A handful of gold motes thrown out from a point — the same magic the tapped
+// twinkles use. Deterministic off the index, so it is the same burst each time.
+function sparkleBurst(pane, { x, y, spread, count = 14 }) {
+  for (let i = 0; i < count; i++) {
+    const a = (i / count) * Math.PI * 2 + (i % 3) * 0.4;
+    const r = spread * (0.3 + ((i * 37) % 60) / 100);
+    const bit = document.createElement("i");
+    bit.className = "magic-bit";
+    bit.style.left = `${x + Math.cos(a) * r * 0.4}px`;
+    bit.style.top = `${y + Math.sin(a) * r * 0.25}px`;
+    bit.style.setProperty("--px", `${(Math.cos(a) * r * 0.7).toFixed(1)}px`);
+    bit.style.setProperty("--py", `${(Math.sin(a) * r * 0.45 - 24).toFixed(1)}px`);
+    bit.style.width = bit.style.height = `${7 + (i % 4) * 4}px`;
+    bit.style.animationDelay = `${(i % 5) * 60}ms`;
+    pane.append(bit);
+    window.setTimeout(() => bit.remove(), 1400);
+  }
 }
 
 function settle() {
@@ -313,7 +365,7 @@ function render(screen) {
 
   if (screen.fireflies) frag.append(swarm(screen));
   if (screen.lamp) frag.append(lamp(screen.lamp));
-  if (screen.keypad) frag.append(keypadPanel());
+  if (screen.keypad) frag.append(keypadPanel(screen));
   if (screen.counter) frag.append(counterCard(screen.counter));
   if (screen.numberLine) frag.append(numberLineStrip(screen));
   if (screen.hint) frag.append(imageLayer(screen.hint, "layer hint"));
@@ -381,6 +433,10 @@ function swarm(screen) {
   group.className = enter ? `swarm is-swarming from-${enter}` : "swarm";
   group.style.left = `${screen.fireflies.x}px`;
   group.style.top = `${screen.fireflies.y}px`;
+  // When the swarm starts, ms into the beat. Everything downstream — each
+  // twinkle's stagger, its vanish, the poof it vanishes on — is CSS arithmetic
+  // over this one number; see --swarm-at in css/game.css.
+  group.style.setProperty("--swarm-at", `${screen.fireflies.at ?? 0}ms`);
 
   FIREFLIES.forEach((spot, i) => {
     // A countable twinkle is a real button; a decorative one is not.
@@ -407,6 +463,25 @@ function swarm(screen) {
       el.append(tag);
 
       el.addEventListener("click", () => tally(el));
+    }
+
+    // An arriving swarm leaves by magic: each twinkle bursts into a ring of
+    // gold as it goes — and on the beats that materialise (enter: "magic") the
+    // same burst runs as it appears. The bits are built now and fired by CSS on
+    // the same clock as the twinkle itself, so the two can never drift apart.
+    if (enter) {
+      const sets = enter === "magic" ? ["poof__bit poof__bit--in", "poof__bit"] : ["poof__bit"];
+      for (const cls of sets) {
+        for (let k = 0; k < 7; k++) {
+          const a = (k / 7) * Math.PI * 2 + (i % 3) * 0.5;
+          const bit = document.createElement("i");
+          bit.className = cls;
+          bit.style.setProperty("--px", `${Math.round(Math.cos(a) * (42 + (k % 3) * 20))}px`);
+          bit.style.setProperty("--py", `${Math.round(Math.sin(a) * (32 + ((k + 1) % 3) * 17) - 14)}px`);
+          bit.style.width = bit.style.height = `${7 + ((i + k) % 3) * 4}px`;
+          el.append(bit);
+        }
+      }
     }
 
     group.append(el);
@@ -516,9 +591,11 @@ function lamp(spec) {
 // The panel and ten digits. The guess is a single number, so tapping one is the
 // whole interaction: it lands in the counter and the beat moves on. No readout
 // above them, and nothing to clear or confirm.
-function keypadPanel() {
+function keypadPanel(screen) {
   const panel = document.createElement("div");
   panel.className = "keypad";
+  // Held invisible until the question has been asked — see scheduleReveals().
+  if (screen?.keypadAt) panel.classList.add("is-waiting");
 
   panel.append(imageLayer(keypad.frame, "layer"));
 
@@ -597,6 +674,23 @@ function flyToCounter(pane, key, value) {
   flier.style.setProperty("--dy", `${to.y - from.y}px`);
   pane.append(flier);
 
+  // The dust it sheds. Laid along the flight path ahead of time, each mote
+  // lighting as the digit reaches it — the same arc as @keyframes key-flight,
+  // a straight line lifted 90px at its midpoint.
+  for (let i = 0; i < 22; i++) {
+    const t = (i + 0.5) / 22;
+    const bit = document.createElement("i");
+    bit.className = "magic-bit";
+    bit.style.left = `${(from.x + (to.x - from.x) * t + (((i * 29) % 22) - 11)).toFixed(1)}px`;
+    bit.style.top = `${(from.y + (to.y - from.y) * t - 360 * t * (1 - t) + (((i * 41) % 18) - 9)).toFixed(1)}px`;
+    bit.style.setProperty("--px", `${((i % 5) - 2) * 6}px`);
+    bit.style.setProperty("--py", `${14 + (i % 3) * 8}px`);
+    bit.style.width = bit.style.height = `${6 + (i % 4) * 3.5}px`;
+    bit.style.animationDelay = `${Math.round(t * GUESS_FLIGHT) - 140}ms`;
+    pane.append(bit);
+    window.setTimeout(() => bit.remove(), GUESS_FLIGHT + 900);
+  }
+
   // The counter only takes the value once the digit has actually got there.
   window.setTimeout(() => {
     readout.textContent = value;
@@ -616,7 +710,7 @@ function counterCard(mode) {
   const value = document.createElement("span");
   value.className = "counter__value";
   value.textContent =
-    mode === "live" ? counted : mode === "guess" ? (guess === null ? "?" : guess) : TOTAL;
+    mode === "live" ? counted : mode === "guess" ? (guess ?? 0) : TOTAL;
   card.append(value);
 
   return card;

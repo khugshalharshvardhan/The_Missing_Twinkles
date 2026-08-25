@@ -124,15 +124,16 @@ export const screens = [
       { src: `${IMG}neel_point_up.webp`, x: 1382, y: 447, w: 465, h: 559, fill: CROP.neelPointUp, flipX: true, fx: "breathe-slow" }
     ],
     // The arrival. `enter: "left"` streams the swarm in from off the left of
-    // frame and then scatters it, and `dwell` holds the beat open long enough to
-    // watch all three parts — in, seen, gone. Without the dwell the beat runs on
-    // its reading pace, which for three words is about two seconds, and the
-    // swarm would still be flying in when the next screen arrived.
+    // frame, and `dwell` holds the beat open long enough to watch all of it —
+    // in, five seconds to be looked at, and the vanish. Without the dwell the
+    // beat runs on its reading pace, which for three words is about two
+    // seconds, and the swarm would still be flying in when the next screen
+    // arrived.
     //
-    // Timing lives in @keyframes ff-swarm in css/game.css: 0.9s in, 3.7s held,
-    // 1.0s scatter. Change one, change the other.
-    fireflies: { x: 586, y: 42, enter: "left" },
-    dwell: 6300,
+    // Timing lives in @keyframes ff-swarm in css/game.css: 0.9s in, 5s held,
+    // 0.7s to vanish where they stand. Change one, change the other.
+    fireflies: { x: 586, y: 115, enter: "left" },
+    dwell: 7100,
     bubble: {
       art: `${IMG}bub_11.webp`, who: "agni",
       x: 213, y: 263, w: 416, h: 229,
@@ -198,12 +199,15 @@ export const screens = [
       { src: `${IMG}agni_b.webp`, x: 25, y: 445, w: 553, h: 614, fill: CROP.agniB, fx: "breathe" },
       { src: `${IMG}neel_think.webp`, x: 1327, y: 395, w: 372, h: 617, fill: CROP.neelThink, flipX: true, fx: "breathe-slow" }
     ],
-    // The last look before the keypad. They converge from every direction this
-    // time rather than streaming in from one side, hold while Agni says to look
-    // closely, and scatter again — so the player is asked to guess at something
-    // they have just watched hide.
-    fireflies: { x: 600, y: 19, enter: "all" },
-    dwell: 6300,
+    // The last look before the keypad. Nothing is on screen while Agni speaks;
+    // the moment her line ends the bubble goes and the swarm materialises where
+    // it stands — the same magic it vanishes on, run forward: each twinkle
+    // grows out of a burst of gold (`at` is when, ms into the beat — the line
+    // runs 500 to 2581), holds its five seconds, and vanishes the same way.
+    // The player is asked to guess at something they have just watched appear
+    // and disappear by magic.
+    fireflies: { x: 600, y: 115, enter: "magic", at: 2650 },
+    dwell: 10000,
     bubble: {
       art: `${IMG}bub_15.webp`, who: "agni",
       x: 224, y: 107, w: 514, h: 277,
@@ -224,6 +228,9 @@ export const screens = [
       { src: `${IMG}neel_think.webp`, x: 1369, y: 386, w: 372, h: 617, fill: CROP.neelThink, flipX: true, fx: "breathe-slow" }
     ],
     keypad: true,
+    // The pad appears only once the question has been asked in full — her line
+    // runs 500 to 2216 — and it arrives on a burst of sparkle.
+    keypadAt: 2300,
     bubble: {
       art: `${IMG}bub_15.webp`, who: "agni",
       x: 0, y: 185, w: 514, h: 277,
@@ -243,7 +250,7 @@ export const screens = [
     ],
     bubble: {
       art: `${IMG}bub_neel.webp`, who: "neel",
-      x: 1218, y: 170, w: 400, h: 237,
+      x: 1157, y: 209, w: 400, h: 237,
       text: "Hmm… I think there were {guess}."
     }
   },
@@ -258,7 +265,7 @@ export const screens = [
       { src: `${IMG}agni_point.webp`, x: 64, y: 498, w: 525, h: 501, fill: CROP.agniPoint, fx: "breathe" },
       { src: `${IMG}neel_d.webp`, x: 1344, y: 417, w: 449, h: 581, fill: CROP.neelD, flipX: true, fx: "breathe-slow" }
     ],
-    fireflies: { x: 606, y: 63 },
+    fireflies: { x: 606, y: 120 },
     bubble: {
       art: `${IMG}bub_3.webp`, who: "agni",
       x: 220, y: 216, w: 557, h: 282,
@@ -277,10 +284,10 @@ export const screens = [
       { src: `${IMG}agni_g.webp`, x: 80, y: 490, w: 554, h: 512, fill: CROP.agniG, fx: "breathe" },
       { src: `${IMG}neel_c.webp`, x: 1385, y: 484, w: 396, h: 557, fill: CROP.neelC, fx: "breathe-slow" }
     ],
-    fireflies: { x: 664, y: 60 },
+    fireflies: { x: 664, y: 120 },
     counter: "guess",
     numberLine: true,
-    hint: { src: `${SHARED}hand_nudge.svg`, x: 568, y: 43, w: 308.396, h: 308.396 },
+    hint: { src: `${SHARED}hand_nudge.svg`, x: 568, y: 103, w: 308.396, h: 308.396 },
     bubble: {
       art: `${IMG}bub_32.webp`, who: "agni",
       x: 220, y: 222, w: 489, h: 256,
@@ -302,7 +309,7 @@ export const screens = [
       { src: `${IMG}agni_f.webp`, x: 9, y: 481, w: 605, h: 553, fx: "breathe" },
       { src: `${IMG}neel_f.webp`, x: 1372, y: 424, w: 465, h: 589, fx: "breathe-slow" }
     ],
-    fireflies: { x: 576, y: 92 },
+    fireflies: { x: 576, y: 130 },
     counter: "total",
     bubble: {
       art: `${IMG}bub_4.webp`, who: "agni",
@@ -325,7 +332,7 @@ export const screens = [
       { src: `${IMG}agni_f.webp`, x: 9, y: 481, w: 605, h: 553, fx: "breathe" },
       { src: `${IMG}neel_f.webp`, x: 1372, y: 424, w: 465, h: 589, fx: "breathe-slow" }
     ],
-    fireflies: { x: 576, y: 92 },
+    fireflies: { x: 576, y: 130 },
     counter: "guess",
     bubble: {
       art: `${IMG}bub_4.webp`, who: "agni",
