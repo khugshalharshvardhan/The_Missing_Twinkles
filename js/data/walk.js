@@ -18,9 +18,12 @@ const GAME = "assets/game/";
 export const FRAME_W = 1882;
 export const FRAME_H = 1059;
 
-// How long the whole thing runs, and how it is spent.
-export const WALK_MS = 8600;
-export const SETTLE_MS = 2200; // the last stretch, easing to a standstill
+// How long the whole thing runs, and how it is spent. Four seconds: two flat
+// was over before the eye had settled on it, and the original 8.6 was a wait —
+// this is long enough to watch them follow the firefly and still be done
+// before it drags.
+export const WALK_MS = 4000;
+export const SETTLE_MS = 1100; // the last stretch, easing to a standstill
 export const HAND_OVER_MS = 900; // cross-fade onto the game's first screen
 
 // Where their feet land. Measured: on the game's first screen Agni's soles are

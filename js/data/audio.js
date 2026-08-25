@@ -163,20 +163,20 @@ export const cues = {
   },
 
   // The walk between the acts. The music is already running, so it carries
-  // straight through; the footsteps and twinkles are what is new.
+  // straight through; the footsteps and the twinkle are what is new.
   //
-  // One continuous walking loop rather than three one-shots, faded out across
-  // the settle — WALK_MS is 8600 with SETTLE_MS 2200, so it starts leaving at
-  // 6400 and is gone as they stop. Change those, change this.
+  // One walking loop, faded out across the settle — WALK_MS is 4000 with
+  // SETTLE_MS 1100, so it starts leaving at 2900 and is gone as they stop.
+  // Change those, change this.
   walk: {
     bed: "bed_main",
-    sfx: [{ id: "footsteps_walk", at: 120, gain: 0.55, fade: { at: 6280, over: 2.2 } },
+    sfx: [{ id: "footsteps_walk", at: 120, gain: 0.55, fade: { at: 2850, over: 1.1 } },
       { id: "twinkle", at: 700, gain: 0.4, pan: 0.5 },
-      { id: "twinkle", at: 2600, gain: 0.35, pan: 0.3 },
-      { id: "twinkle", at: 4600, gain: 0.4, pan: 0.6 },
-      { id: "sparkle", at: 6100, gain: 0.5 }
+      { id: "twinkle", at: 2100, gain: 0.35, pan: 0.3 },
+      { id: "sparkle", at: 3300, gain: 0.5 }
     ]
   }
+
 };
 
 /* =========================================================
