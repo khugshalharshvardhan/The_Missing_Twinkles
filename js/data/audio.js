@@ -50,16 +50,13 @@ export const cues = {
 
   // Neel catches the bakery on the air.
   "1.2": {
-    sfx: [
-      { id: "sniff", at: 120, gain: 0.8, pan: 0.25 },
-      { id: "bubble", at: 260, gain: 0.6 }
+    sfx: [{ id: "sniff", at: 120, gain: 0.8, pan: 0.25 }
     ],
     vo: { id: "vo_neel_cake", at: 560 }
   },
 
   "1.3": {
-    sfx: [{ id: "bubble", at: 260, gain: 0.6 }],
-    vo: { id: "vo_agni_cookie", at: 560 }
+        vo: { id: "vo_agni_cookie", at: 560 }
   },
 
   "1.4": {
@@ -73,15 +70,13 @@ export const cues = {
   "2.1": {
     // The first turn: the music pulls back as the mist arrives.
     music: { to: 0.7, at: 0, over: 1.6 },
-    sfx: [
-      { id: "mist_rise", at: 0, gain: 0.85 },
+    sfx: [{ id: "mist_rise", at: 0, gain: 0.85 },
       // The heartbeats carry the rise; he only speaks once it has covered the
       // ground, so the bubble and the line wait for it. Matches `say.at` on
       // step 2.1 in scenes.js — change one, change the other.
       { id: "heartbeat", at: 900, gain: 0.5 },
       { id: "heartbeat", at: 1700, gain: 0.55 },
-      { id: "heartbeat", at: 2500, gain: 0.6 },
-      { id: "bubble", at: 2860, gain: 0.6 }
+      { id: "heartbeat", at: 2500, gain: 0.6 }
     ],
     vo: { id: "vo_neel_what", at: 3160 }
   },
@@ -93,8 +88,7 @@ export const cues = {
     // Down to almost nothing, reaching bottom under blackout_hit at 4100 — the
     // lights going out wants air behind it, not a cheerful loop.
     music: { to: 0.18, at: 2500, over: 1.5 },
-    sfx: [
-      { id: "mist_rush", at: 0, gain: 1 },
+    sfx: [{ id: "mist_rush", at: 0, gain: 1 },
       // One pop per lamp in LAMP_LIST, panned to where each one stands and
       // pitched down as they come nearer. Change one, change the other.
       { id: "lantern_pop", at: 400, gain: 0.5, rate: 1.25, pan: 0 },
@@ -114,8 +108,7 @@ export const cues = {
   // The eyes open, and he crosses overhead. The pan sweeps with the text.
   // The dip from 2.2 carries: nothing here puts the music back.
   "3.1": {
-    sfx: [
-      { id: "blink", at: 900, gain: 0.55, pan: -0.42 },
+    sfx: [{ id: "blink", at: 900, gain: 0.55, pan: -0.42 },
       { id: "blink", at: 2100, gain: 0.55, pan: 0.55 }
     ],
     vo: { id: "vo_giggles_2", at: 500, gain: 0.95, sweep: [-0.9, 0.9] }
@@ -142,9 +135,7 @@ export const cues = {
 
   // Agni's spark catches. Twinkles sit on two of the distant glimmers.
   "4.1": {
-    sfx: [
-      { id: "spark_ignite", at: 150, gain: 0.85, pan: -0.2 },
-      { id: "bubble", at: 260, gain: 0.6 },
+    sfx: [{ id: "spark_ignite", at: 150, gain: 0.85, pan: -0.2 },
       { id: "twinkle", at: 900, gain: 0.35, pan: 0.77 },
       { id: "twinkle", at: 2600, gain: 0.3, pan: -0.78 }
     ],
@@ -152,9 +143,7 @@ export const cues = {
   },
 
   "4.2": {
-    sfx: [
-      { id: "bubble", at: 260, gain: 0.6 },
-      { id: "cheer_swell", at: 260, gain: 0.8 },
+    sfx: [{ id: "cheer_swell", at: 260, gain: 0.8 },
       { id: "twinkle", at: 1600, gain: 0.35, pan: 0.77 }
     ],
     vo: { id: "vo_agni_light", at: 560 }
@@ -168,8 +157,7 @@ export const cues = {
   // 6400 and is gone as they stop. Change those, change this.
   walk: {
     bed: "bed_main",
-    sfx: [
-      { id: "footsteps_walk", at: 120, gain: 0.55, fade: { at: 6280, over: 2.2 } },
+    sfx: [{ id: "footsteps_walk", at: 120, gain: 0.55, fade: { at: 6280, over: 2.2 } },
       { id: "twinkle", at: 700, gain: 0.4, pan: 0.5 },
       { id: "twinkle", at: 2600, gain: 0.35, pan: 0.3 },
       { id: "twinkle", at: 4600, gain: 0.4, pan: 0.6 },
@@ -200,69 +188,62 @@ export const gameCues = {
   // ---- they notice the twinkles, and the problem is stated ----
   "1.1": {
     bed: "bed_main",
-    sfx: [{ id: "bubble", at: 200, gain: 0.6 }, { id: "twinkle", at: 700, gain: 0.4 }],
+    sfx: [{ id: "twinkle", at: 700, gain: 0.4 }],
     vo: { id: "vo_g_look", at: 500, pan: -0.55 }
   },
   "1.2": {
     bed: "bed_main",
-    sfx: [{ id: "bubble", at: 200, gain: 0.6 }],
-    vo: { id: "vo_g_gone", at: 500, pan: -0.55 }
+        vo: { id: "vo_g_gone", at: 500, pan: -0.55 }
   },
   "1.3": {
-    sfx: [{ id: "bubble", at: 200, gain: 0.6 }],
-    vo: { id: "vo_g_howmany", at: 500, pan: -0.5 }
+        vo: { id: "vo_g_howmany", at: 500, pan: -0.5 }
   },
   // Neel's line, so it comes from his side of the frame.
   "1.4": {
-    sfx: [{ id: "bubble", at: 200, gain: 0.6 }, { id: "grin_boing", at: 120, gain: 0.5, pan: 0.4 }],
+    sfx: [{ id: "grin_boing", at: 120, gain: 0.5, pan: 0.4 }],
     vo: { id: "vo_g_catch", at: 500, pan: 0.5 }
   },
   "1.5": {
-    sfx: [{ id: "bubble", at: 200, gain: 0.6 }, { id: "twinkle", at: 800, gain: 0.35, pan: 0.2 }],
+    sfx: [{ id: "twinkle", at: 800, gain: 0.35, pan: 0.2 }],
     vo: { id: "vo_g_guess", at: 500, pan: -0.5 }
   },
 
   // ---- the keypad. Key presses are played from js/game.js, on the tap ----
   "2": {
-    sfx: [{ id: "page_air", at: 0, gain: 0.5 }, { id: "bubble", at: 200, gain: 0.6 }],
+    sfx: [{ id: "page_air", at: 0, gain: 0.5 }],
     vo: { id: "vo_g_howmany_q", at: 500, pan: -0.6 }
   },
   // Stem only: js/game.js says the number after it.
   "2.2": {
-    sfx: [{ id: "bubble", at: 200, gain: 0.6 }],
-    vo: { id: "vo_g_ithink", at: 500, pan: 0.55 }
+        vo: { id: "vo_g_ithink", at: 500, pan: 0.55 }
   },
 
   // ---- counting ----
   "3": {
-    sfx: [{ id: "bubble", at: 200, gain: 0.6 }],
-    vo: { id: "vo_g_count", at: 500, pan: -0.5 }
+        vo: { id: "vo_g_count", at: 500, pan: -0.5 }
   },
   // The counting itself is scored per tap in js/game.js — a pip and the spoken
   // number — so this beat only sets it up and then stays out of the way.
   "3.2": {
-    sfx: [{ id: "page_air", at: 0, gain: 0.5 }, { id: "bubble", at: 200, gain: 0.6 }],
+    sfx: [{ id: "page_air", at: 0, gain: 0.5 }],
     vo: { id: "vo_g_tapcount", at: 500, pan: -0.5 }
   },
 
   // ---- the total, and how the guess did ----
   "4": {
-    sfx: [{ id: "bubble", at: 200, gain: 0.6 }, { id: "sparkle", at: 420, gain: 0.5 }],
+    sfx: [{ id: "sparkle", at: 420, gain: 0.5 }],
     vo: { id: "vo_g_total", at: 500, pan: -0.5 }
   },
   // Stem only: js/game.js says the number after it.
   "16": {
-    sfx: [{ id: "bubble", at: 200, gain: 0.6 }],
-    vo: { id: "vo_g_youguessed", at: 500, pan: -0.5 }
+        vo: { id: "vo_g_youguessed", at: 500, pan: -0.5 }
   },
   // The verdict line and its chime are chosen in js/game.js.
-  "4.2": {
-    sfx: [{ id: "bubble", at: 200, gain: 0.6 }]
-  },
+  "4.2": {},
 
   // ---- the lamp. Striking it is played on the tap ----
   "5.1": {
-    sfx: [{ id: "page_air", at: 0, gain: 0.5 }, { id: "bubble", at: 200, gain: 0.6 }],
+    sfx: [{ id: "page_air", at: 0, gain: 0.5 }],
     vo: { id: "vo_g_taplamp", at: 500, pan: -0.5 }
   },
   "5.2": {
@@ -271,11 +252,11 @@ export const gameCues = {
 
   // ---- the town is theirs to light ----
   "6.1": {
-    sfx: [{ id: "bubble", at: 200, gain: 0.6 }, { id: "cheer_swell", at: 240, gain: 0.7 }],
+    sfx: [{ id: "cheer_swell", at: 240, gain: 0.7 }],
     vo: { id: "vo_g_yourturn", at: 620 }
   },
   "6.2": {
-    sfx: [{ id: "bubble", at: 200, gain: 0.6 }, { id: "sparkle", at: 400, gain: 0.5 }],
+    sfx: [{ id: "sparkle", at: 400, gain: 0.5 }],
     vo: { id: "vo_g_guesscount", at: 500 }
   }
 };
@@ -315,6 +296,10 @@ export const audioManifest = [
     // Agni counting, and finishing the two lines that end in a number the
     // player chose. Zero to twenty covers every count and every guess the
     // keypad can hold that is worth speaking.
-    ...Array.from({ length: 21 }, (_, n) => `vo_n_${n}`)
+    ...Array.from({ length: 21 }, (_, n) => `vo_n_${n}`),
+    // Neel's own nought to nine, for the number that finishes his sentence on
+    // screen 2.2. Without these listed here nothing fetches them, and the call
+    // to play one finds no buffer and quietly does nothing.
+    ...Array.from({ length: 10 }, (_, n) => `vo_nn_${n}`)
   ])
 ];

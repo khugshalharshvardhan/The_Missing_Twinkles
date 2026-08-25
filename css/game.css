@@ -440,13 +440,23 @@
   box-shadow: 0 8px 0 #c98a1a, 0 14px 26px rgba(0, 0, 0, 0.45);
 }
 
-/* The guess sits above the answer so the two never cover each other when they
-   land on the same mark — which is exactly what happens when the guess is right. */
 #game .numline__marker.is-guess {
-  top: -84px;
   background: #cbb6ff;
   box-shadow: 0 8px 0 #6f56b8, 0 14px 26px rgba(0, 0, 0, 0.45);
-  animation-delay: 260ms;
+}
+
+/* Both sit at the same height, so the two numbers can be read against each
+   other at a glance. The one case where that cannot work is when the guess was
+   right and both land on the same mark — then, and only then, the guess is
+   lifted to sit above the answer rather than on top of it. */
+#game .numline__marker.is-stacked {
+  top: -92px;
+}
+
+/* Placed rather than thrown: on the beat after its own, a marker is already
+   there and should not arrive again. */
+#game .numline__marker.is-placed {
+  animation: none;
 }
 
 @keyframes numline-drop {
@@ -535,6 +545,44 @@
   filter: saturate(0.25) brightness(0.72);
 }
 
+/* Nothing points at the keypad any more, so the keys say it themselves: a slow
+   swell and a warm edge, offset per key so the pad breathes across rather than
+   flashing all at once.
+
+   On `scale` and `filter` rather than on `transform`, so the press and hover
+   below still work — an animation on transform would own the property and those
+   would stop moving. */
+#game .key {
+  animation: key-invite 2.1s ease-in-out infinite;
+}
+
+/* Left to right, top to bottom, so the swell travels across the pad. */
+#game .key:nth-child(2) { animation-delay: 0ms; }
+#game .key:nth-child(3) { animation-delay: 90ms; }
+#game .key:nth-child(4) { animation-delay: 180ms; }
+#game .key:nth-child(5) { animation-delay: 120ms; }
+#game .key:nth-child(6) { animation-delay: 210ms; }
+#game .key:nth-child(7) { animation-delay: 300ms; }
+#game .key:nth-child(8) { animation-delay: 240ms; }
+#game .key:nth-child(9) { animation-delay: 330ms; }
+#game .key:nth-child(10) { animation-delay: 420ms; }
+#game .key:nth-child(11) { animation-delay: 360ms; }
+
+/* Once a guess is in, every key is disabled — it should stop asking. */
+#game .key:disabled { animation: none; }
+
+@keyframes key-invite {
+  0%, 100% {
+    scale: 1;
+    filter: drop-shadow(0 2px 0 rgba(0, 0, 0, 0.25));
+  }
+  50% {
+    scale: 1.055;
+    filter: drop-shadow(0 2px 0 rgba(0, 0, 0, 0.25))
+      drop-shadow(0 0 14px rgba(255, 190, 74, 0.8));
+  }
+}
+
 #game .key:hover { transform: translateY(-2px); }
 #game .key:active { transform: translateY(3px); }
 
@@ -545,6 +593,53 @@
   outline: 4px solid var(--paper);
   outline-offset: 3px;
   border-radius: 14px;
+}
+
+/* The tapped digit, on its way to the counter. Built and thrown by
+   flyToCounter() in js/game.js; --dx / --dy are the trip, in frame units. It
+   arcs rather than sliding, and shrinks as it lands, so it reads as the number
+   being carried over rather than a label being moved. */
+#game .key-flight {
+  position: absolute;
+  z-index: 6;
+  transform: translate(-50%, -50%);
+  color: #ffe9a8;
+  font-size: 62px;
+  line-height: 1;
+  pointer-events: none;
+  text-shadow: 0 0 18px rgba(255, 176, 66, 0.95), 0 4px 0 rgba(0, 0, 0, 0.4);
+  animation: key-flight 620ms var(--ease) forwards;
+}
+
+@keyframes key-flight {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0;
+  }
+  12% {
+    opacity: 1;
+  }
+  55% {
+    /* Up and over: the high point of the arc, halfway across. */
+    transform: translate(calc(-50% + var(--dx) * 0.5), calc(-50% + var(--dy) * 0.5 - 90px))
+      scale(1.22);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(0.45);
+    opacity: 0;
+  }
+}
+
+/* The counter takes the value as the digit reaches it, and pops to say so. */
+#game .counter__value.is-landing {
+  animation: counter-take 420ms var(--ease);
+}
+
+@keyframes counter-take {
+  0% { transform: scale(0.55); }
+  55% { transform: scale(1.22); }
+  100% { transform: scale(1); }
 }
 
 /* =========================================================
@@ -570,9 +665,23 @@
 
 /* The hand overlaps the first twinkle, so it must never take the tap
    that was meant for the firefly underneath it. */
+/* The tap hand. The file is a still — the one it replaces was an animated
+   WebP — so the tap is done here: down onto the twinkle, held for a beat, and
+   back up, with a pause before it asks again. */
 #game .hint {
   pointer-events: none;
   transition: opacity var(--speed-slow) var(--ease);
+  animation: hand-tap 2.2s var(--ease) infinite;
+  /* The fingertip, not the middle of the box: that is the part that has to stay
+     put while the hand presses. */
+  transform-origin: 52% 42%;
+}
+
+@keyframes hand-tap {
+  0%, 62%, 100% { transform: none; }
+  /* Down, and a touch smaller, the way a finger foreshortens as it presses. */
+  74% { transform: translate(-6px, 12px) scale(0.9); }
+  86% { transform: none; }
 }
 
 #game .hint.is-done {
@@ -583,15 +692,16 @@
    Idle motion
    ========================================================= */
 
+/* The pair hold still.
+
+   These carried a slow scale that was meant to read as breathing and read as
+   hovering instead — a drawn character with both feet on the ground that keeps
+   changing size has nothing to attribute the change to. The classes stay,
+   because the screen data sets them, but they no longer animate. */
 #game .fx-breathe,
 #game .fx-breathe-slow {
   transform-origin: 50% 100%;
-  animation: g-breathe 4.4s ease-in-out infinite;
-}
-
-#game .fx-breathe-slow {
-  animation-duration: 5.6s;
-  animation-delay: -1.4s;
+  animation: none;
 }
 
 #game .fx-flicker { animation: g-flicker 2.4s ease-in-out infinite; }

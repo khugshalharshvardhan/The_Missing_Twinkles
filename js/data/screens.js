@@ -21,6 +21,8 @@
 // arrives already cropped, so it needs no transform).
 
 const IMG = "assets/game/";
+// The tap hand ships with the story art rather than the game's.
+const SHARED = "assets/images/";
 
 export const FRAME_W = 1882;
 export const FRAME_H = 1059;
@@ -132,8 +134,8 @@ export const screens = [
     fireflies: { x: 586, y: 42, enter: "left" },
     dwell: 6300,
     bubble: {
-      art: `${IMG}bub_11.webp`, mirror: true,
-      x: 213, y: 291, w: 416, h: 229,
+      art: `${IMG}bub_11.webp`, who: "agni",
+      x: 213, y: 263, w: 416, h: 229,
       text: "Look, twinkles!"
     }
   },
@@ -148,8 +150,8 @@ export const screens = [
       { src: `${IMG}neel_a.webp`, x: 1327, y: 434, w: 377, h: 573, fill: CROP.neelA, flipX: true, fx: "breathe-slow" }
     ],
     bubble: {
-      art: `${IMG}bub_12.webp`, mirror: true,
-      x: 216, y: 242, w: 495, h: 253,
+      art: `${IMG}bub_12.webp`, who: "agni",
+      x: 216, y: 209, w: 495, h: 253,
       text: "Huh? Where did they go?"
     }
   },
@@ -164,7 +166,7 @@ export const screens = [
       { src: `${IMG}neel_b.webp`, x: 1347, y: 400, w: 376, h: 611, fill: CROP.neelB, flipX: true, fx: "breathe-slow" }
     ],
     bubble: {
-      art: `${IMG}bub_13.webp`, mirror: true,
+      art: `${IMG}bub_13.webp`, who: "agni",
       x: 234, y: 130, w: 596, h: 314,
       artInset: [8.7, 0, 0, 3.23],
       text: "We need to find how many twinkles were there."
@@ -181,8 +183,8 @@ export const screens = [
       { src: `${IMG}neel_e.webp`, x: 1146, y: 344, w: 567, h: 667, fill: CROP.neelE, fx: "breathe-slow" }
     ],
     bubble: {
-      art: `${IMG}bub_neel.webp`, mirror: true,
-      x: 1183, y: 176, w: 400, h: 237,
+      art: `${IMG}bub_neel.webp`, who: "neel",
+      x: 1183, y: 142, w: 400, h: 237,
       text: "Then we can catch them!"
     }
   },
@@ -203,8 +205,8 @@ export const screens = [
     fireflies: { x: 600, y: 19, enter: "all" },
     dwell: 6300,
     bubble: {
-      art: `${IMG}bub_15.webp`, mirror: true,
-      x: 224, y: 200, w: 514, h: 277,
+      art: `${IMG}bub_15.webp`, who: "agni",
+      x: 224, y: 107, w: 514, h: 277,
       text: "Look closely and make a guess!"
     }
   },
@@ -217,12 +219,14 @@ export const screens = [
     counter: "guess",
     layers: [
       BG,
+      // She asks the question on this beat and was missing from it entirely.
+      { src: `${IMG}agni_talk.webp`, x: 10, y: 485, w: 576, h: 532, fill: CROP.agniTalk, flipX: true, fx: "breathe" },
       { src: `${IMG}neel_think.webp`, x: 1369, y: 386, w: 372, h: 617, fill: CROP.neelThink, flipX: true, fx: "breathe-slow" }
     ],
     keypad: true,
     bubble: {
-      art: `${IMG}bub_15.webp`, mirror: true,
-      x: 0, y: 202, w: 514, h: 277,
+      art: `${IMG}bub_15.webp`, who: "agni",
+      x: 0, y: 185, w: 514, h: 277,
       text: "How many twinkles were there?"
     }
   },
@@ -238,8 +242,8 @@ export const screens = [
       { src: `${IMG}neel_c.webp`, x: 1382, y: 428, w: 434, h: 611, fill: CROP.neelC, fx: "breathe-slow" }
     ],
     bubble: {
-      art: `${IMG}bub_neel.webp`, mirror: true,
-      x: 1218, y: 207, w: 400, h: 237,
+      art: `${IMG}bub_neel.webp`, who: "neel",
+      x: 1218, y: 170, w: 400, h: 237,
       text: "Hmm… I think there were {guess}."
     }
   },
@@ -256,7 +260,7 @@ export const screens = [
     ],
     fireflies: { x: 606, y: 63 },
     bubble: {
-      art: `${IMG}bub_3.webp`, mirror: true,
+      art: `${IMG}bub_3.webp`, who: "agni",
       x: 220, y: 216, w: 557, h: 282,
       artInset: [18.09, 9.69, 0, 17.06],
       text: "Let us count to check."
@@ -276,10 +280,10 @@ export const screens = [
     fireflies: { x: 664, y: 60 },
     counter: "guess",
     numberLine: true,
-    hint: { src: `${IMG}tap_hint.webp`, x: 568, y: 43, w: 308.396, h: 308.396 },
+    hint: { src: `${SHARED}hand_nudge.svg`, x: 568, y: 43, w: 308.396, h: 308.396 },
     bubble: {
-      art: `${IMG}bub_32.webp`, mirror: true,
-      x: 220, y: 242, w: 489, h: 256,
+      art: `${IMG}bub_32.webp`, who: "agni",
+      x: 220, y: 222, w: 489, h: 256,
       text: "Tap each twinkle to count."
     }
   },
@@ -288,6 +292,11 @@ export const screens = [
   {
     id: "4",
     anchor: THE_CLEARING,
+    numberLine: true,
+    // Long enough to watch the number travel down to the line and then read
+    // it there. On reading pace alone this beat ended about a tenth of a
+    // second after the marker landed.
+    dwell: 3800,
     layers: [
       BG,
       { src: `${IMG}agni_f.webp`, x: 9, y: 481, w: 605, h: 553, fx: "breathe" },
@@ -296,8 +305,8 @@ export const screens = [
     fireflies: { x: 576, y: 92 },
     counter: "total",
     bubble: {
-      art: `${IMG}bub_4.webp`, mirror: true,
-      x: 254, y: 280, w: 417, h: 201,
+      art: `${IMG}bub_4.webp`, who: "agni",
+      x: 254, y: 251, w: 417, h: 201,
       text: "There are {total} twinkles"
     }
   },
@@ -306,16 +315,21 @@ export const screens = [
   {
     id: "16",
     anchor: THE_CLEARING,
+    numberLine: true,
+    // Long enough to watch the number travel down to the line and then read
+    // it there. On reading pace alone this beat ended about a tenth of a
+    // second after the marker landed.
+    dwell: 4600,
     layers: [
       BG,
       { src: `${IMG}agni_f.webp`, x: 9, y: 481, w: 605, h: 553, fx: "breathe" },
       { src: `${IMG}neel_f.webp`, x: 1372, y: 424, w: 465, h: 589, fx: "breathe-slow" }
     ],
     fireflies: { x: 576, y: 92 },
-    counter: "total",
+    counter: "guess",
     bubble: {
-      art: `${IMG}bub_4.webp`, mirror: true,
-      x: 254, y: 280, w: 417, h: 201,
+      art: `${IMG}bub_4.webp`, who: "agni",
+      x: 254, y: 251, w: 417, h: 201,
       text: "You guessed {guess}."
     }
   },
@@ -330,8 +344,8 @@ export const screens = [
       { src: `${IMG}neel_f.webp`, x: 1355, y: 408, w: 465, h: 589, fx: "breathe-slow" }
     ],
     bubble: {
-      art: `${IMG}bub_42.webp`, mirror: true,
-      x: 276, y: 248, w: 376, h: 226,
+      art: `${IMG}bub_42.webp`, who: "agni",
+      x: 276, y: 222, w: 376, h: 226,
       text: "{verdict}"
     }
   },
@@ -348,7 +362,7 @@ export const screens = [
     ],
     lamp: { src: `${IMG}lamp_off.webp`, x: 807, y: 74, w: 272, h: 927, fill: CROP.lampOff },
     bubble: {
-      art: `${IMG}bub_51.webp`, mirror: false,
+      art: `${IMG}bub_51.webp`, who: "agni",
       x: 314, y: 300, w: 383, h: 184,
       text: "Tap the lamp!"
     }
@@ -377,7 +391,7 @@ export const screens = [
       { src: `${IMG}neel_e.webp`, x: 945, y: 310, w: 567, h: 667, fill: CROP.neelE, fx: "breathe-slow" }
     ],
     bubble: {
-      art: `${IMG}bub_61.webp`, mirror: false,
+      art: `${IMG}bub_61.webp`, who: "agni",
       x: 646, y: 186, w: 361, h: 199,
       text: "Now, it is your turn."
     }
@@ -393,8 +407,8 @@ export const screens = [
       { src: `${IMG}neel_g.webp`, x: 1039, y: 366, w: 462, h: 646, fill: CROP.neelG, fx: "breathe-slow" }
     ],
     bubble: {
-      art: `${IMG}bub_62.webp`, mirror: false,
-      x: 667, y: 108, w: 492, h: 281,
+      art: `${IMG}bub_62.webp`, who: "agni",
+      x: 667, y: 77, w: 492, h: 281,
       text: "Make a guess, and count to check!"
     }
   }
@@ -403,26 +417,34 @@ export const screens = [
 /* The keypad, from the `keypad` group (108:12). Key boxes are 116 x 85 on a
    120px pitch, which is what the design's 4px gaps work out to.
 
-   The panel behind it, the readout above it and both action keys are gone: the
-   guess is one digit, so tapping a number is the whole interaction and there is
-   nothing to clear or confirm. The ten digits keep the positions they had, which
-   is why 0 still sits alone in the middle of the bottom row. */
+   The readout above it and both action keys are gone: the guess is one digit,
+   so tapping a number is the whole interaction and there is nothing to clear or
+   confirm. The ten digits keep the positions they had, which is why 0 still sits
+   alone in the middle of the bottom row — and the panel is still behind them,
+   because without it they had nothing holding them together. */
 export const keypad = {
+  // The panel behind the keys, back where Figma has it. Without it the digits
+  // floated on the background with nothing holding them together.
+  frame: { src: `${IMG}keypad.webp`, x: 665, y: 184, w: 553, h: 691 },
   keyW: 116,
   keyH: 85,
   keyArt: `${IMG}key.webp`,
   keyFill: CROP.key,
+  // Every row is 60px above where Figma has it. The readout used to fill the top
+  // of the panel and the keys sat under it; with the readout gone that left a
+  // third of the panel empty. Measured off the art: the cream face runs from
+  // y 267 to 802, centre 534, and the key block's own centre was 594.
   keys: [
-    { label: "1", x: 766, y: 421 },
-    { label: "2", x: 886, y: 421 },
-    { label: "3", x: 1006, y: 421 },
-    { label: "4", x: 766, y: 508 },
-    { label: "5", x: 886, y: 508 },
-    { label: "6", x: 1006, y: 508 },
-    { label: "7", x: 766, y: 595 },
-    { label: "8", x: 886, y: 595 },
-    { label: "9", x: 1006, y: 595 },
-    { label: "0", x: 886, y: 682 }
+    { label: "1", x: 766, y: 361 },
+    { label: "2", x: 886, y: 361 },
+    { label: "3", x: 1006, y: 361 },
+    { label: "4", x: 766, y: 448 },
+    { label: "5", x: 886, y: 448 },
+    { label: "6", x: 1006, y: 448 },
+    { label: "7", x: 766, y: 535 },
+    { label: "8", x: 886, y: 535 },
+    { label: "9", x: 1006, y: 535 },
+    { label: "0", x: 886, y: 622 }
   ]
 };
 
@@ -445,6 +467,7 @@ export const manifest = [
     ]),
     FIREFLY_SRC,
     `${IMG}lamp_on.webp`,
+    keypad.frame.src,
     keypad.keyArt,
     counter.src
   ])

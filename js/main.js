@@ -191,9 +191,10 @@ function enterStory() {
 // Dev only: put an act on stage without starting it playing. The tools pick
 // the moment themselves, so kicking off a run first would only be undone.
 function devSetAct(act) {
-  const game = act === "game";
+  // The walk is drawn in the game's frame, not the story's — see js/data/walk.js.
+  const wide = act === "game" || act === "walk";
   document.body.dataset.act = act;
-  setFrame(game ? GAME_W : STORY_W, game ? GAME_H : STORY_H);
+  setFrame(wide ? GAME_W : STORY_W, wide ? GAME_H : STORY_H);
   hud.classList.add("is-active");
   hud.classList.remove("is-waiting");
 }

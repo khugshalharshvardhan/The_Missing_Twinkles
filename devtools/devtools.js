@@ -5,8 +5,10 @@
 // tooling entirely: delete this folder and that one guarded import.
 //
 // What it gives you:
-//   * a hamburger menu of every page and step in the story, and every screen
-//     in the counting game — click one to jump straight to it
+//   * a hamburger menu of every page and step in the story, the walk between
+//     the acts, and every screen in the counting game — click one to jump
+//     straight to it. Game rows name what is on the screen, so the beat with the
+//     keypad or the number line can be found without counting.
 //   * pause, which freezes the artwork, every CSS animation and the video
 //   * edit mode: drag to move, drag the corner to resize, arrow keys to nudge
 //     (hold shift for 10px), or type exact numbers
@@ -16,6 +18,7 @@ import { pages, timeline } from "../js/data/scenes.js";
 import { screens } from "../js/data/screens.js";
 import { devGoto as storyGoto, devPause as storyPause } from "../js/story.js";
 import { devGoto as gameGoto, devPause as gamePause } from "../js/game.js";
+import { devGoto as walkGoto, devPause as walkPause, startWalk } from "../js/walk.js";
 import { initEdit, markTargets, deselect, nudge, edits, clearEdits, targets, pick } from "./edit.js";
 
 const root = document.documentElement;
@@ -160,14 +163,35 @@ function buildTrees() {
     );
   });
 
+  // The walk is one moment rather than a list, but it belongs in the menu: it
+  // is the third act and had no way in at all.
+  ui.gameTree.append(
+    group("The walk", "story → game", [
+      { label: "walk  ·  they arrive", act: "walk", index: 0 }
+    ], false)
+  );
+
   ui.gameTree.append(
     group("Screens", `${screens.length} screens`,
-      screens.map((screen, i) => ({
-        label: `${screen.id}${screen.interact ? `  ·  ${screen.interact}` : ""}`,
-        act: "game",
-        index: i
-      })), false)
+      screens.map((screen, i) => ({ label: `${screen.id}${parts(screen)}`, act: "game", index: i })), false)
   );
+}
+
+// What a screen actually carries, so a beat can be found by what is on it
+// rather than by counting rows.
+function parts(screen) {
+  // `interact` names the same thing twice on two screens — the keypad beat is
+  // both `interact: "keypad"` and `keypad: true` — so the list is deduped.
+  const bits = new Set();
+  if (screen.interact) bits.add(screen.interact);
+  if (screen.keypad) bits.add("keypad");
+  if (screen.counter) bits.add(`counter:${screen.counter}`);
+  if (screen.numberLine) bits.add("number line");
+  if (screen.fireflies) bits.add(screen.fireflies.enter ? `swarm ⇢ ${screen.fireflies.enter}` : "swarm");
+  if (screen.lamp) bits.add("lamp");
+  if (screen.hint) bits.add("hint");
+  if (screen.bubble) bits.add("bubble");
+  return bits.size ? `  ·  ${[...bits].join("  ·  ")}` : "";
 }
 
 function group(name, note, rows, open) {
@@ -204,7 +228,12 @@ function jump(act, index) {
 
   if (act !== api.act()) api.setAct(act);
 
-  const at = act === "game" ? gameGoto(index) : storyGoto(index);
+  // The walk plays itself from the top rather than seeking, so entering it is
+  // a restart.
+  const at =
+    act === "walk" ? (startWalk(), walkGoto(index))
+    : act === "game" ? gameGoto(index)
+    : storyGoto(index);
   here = { act, index, label: at?.step?.id ?? at?.id ?? String(index) };
 
   for (const btn of ui.dv.querySelectorAll(".dv__step")) {
@@ -216,14 +245,19 @@ function jump(act, index) {
   // A fresh step brings a fresh clock and fresh animations, so re-apply the
   // hold over both. Jumping never pauses on its own.
   if (paused) {
-    if (act === "game") gamePause(true);
-    else storyPause(true);
+    pauseAct(act, true);
     requestAnimationFrame(() => freeze(true));
   }
   paintOut();
 }
 
 /* ---- pause ---- */
+
+function pauseAct(act, on) {
+  if (act === "walk") return walkPause(on);
+  if (act === "game") return gamePause(on);
+  return storyPause(on);
+}
 
 function setPaused(on) {
   paused = on;
@@ -233,8 +267,7 @@ function setPaused(on) {
 
   // Both halves: hold the clock so the step cannot move on underneath a frozen
   // picture, and freeze the picture itself.
-  if (here.act === "game") gamePause(on);
-  else storyPause(on);
+  pauseAct(here.act, on);
   freeze(on);
 }
 

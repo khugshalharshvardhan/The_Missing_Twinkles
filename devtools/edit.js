@@ -26,7 +26,21 @@ const TARGETS = {
     "#game .scene.is-active > .layer",
     "#game .scene.is-active > .bubble",
     "#game .scene.is-active > .keypad",
-    "#game .scene.is-active > .swarm"
+    "#game .scene.is-active > .swarm",
+    // Added with the counter, the number line and the hint. Without these the
+    // three newest things on screen were the only ones that could not be moved.
+    "#game .scene.is-active > .counter",
+    "#game .scene.is-active > .numline",
+    "#game .scene.is-active > .hint",
+    "#game .scene.is-active > .lamp"
+  ],
+  // The walk lays itself out from js/data/walk.js rather than from Figma
+  // coordinates, so the pieces worth grabbing are the pair and the firefly they
+  // are following. The scrolling bands are positioned by the loop every frame
+  // and would fight anything dragged.
+  walk: [
+    "#walk > .pw__walker",
+    "#walk > .pw__guide"
   ]
 };
 
@@ -44,7 +58,9 @@ export function initEdit(handlers) {
 
 export function markTargets(act) {
   for (const el of stage.querySelectorAll(".dv-hit")) el.classList.remove("dv-hit");
-  for (const el of stage.querySelectorAll(TARGETS[act].join(","))) el.classList.add("dv-hit");
+  const sel = TARGETS[act];
+  if (!sel) return;
+  for (const el of stage.querySelectorAll(sel.join(","))) el.classList.add("dv-hit");
 }
 
 export function deselect() {

@@ -130,7 +130,18 @@ const MIST_LOW = { key: "mist-band", src: `${IMG}mist_band.webp`, x: 0, y: 510, 
 
 // A second, wider pass of the same mist art sitting further up the frame, so
 // the street can thicken over without cutting to a different render.
-const MIST_HIGH = { key: "mist-high", src: `${IMG}mist_band.webp`, x: -160, y: 250, w: 2240, h: 760, opacity: 0.28, fx: "mist-swell" };
+// Taller than Figma draws it, and deliberately so. The art is dense right to
+// its own bottom edge, so wherever that edge lands is a straight cut across the
+// frame — and `mist-swell` finishes at translateY(-20px) scale(1.1), which put
+// this box's bottom at y 1028, fifty pixels short of the frame. That visible
+// horizontal edge is what made the second bank read as a picture laid on top.
+// At h 900 it finishes at 1175, well past the bottom, so the only edges on
+// screen are the soft ones the art draws itself. MIST_LOW already clears it.
+//
+// The box is now 2240x900 against the art's 3:1, so `object-fit: cover` crops
+// it horizontally rather than stretching it — no distortion, just less of the
+// width, which on the blurred far bank costs nothing.
+const MIST_HIGH = { key: "mist-high", src: `${IMG}mist_band.webp`, x: -160, y: 250, w: 2240, h: 900, opacity: 0.28, fx: "mist-swell" };
 
 // The lamps are painted into the background, so putting them out means taking
 // the light back out of the picture where each one stands. Positions were

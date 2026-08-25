@@ -15,7 +15,7 @@ import {
   FIREFLIES, FIREFLY_SRC, TOTAL, FRAME_W
 } from "./data/screens.js";
 import { gameCues } from "./data/audio.js";
-import { anchorOffset } from "./anchor.js";
+import { anchorOffset, bodyBox, castOf } from "./anchor.js";
 import { clearCues, playCues, playSfx, playVo, clipLength } from "./audio.js";
 
 const panes = [
@@ -36,7 +36,8 @@ const READ_MAX = 6200;
 const AFTER_COUNT = 950; // let the last twinkle land before moving on
 const AFTER_LAMP = 900; // hold on the lit lamp for a moment
 const VO_TAIL = 650; // breath between the end of a line and the next beat
-const GUESS_LANDS = 900; // watch the tapped number arrive in the counter
+const GUESS_FLIGHT = 620; // the tapped digit's trip across to the counter
+const GUESS_LANDS = 1050; // and a beat to see it sitting there before moving on
 const COUNT_SETTLE = 600; // the last number grows before the line is drawn
 const LINE_WALK = 1500; // both markers travel down onto the number line
 const LINE_HOLD = 2200; // and then stay put long enough to be compared
@@ -250,9 +251,15 @@ function verdict() {
 // bubble, which is showing the figure anyway.
 const SPOKEN_MAX = 20;
 
-function sayNumber(n, at, pan) {
-  if (!Number.isInteger(n) || n < 0 || n > SPOKEN_MAX) return false;
-  playVo({ id: `vo_n_${n}`, at, pan });
+// `who` picks whose voice says it. Agni counts the twinkles and reads the
+// total; Neel has his own nought to nine, because he is the one who says "Hmm...
+// I think there were —" and the number that finishes his sentence cannot be in
+// her voice. His only go to nine, which is all the pad can make.
+function sayNumber(n, at, pan, who = "agni") {
+  if (!Number.isInteger(n) || n < 0) return false;
+  const neel = who === "neel";
+  if (n > (neel ? 9 : SPOKEN_MAX)) return false;
+  playVo({ id: `${neel ? "vo_nn_" : "vo_n_"}${n}`, at, pan });
   return true;
 }
 
@@ -263,13 +270,21 @@ function dynamicVoice(screen) {
   // "Hmm... I think there were {guess}." — vo_g_ithink starts at 500ms.
   if (screen.id === "2.2") {
     const at = 500 + clipLength("vo_g_ithink") + 120;
-    return sayNumber(guess, at, 0.55) ? at + clipLength(`vo_n_${guess}`) : 0;
+    return sayNumber(guess, at, 0.55, "neel") ? at + clipLength(`vo_nn_${guess}`) : 0;
   }
 
   // "You guessed {guess}." — vo_g_youguessed starts at 500ms.
+  // "You guessed —" and then the number, which drops onto the line with it.
   if (screen.id === "16") {
     const at = 500 + clipLength("vo_g_youguessed") + 120;
+    window.setTimeout(() => dropFromCounter(panes[front], "guess", guess), at);
     return sayNumber(guess, at, -0.5) ? at + clipLength(`vo_n_${guess}`) : 0;
+  }
+
+  // "There are eight twinkles." The answer goes onto the line as it is said.
+  if (screen.id === "4") {
+    window.setTimeout(() => dropFromCounter(panes[front], "total", counted || TOTAL), 620);
+    return 0;
   }
 
   if (screen.id === "4.2") {
@@ -300,9 +315,9 @@ function render(screen) {
   if (screen.lamp) frag.append(lamp(screen.lamp));
   if (screen.keypad) frag.append(keypadPanel());
   if (screen.counter) frag.append(counterCard(screen.counter));
-  if (screen.numberLine) frag.append(numberLineStrip());
+  if (screen.numberLine) frag.append(numberLineStrip(screen));
   if (screen.hint) frag.append(imageLayer(screen.hint, "layer hint"));
-  if (screen.bubble) frag.append(bubble(screen.bubble));
+  if (screen.bubble) frag.append(bubble(screen.bubble, screen));
 
   return frag;
 }
@@ -444,35 +459,13 @@ function finishCount(pane, last) {
   pane.classList.add("is-counted-out");
   last.querySelector(".firefly__n")?.classList.add("is-total");
 
+  // The line comes up empty here. The two numbers arrive on the beats that
+  // speak them — the answer on "There are eight twinkles", the guess on "You
+  // guessed —" — so each one is put on the line as it is said.
   window.setTimeout(() => {
-    const box = pane.getBoundingClientRect();
-    const scale = box.width / FRAME_W || 1;
-    const at = (el) => {
-      const r = el.getBoundingClientRect();
-      return { x: (r.left + r.width / 2 - box.left) / scale, y: (r.top + r.height / 2 - box.top) / scale };
-    };
-
-    const wrap = pane.querySelector(".numline");
-    if (wrap) {
-      wrap.classList.add("is-live");
-      const origin = at(wrap);
-      const tag = last.querySelector(".firefly__n");
-      const card = pane.querySelector(".counter__value");
-
-      // Each marker starts from where its number already is, so it reads as
-      // that number moving rather than a new one appearing.
-      if (tag) {
-        const p = at(tag);
-        dropMarker(pane, "total", counted, { x: p.x - origin.x, y: p.y - origin.y });
-      }
-      if (card && guess !== null) {
-        const p = at(card);
-        dropMarker(pane, "guess", guess, { x: p.x - origin.x, y: p.y - origin.y });
-      }
-      playSfx({ id: "sparkle", at: 260, gain: 0.6 });
-    }
-
-    advanceIn(LINE_WALK + LINE_HOLD);
+    pane.querySelector(".numline")?.classList.add("is-live");
+    playSfx({ id: "sparkle", at: 160, gain: 0.55 });
+    advanceIn(LINE_WALK);
   }, COUNT_SETTLE);
 }
 
@@ -520,12 +513,14 @@ function lamp(spec) {
 
 /* ---- the keypad ---- */
 
-// Ten digits and nothing else. The guess is a single number, so tapping one is
-// the whole interaction: it lands in the counter and the beat moves on. There is
-// no panel behind them, no readout above them, and nothing to clear or confirm.
+// The panel and ten digits. The guess is a single number, so tapping one is the
+// whole interaction: it lands in the counter and the beat moves on. No readout
+// above them, and nothing to clear or confirm.
 function keypadPanel() {
   const panel = document.createElement("div");
   panel.className = "keypad";
+
+  panel.append(imageLayer(keypad.frame, "layer"));
 
   keypad.keys.forEach((key) => {
     const btn = document.createElement("button");
@@ -556,15 +551,14 @@ function keypadPanel() {
       guess = Number(key.label);
       playSfx({ id: "key_confirm", gain: 0.85 });
 
-      // Show it landing in the counter before the beat turns over, so the
-      // number is seen going where it is going.
+      // The number is seen going where it is going: a copy of the digit lifts
+      // off the key and flies to the counter, and only when it arrives does the
+      // counter take the value. Without that the figure simply appeared in the
+      // corner and nothing connected the two.
       const pane = panel.closest(".scene");
       pane?.querySelectorAll(".key").forEach((k) => { k.disabled = true; });
-      const readout = pane?.querySelector(".counter__value");
-      if (readout) {
-        readout.textContent = guess;
-        readout.classList.add("is-landing");
-      }
+      pane?.querySelector(".hint")?.classList.add("is-done");
+      flyToCounter(pane, btn, guess);
       advanceIn(GUESS_LANDS);
     });
 
@@ -572,6 +566,43 @@ function keypadPanel() {
   });
 
   return panel;
+}
+
+// Send the tapped digit across to the counter. Positions are read off the live
+// boxes and converted back into frame units, because the stage is scaled to fit
+// and a screen pixel is not a frame pixel.
+function flyToCounter(pane, key, value) {
+  const readout = pane?.querySelector(".counter__value");
+  if (!pane || !readout) return;
+
+  const box = pane.getBoundingClientRect();
+  const scale = box.width / FRAME_W || 1;
+  const at = (el) => {
+    const r = el.getBoundingClientRect();
+    return {
+      x: (r.left + r.width / 2 - box.left) / scale,
+      y: (r.top + r.height / 2 - box.top) / scale
+    };
+  };
+
+  const from = at(key);
+  const to = at(readout);
+
+  const flier = document.createElement("b");
+  flier.className = "key-flight";
+  flier.textContent = value;
+  flier.style.left = `${from.x}px`;
+  flier.style.top = `${from.y}px`;
+  flier.style.setProperty("--dx", `${to.x - from.x}px`);
+  flier.style.setProperty("--dy", `${to.y - from.y}px`);
+  pane.append(flier);
+
+  // The counter only takes the value once the digit has actually got there.
+  window.setTimeout(() => {
+    readout.textContent = value;
+    readout.classList.add("is-landing");
+  }, GUESS_FLIGHT);
+  window.setTimeout(() => flier.remove(), GUESS_FLIGHT + 120);
 }
 
 /* ---- the counter ---- */
@@ -597,9 +628,12 @@ function counterCard(mode) {
 // two markers slide down from where their numbers already are — the guess from
 // the counter, the answer from the last twinkle — so the comparison is watched
 // being made rather than simply stated.
-function numberLineStrip() {
+function numberLineStrip(screen) {
   const wrap = document.createElement("div");
   wrap.className = "numline";
+  // The counting beat draws it empty and reveals it once the last twinkle is
+  // in; the two beats after it are already showing it when they arrive.
+  if (screen && screen.id !== "3.2") wrap.classList.add("is-live");
   place(wrap, { x: numberLine.x, y: numberLine.y, w: numberLine.w, h: 130 });
 
   const rule = document.createElement("i");
@@ -620,26 +654,74 @@ function numberLineStrip() {
     wrap.append(tick);
   }
 
+  // What the earlier beats already put there. Marked `is-placed`, so it does
+  // not fly in a second time — only the beat's own number arrives.
+  if (screen && screen.id === "16" && counted) {
+    level(mark(wrap, "total", counted), true);
+  }
+
   return wrap;
 }
 
-// Send one marker to its mark. `from` is where the number already is on screen,
-// so it looks like that number moving rather than a new one appearing.
-function dropMarker(pane, kind, value, from) {
-  const wrap = pane.querySelector(".numline");
-  if (!wrap || value === null || value > numberLine.max) return;
+// One marker on the line: the pill, and the tick under it lighting up.
+function mark(wrap, kind, value) {
+  if (!wrap || value === null || value === undefined || value > numberLine.max) return null;
 
   const marker = document.createElement("span");
   marker.className = `numline__marker is-${kind}`;
   marker.textContent = value;
   marker.style.left = `${(value / numberLine.max) * 100}%`;
-  // Travelled as a transform from wherever the number is now, so the two
-  // markers arrive from different corners of the screen.
-  marker.style.setProperty("--from-x", `${from.x}px`);
-  marker.style.setProperty("--from-y", `${from.y}px`);
   wrap.append(marker);
 
   wrap.querySelector(`.numline__tick[data-n="${value}"]`)?.classList.add("is-hit");
+  return marker;
+}
+
+// Both markers sit at the same height so the two numbers read against each
+// other. The one arrangement where that cannot work is a correct guess, where
+// both land on the same mark — then the guess is lifted to sit above the answer
+// instead of on top of it.
+function level(marker, placed) {
+  if (!marker) return null;
+  if (placed) marker.classList.add("is-placed");
+
+  const wrap = marker.parentElement;
+  const mine = marker.style.left;
+  const clash = [...wrap.querySelectorAll(".numline__marker")].some(
+    (other) => other !== marker && other.style.left === mine
+  );
+  if (clash) wrap.querySelector(".numline__marker.is-guess")?.classList.add("is-stacked");
+  return marker;
+}
+
+// Send a number down onto the line from the counter it is showing in, so the
+// comparison is watched being made rather than simply appearing. Positions come
+// off the live boxes and are converted back into frame units, because the stage
+// is scaled to fit and a screen pixel is not a frame pixel.
+function dropFromCounter(pane, kind, value) {
+  const wrap = pane?.querySelector(".numline");
+  const card = pane?.querySelector(".counter__value");
+  if (!wrap || !card) return;
+
+  const marker = mark(wrap, kind, value);
+  if (!marker) return;
+
+  const box = pane.getBoundingClientRect();
+  const scale = box.width / FRAME_W || 1;
+  const at = (el) => {
+    const r = el.getBoundingClientRect();
+    return {
+      x: (r.left + r.width / 2 - box.left) / scale,
+      y: (r.top + r.height / 2 - box.top) / scale
+    };
+  };
+
+  const origin = at(wrap);
+  const from = at(card);
+  marker.style.setProperty("--from-x", `${from.x - origin.x}px`);
+  marker.style.setProperty("--from-y", `${from.y - origin.y}px`);
+  level(marker, false);
+  playSfx({ id: "sparkle", at: 120, gain: 0.55 });
 }
 
 /* ---- speech bubbles ---- */
@@ -654,7 +736,36 @@ function inset(el, [top, right, bottom, left]) {
 // is symmetric, so it never pulls the words off centre.
 const BUBBLE_PAD_X = 0.1;
 
-function bubble(spec) {
+// Where the tail sits across the balloon, as a fraction of its width. Measured
+// off all twelve balloon files: every one of them draws it here, on the left.
+// Mirroring the art puts it at 1 - this, on the right.
+const BUBBLE_TAIL_X = 0.32;
+
+// Which way round to draw the balloon, so its tail points at whoever is
+// speaking. Worked out from where that character actually stands rather than
+// set by hand, so it follows a change of pose or of anchor instead of drifting
+// out of step with one. Falls back to leaving the art unmirrored when the
+// speaker is not on the screen.
+function tailToward(spec, screen) {
+  if (!screen || !spec.who) return false;
+
+  let mark = null;
+  for (const layer of screen.layers) {
+    if (castOf(layer.src) !== spec.who) continue;
+    const nudge = anchorOffset(layer, screen.anchor);
+    const box = bodyBox(
+      nudge ? { ...layer, x: layer.x + nudge.dx, y: layer.y + nudge.dy } : layer
+    );
+    if (box) mark = (box.x0 + box.x1) / 2;
+  }
+  if (mark === null) return false;
+
+  const left = spec.x + BUBBLE_TAIL_X * spec.w;
+  const right = spec.x + (1 - BUBBLE_TAIL_X) * spec.w;
+  return Math.abs(right - mark) < Math.abs(left - mark);
+}
+
+function bubble(spec, screen) {
   const box = document.createElement("div");
 
   box.className = "bubble";
@@ -667,7 +778,7 @@ function bubble(spec) {
   const art = document.createElement("div");
   art.className = "bubble__art";
   inset(art, spec.artInset ?? [0, 0, 0, 0]);
-  if (spec.mirror) art.style.transform = "scaleX(-1)";
+  if (tailToward(spec, screen)) art.style.transform = "scaleX(-1)";
 
   const artImg = document.createElement("img");
   artImg.className = "fill fill--crop";

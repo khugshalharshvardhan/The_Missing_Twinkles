@@ -104,6 +104,17 @@ const NUMBERS = [
   text: word, rate: 1.0, pitch: "+14%", volume: 98
 }));
 
+// Neel needs his own nought to nine. He is the one who says "Hmm... I think
+// there were —" and the number that finishes his sentence has to be his voice,
+// not hers. Same prosody as vo_g_ithink, so the stem and the number are one
+// breath rather than two takes. Only single digits: the pad cannot make more.
+const NEEL_NUMBERS = [
+  "zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"
+].map((word, n) => ({
+  id: `vo_nn_${n}`, who: "neel", screen: "2.2", mood: "still thinking it over",
+  text: word, rate: 0.86, pitch: "+24%", volume: 92
+}));
+
 function speak(voice, text, prosody, out) {
   return new Promise(async (resolve, reject) => {
     try {
@@ -127,7 +138,7 @@ const OUT = process.argv[2] || "vo_game_raw";
 fs.mkdirSync(OUT, { recursive: true });
 
 (async () => {
-  const all = [...LINES, ...NUMBERS];
+  const all = [...LINES, ...NUMBERS, ...NEEL_NUMBERS];
   let ok = 0;
   for (const L of all) {
     const voice = CAST[L.who];
