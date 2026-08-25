@@ -15,7 +15,8 @@
 //   * an export of what you changed, as JSON to hand back for applying
 
 import { pages, timeline } from "../js/data/scenes.js";
-import { screens } from "../js/data/screens.js";
+import { levels } from "../js/data/screens.js";
+import { destinations } from "../js/data/walk.js";
 import { devGoto as storyGoto, devPause as storyPause } from "../js/story.js";
 import { devGoto as gameGoto, devPause as gamePause } from "../js/game.js";
 import { devGoto as walkGoto, devPause as walkPause, startWalk } from "../js/walk.js";
@@ -41,7 +42,7 @@ export function initDevTools(handlers) {
 
   build();
   initEdit({ onChange: paintSelection });
-  jump("story", 0);
+  jump({ act: "story", index: 0 });
   console.info("[dev] tools on. Remove ?dev from the URL to play normally.");
 }
 
@@ -132,7 +133,7 @@ function build() {
   q("copy").addEventListener("click", copyOut);
   q("reset").addEventListener("click", () => {
     clearEdits();
-    jump(here.act, here.index);
+    jump(here);
   });
 
   for (const [field, input] of Object.entries(ui.f)) {
@@ -163,18 +164,23 @@ function buildTrees() {
     );
   });
 
-  // The walk is one moment rather than a list, but it belongs in the menu: it
-  // is the third act and had no way in at all.
+  // The walks are one moment each rather than a list, but they belong in the
+  // menu: each is the act leading into a level. `dest` picks where it ends up.
   ui.gameTree.append(
-    group("The walk", "story → game", [
-      { label: "walk  ·  they arrive", act: "walk", index: 0 }
+    group("The walks", "between the acts", [
+      { label: "walk  ·  to the clearing", act: "walk", index: 0, dest: "clearing" },
+      { label: "walk  ·  to the meadow", act: "walk", index: 0, dest: "meadow" }
     ], false)
   );
 
-  ui.gameTree.append(
-    group("Screens", `${screens.length} screens`,
-      screens.map((screen, i) => ({ label: `${screen.id}${parts(screen)}`, act: "game", index: i })), false)
-  );
+  // One group per level — the tutorial and every round after it.
+  levels.forEach((level, li) => {
+    ui.gameTree.append(
+      group(level.name, `${level.screens.length} screens`,
+        level.screens.map((screen, i) =>
+          ({ label: `${screen.id}${parts(screen)}`, act: "game", index: i, level: li })), false)
+    );
+  });
 }
 
 // What a screen actually carries, so a beat can be found by what is on it
@@ -218,7 +224,10 @@ function group(name, note, rows, open) {
     btn.textContent = row.label;
     btn.dataset.act = row.act;
     btn.dataset.index = String(row.index);
-    btn.addEventListener("click", () => jump(row.act, row.index));
+    // What tells two rows with the same act and index apart: which level a
+    // game row belongs to, and which destination a walk row leads to.
+    btn.dataset.sub = String(row.level ?? row.dest ?? "");
+    btn.addEventListener("click", () => jump(row));
     list.append(btn);
   }
 
@@ -228,21 +237,24 @@ function group(name, note, rows, open) {
 
 /* ---- jumping ---- */
 
-function jump(act, index) {
+function jump(row) {
+  const { act, index } = row;
   deselect();
 
   if (act !== api.act()) api.setAct(act);
 
   // The walk plays itself from the top rather than seeking, so entering it is
-  // a restart.
+  // a restart — of the walk to wherever the row leads.
   const at =
-    act === "walk" ? (startWalk(), walkGoto(index))
-    : act === "game" ? gameGoto(index)
+    act === "walk" ? (startWalk(destinations[row.dest ?? "clearing"]), walkGoto(index))
+    : act === "game" ? gameGoto(index, row.level ?? 0)
     : storyGoto(index);
-  here = { act, index, label: at?.step?.id ?? at?.id ?? String(index) };
+  here = { ...row, label: at?.step?.id ?? at?.id ?? String(index) };
 
+  const sub = String(row.level ?? row.dest ?? "");
   for (const btn of ui.dv.querySelectorAll(".dv__step")) {
-    btn.classList.toggle("is-on", btn.dataset.act === act && Number(btn.dataset.index) === index);
+    btn.classList.toggle("is-on",
+      btn.dataset.act === act && Number(btn.dataset.index) === index && btn.dataset.sub === sub);
   }
 
   if (editing) markTargets(act);

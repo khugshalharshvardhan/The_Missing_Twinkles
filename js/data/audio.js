@@ -282,6 +282,58 @@ export const gameCues = {
   "6.2": {
     sfx: [{ id: "sparkle", at: 400, gain: 0.5 }],
     vo: { id: "vo_g_guesscount", at: 500 }
+  },
+
+  /* ---------- Level 1 — the glowberries ----------
+     The tutorial's own cues on the meadow's beats. Lines that do not name the
+     element are the same clips; only the three that say "glowberries" out loud
+     are new (vo_l1_*, tools/gen-vo-game.js). Timings mirror the tutorial's —
+     the berries wait for the line, the pad arrives on its sparkle. */
+
+  // Look closely — the berries materialise after the line (fireflies.at 2650
+  // in screens.js) and vanish on their sparkle 5.9s later.
+  "p1": {
+    bed: "bed_main",
+    sfx: [{ id: "twinkle", at: 2750, gain: 0.4, pan: 0.2 },
+      { id: "sparkle", at: 8600, gain: 0.6 }],
+    vo: { id: "vo_g_guess", at: 500, pan: -0.5 }
+  },
+  // The keypad — the pad appears once the question is asked (keypadAt 2350).
+  "p2": {
+    sfx: [{ id: "page_air", at: 0, gain: 0.5 },
+      { id: "sparkle", at: 2350, gain: 0.55 }],
+    vo: { id: "vo_l1_howmany", at: 500, pan: -0.6 }
+  },
+
+  // ---- counting ----
+  "p3": {
+        vo: { id: "vo_g_count", at: 500, pan: -0.5 }
+  },
+  "p3.2": {
+    sfx: [{ id: "page_air", at: 0, gain: 0.5 }],
+    vo: { id: "vo_l1_tapcount", at: 500, pan: -0.5 }
+  },
+
+  // ---- the total, and how the guess did ----
+  "p4": {
+    sfx: [{ id: "sparkle", at: 420, gain: 0.5 }],
+    vo: { id: "vo_l1_total", at: 500, pan: -0.5 }
+  },
+  // Stem only: js/game.js says the number after it (role "guessline").
+  "p16": {
+        vo: { id: "vo_g_youguessed", at: 500, pan: -0.5 }
+  },
+  // The verdict line and its chime are chosen in js/game.js.
+  "p4.2": {},
+
+  // ---- the lamp ----
+  "p5.1": {
+    sfx: [{ id: "page_air", at: 0, gain: 0.5 }],
+    vo: { id: "vo_g_taplamp", at: 500, pan: -0.5 }
+  },
+  "p5.2": {
+    sfx: [{ id: "catch_pop", at: 120, gain: 0.8 }, { id: "twinkle", at: 500, gain: 0.45 }],
+    vo: { id: "vo_neel_yay", at: 260, pan: 0.5 }
   }
 };
 

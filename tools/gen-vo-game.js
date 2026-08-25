@@ -87,7 +87,20 @@ const LINES = [
     text: "Now, it is your turn.", rate: 0.92, pitch: "+10%", volume: 96 },
 
   { id: "vo_g_guesscount", who: "agni", screen: "6.2", mood: "bright, rallying",
-    text: "Make a guess, and count to check!", rate: 1.04, pitch: "+16%", volume: 100 }
+    text: "Make a guess, and count to check!", rate: 1.04, pitch: "+16%", volume: 100 },
+
+  // ---- Level 1 — the glowberries. Same beats as the tutorial, so the level
+  // reuses every line that does not name the element; only the three that say
+  // "glowberries" out loud are new. Prosody matches the twinkle versions of
+  // the same lines, so the two levels sound like one narrator.
+  { id: "vo_l1_howmany", who: "agni", screen: "p2", mood: "asking the player, open and unhurried",
+    text: "How many glowberries were there?", rate: 0.92, pitch: "+10%", volume: 94 },
+
+  { id: "vo_l1_tapcount", who: "agni", screen: "p3.2", mood: "showing how, kind",
+    text: "Tap each glowberry to count.", rate: 0.94, pitch: "+8%", volume: 96 },
+
+  { id: "vo_l1_total", who: "agni", screen: "p4", mood: "announcing it, pleased",
+    text: "There are nine glowberries.", rate: 0.98, pitch: "+12%", volume: 98 }
 ];
 
 // Counting out loud is the point of the game, so Agni says each number as the

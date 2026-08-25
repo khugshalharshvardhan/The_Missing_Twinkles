@@ -195,3 +195,22 @@ export const guide = {
   x: 1180,
   y: 402
 };
+
+// Where a walk can end up. The journey itself is shared — the same countryside
+// scrolls past on the way to every level — and what makes each walk its own is
+// the destination: which painting the layers dissolve back into (the `arrive`
+// layer's src) and what leads the pair there. The guide doubles as a preview
+// of the level: a firefly leads them to the twinkles, a glowberry to the
+// berries. Keyed by the `walkTo` names on `levels` in js/data/screens.js.
+export const destinations = {
+  clearing: {
+    arrive: `${GAME}bg_night.webp`,
+    guide: { src: `${GAME}firefly.webp`, w: 104, h: 109 }
+  },
+  meadow: {
+    arrive: `${GAME}bg_meadow.webp`,
+    // The berry art is 224x246; kept near the firefly's size so the weave
+    // keyframes read the same.
+    guide: { src: `${GAME}glowberry.webp`, w: 96, h: 105 }
+  }
+};

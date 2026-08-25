@@ -48,6 +48,37 @@ export const FIREFLY_SRC = `${IMG}firefly.webp`;
 
 const BG = { src: `${IMG}bg_night.webp`, x: 0, y: 0, w: FRAME_W, h: FRAME_H };
 
+/* ---- Level 1 — the glowberries, in the meadow ----
+
+   Same beats, different place and different thing to count. The meadow render
+   (assets/images/location2.png, cut to the frame) stands in for bg_night, and
+   the swarm slots hold glowberries instead of twinkles.
+
+   NINE for now, not the sheet's ten: the pad takes a single digit, so until
+   multi-digit entry lands (parked, per discussion) every total has to stay
+   below ten. Bump BERRY_TOTAL and add a row when it does.
+
+   The layout is the sheet's design rule made literal — "keep equal spacing" —
+   three staggered rows on a 250px pitch, against the tutorial's loose scatter.
+   Boxes are 112x123 to match the berry art's own aspect (224x246), since the
+   fill covers the box. */
+export const BERRY_TOTAL = 9;
+export const BERRY_SRC = `${IMG}glowberry.webp`;
+
+export const BERRIES = [
+  { x: 0, y: 0, w: 112, h: 123 },
+  { x: 250, y: 0, w: 112, h: 123 },
+  { x: 500, y: 0, w: 112, h: 123 },
+  { x: 125, y: 150, w: 112, h: 123 },
+  { x: 375, y: 150, w: 112, h: 123 },
+  { x: 625, y: 150, w: 112, h: 123 },
+  { x: 0, y: 300, w: 112, h: 123 },
+  { x: 250, y: 300, w: 112, h: 123 },
+  { x: 500, y: 300, w: 112, h: 123 }
+];
+
+const BG_MEADOW = { src: `${IMG}bg_meadow.webp`, x: 0, y: 0, w: FRAME_W, h: FRAME_H };
+
 /* ---- crop transforms, named where a pose is reused ---- */
 
 const CROP = {
@@ -242,6 +273,11 @@ export const screens = [
   {
     id: "2.2",
     anchor: THE_CLEARING,
+    // `role` names what js/game.js has to add to the beat beyond its cue —
+    // here, Neel's voice finishing the stem with the number the player typed.
+    // Roles rather than ids, so every level's version of the beat gets the
+    // same treatment without game.js keeping a list of ids per level.
+    role: "readback",
     counter: "guess",
     layers: [
       BG,
@@ -299,6 +335,7 @@ export const screens = [
   {
     id: "4",
     anchor: THE_CLEARING,
+    role: "totalline",
     numberLine: true,
     // Long enough to watch the number travel down to the line and then read
     // it there. On reading pace alone this beat ended about a tenth of a
@@ -322,6 +359,7 @@ export const screens = [
   {
     id: "16",
     anchor: THE_CLEARING,
+    role: "guessline",
     numberLine: true,
     // Long enough to watch the number travel down to the line and then read
     // it there. On reading pace alone this beat ended about a tenth of a
@@ -345,6 +383,7 @@ export const screens = [
   {
     id: "4.2",
     anchor: THE_CLEARING,
+    role: "verdict",
     layers: [
       BG,
       { src: `${IMG}agni_d.webp`, x: 84, y: 474, w: 342, h: 560, fill: CROP.agniD, fx: "breathe" },
@@ -431,6 +470,226 @@ export const screens = [
   }
 ];
 
+/* ---- Level 1 — the practice round in the meadow (sheet: Practice Game
+   Screens). The tutorial's own loop, run by the player: look, guess, count,
+   verdict, lamp. The four story beats that set the problem up (1.1..1.4) and
+   the two that hand the game over (6.1, 6.2) belong to the tutorial and are
+   not repeated; the readback beat (2.2) is not either — there Neel models a
+   guess, and here the guess is the player's own.
+
+   Poses, marks, bubbles and fittings are the tutorial's: the pair stand on
+   THE_CLEARING anchors (on the meadow they land on the grass flanking the
+   stone path), and the keypad, counter, number line and lamp keep their
+   coordinates. What changes is the painting behind them and what there is to
+   count. */
+export const level1 = [
+  // ---- P1 — look before you guess ----
+  {
+    id: "p1",
+    anchor: THE_CLEARING,
+    layers: [
+      BG_MEADOW,
+      { src: `${IMG}agni_b.webp`, x: 25, y: 445, w: 553, h: 614, fill: CROP.agniB, fx: "breathe" },
+      { src: `${IMG}neel_think.webp`, x: 1327, y: 395, w: 372, h: 617, fill: CROP.neelThink, flipX: true, fx: "breathe-slow" }
+    ],
+    // Same clock as tutorial 1.5: her line ends (vo_g_guess runs 500 to 2581),
+    // the bubble goes, the berries materialise, hold five seconds, vanish.
+    fireflies: { x: 630, y: 145, enter: "magic", at: 2650 },
+    dwell: 10000,
+    bubble: {
+      art: `${IMG}bub_15.webp`, who: "agni",
+      x: 224, y: 107, w: 514, h: 277,
+      text: "Look closely and make a guess!"
+    }
+  },
+
+  // ---- P2 — the keypad ----
+  {
+    id: "p2",
+    anchor: THE_CLEARING,
+    interact: "keypad",
+    counter: "guess",
+    layers: [
+      BG_MEADOW,
+      { src: `${IMG}agni_talk.webp`, x: 10, y: 485, w: 576, h: 532, fill: CROP.agniTalk, flipX: true, fx: "breathe" },
+      { src: `${IMG}neel_think.webp`, x: 1369, y: 386, w: 372, h: 617, fill: CROP.neelThink, flipX: true, fx: "breathe-slow" }
+    ],
+    keypad: true,
+    // vo_l1_howmany runs 500 to 2250.
+    keypadAt: 2350,
+    bubble: {
+      art: `${IMG}bub_15.webp`, who: "agni",
+      x: 0, y: 185, w: 514, h: 277,
+      text: "How many glowberries were there?"
+    }
+  },
+
+  // ---- P3 — the berries come back, dim, to be counted ----
+  {
+    id: "p3",
+    anchor: THE_CLEARING,
+    counter: "guess",
+    layers: [
+      BG_MEADOW,
+      { src: `${IMG}agni_point.webp`, x: 64, y: 498, w: 525, h: 501, fill: CROP.agniPoint, fx: "breathe" },
+      { src: `${IMG}neel_d.webp`, x: 1344, y: 417, w: 449, h: 581, fill: CROP.neelD, flipX: true, fx: "breathe-slow" }
+    ],
+    fireflies: { x: 630, y: 145, dim: true },
+    bubble: {
+      art: `${IMG}bub_3.webp`, who: "agni",
+      x: 220, y: 216, w: 557, h: 282,
+      artInset: [18.09, 9.69, 0, 17.06],
+      text: "Let us count to check."
+    }
+  },
+
+  // ---- P3.2 — tap each one ----
+  {
+    id: "p3.2",
+    anchor: THE_CLEARING,
+    interact: "count",
+    layers: [
+      BG_MEADOW,
+      { src: `${IMG}agni_g.webp`, x: 80, y: 490, w: 554, h: 512, fill: CROP.agniG, fx: "breathe" },
+      { src: `${IMG}neel_c.webp`, x: 1385, y: 484, w: 396, h: 557, fill: CROP.neelC, fx: "breathe-slow" }
+    ],
+    fireflies: { x: 630, y: 145 },
+    counter: "guess",
+    numberLine: true,
+    hint: { src: `${SHARED}hand_nudge.svg`, x: 596, y: 128, w: 308.396, h: 308.396 },
+    bubble: {
+      art: `${IMG}bub_32.webp`, who: "agni",
+      x: 190, y: 248, w: 489, h: 256,
+      text: "Tap each glowberry to count."
+    }
+  },
+
+  // ---- P4 — the true count ----
+  {
+    id: "p4",
+    anchor: THE_CLEARING,
+    role: "totalline",
+    numberLine: true,
+    dwell: 3800,
+    layers: [
+      BG_MEADOW,
+      { src: `${IMG}agni_f.webp`, x: 9, y: 481, w: 605, h: 553, fx: "breathe" },
+      { src: `${IMG}neel_f.webp`, x: 1372, y: 424, w: 465, h: 589, fx: "breathe-slow" }
+    ],
+    fireflies: { x: 630, y: 145 },
+    counter: "total",
+    bubble: {
+      art: `${IMG}bub_4.webp`, who: "agni",
+      x: 254, y: 251, w: 417, h: 201,
+      text: "There are {total} glowberries"
+    }
+  },
+
+  // ---- P16 — the guess, next to the truth ----
+  {
+    id: "p16",
+    anchor: THE_CLEARING,
+    role: "guessline",
+    numberLine: true,
+    dwell: 4600,
+    layers: [
+      BG_MEADOW,
+      { src: `${IMG}agni_f.webp`, x: 9, y: 481, w: 605, h: 553, fx: "breathe" },
+      { src: `${IMG}neel_f.webp`, x: 1372, y: 424, w: 465, h: 589, fx: "breathe-slow" }
+    ],
+    fireflies: { x: 630, y: 145 },
+    counter: "guess",
+    bubble: {
+      art: `${IMG}bub_4.webp`, who: "agni",
+      x: 254, y: 251, w: 417, h: 201,
+      text: "You guessed {guess}."
+    }
+  },
+
+  // ---- P4.2 — the verdict ----
+  {
+    id: "p4.2",
+    anchor: THE_CLEARING,
+    role: "verdict",
+    layers: [
+      BG_MEADOW,
+      { src: `${IMG}agni_d.webp`, x: 84, y: 474, w: 342, h: 560, fill: CROP.agniD, fx: "breathe" },
+      { src: `${IMG}neel_f.webp`, x: 1355, y: 408, w: 465, h: 589, fx: "breathe-slow" }
+    ],
+    bubble: {
+      art: `${IMG}bub_42.webp`, who: "agni",
+      x: 276, y: 222, w: 376, h: 226,
+      text: "{verdict}"
+    }
+  },
+
+  // ---- P5.1 — tap the lamp ----
+  {
+    id: "p5.1",
+    anchor: THE_CLEARING,
+    interact: "lamp",
+    layers: [
+      BG_MEADOW,
+      { src: `${IMG}agni_g.webp`, x: 70, y: 489, w: 554, h: 512, fill: CROP.agniG, fx: "breathe" },
+      { src: `${IMG}neel_f.webp`, x: 1294, y: 412, w: 465, h: 589, fx: "breathe-slow" }
+    ],
+    lamp: { src: `${IMG}lamp_off.webp`, x: 807, y: 74, w: 272, h: 927, fill: CROP.lampOff },
+    lampLit: { src: `${IMG}lamp_on.webp`, x: 799, y: 74, w: 287, h: 927, fill: CROP.lampOn },
+    lampGlass: { x: 902, y: 254 },
+    bubble: {
+      art: `${IMG}bub_51.webp`, who: "agni",
+      x: 314, y: 300, w: 383, h: 184,
+      text: "Tap the lamp!"
+    }
+  },
+
+  // ---- P5.2 — the lamp catches a berry, and Neel cheers ----
+  {
+    id: "p5.2",
+    anchor: THE_CLEARING,
+    layers: [
+      BG_MEADOW,
+      { src: `${IMG}agni_g.webp`, x: 70, y: 489, w: 554, h: 512, fill: CROP.agniG, fx: "breathe" },
+      { src: `${IMG}neel_turn.webp`, x: 1125, y: 391, w: 735, h: 610, fill: CROP.neelTurn, flipX: true, fx: "breathe-slow" },
+      { src: `${IMG}lamp_on.webp`, x: 799, y: 74, w: 287, h: 927, fill: CROP.lampOn, fx: "lamp-glow" },
+      // The caught one, glowing in the glass where the tutorial kept its
+      // firefly.
+      { src: BERRY_SRC, x: 833, y: 262, w: 24, h: 27, fx: "flicker" }
+    ],
+    shout: { text: "YAY!", x: 1264, y: 258, tilt: -9 }
+  }
+];
+
+/* ---- the levels, in playing order ----
+
+   Everything js/game.js needs to run a round with a different element in a
+   different place: which screens, what is counted (art, layout, how many), what
+   the thing is called, and the class that restyles the swarm's glow. The
+   tutorial is level zero — same machine, plus its extra story beats. `walkTo`
+   names the walk destination (js/data/walk.js) that leads INTO the level. */
+export const levels = [
+  {
+    name: "Tutorial — the twinkles",
+    word: "Twinkle",
+    total: TOTAL,
+    swarmSrc: FIREFLY_SRC,
+    layout: FIREFLIES,
+    swarmClass: "",
+    walkTo: "clearing",
+    screens
+  },
+  {
+    name: "Level 1 — the glowberries",
+    word: "Glowberry",
+    total: BERRY_TOTAL,
+    swarmSrc: BERRY_SRC,
+    layout: BERRIES,
+    swarmClass: "is-berries",
+    walkTo: "meadow",
+    screens: level1
+  }
+];
+
 /* The keypad, from the `keypad` group (108:12). Key boxes are 116 x 85 on a
    120px pitch, which is what the design's 4px gaps work out to.
 
@@ -473,17 +732,21 @@ export const numberLine = { x: 500, y: 866, w: 900, max: 10 };
 // The counter card (99:487).
 export const counter = { src: `${IMG}counter.webp`, x: 1490, y: 57, w: 338, h: 190 };
 
-// Everything the game needs on screen, in one list, for the preloader.
+// Everything the game needs on screen, in one list, for the preloader —
+// every level's screens and every level's countable, so a later level never
+// stops to fetch mid-chapter.
 export const manifest = [
   ...new Set([
-    ...screens.flatMap((screen) => [
-      ...screen.layers.map((layer) => layer.src),
-      ...(screen.lamp ? [screen.lamp.src] : []),
-      ...(screen.hint ? [screen.hint.src] : []),
-      ...(screen.bubble ? [screen.bubble.art] : [])
+    ...levels.flatMap((level) => [
+      ...level.screens.flatMap((screen) => [
+        ...screen.layers.map((layer) => layer.src),
+        ...(screen.lamp ? [screen.lamp.src] : []),
+        ...(screen.lampLit ? [screen.lampLit.src] : []),
+        ...(screen.hint ? [screen.hint.src] : []),
+        ...(screen.bubble ? [screen.bubble.art] : [])
+      ]),
+      level.swarmSrc
     ]),
-    FIREFLY_SRC,
-    `${IMG}lamp_on.webp`,
     keypad.frame.src,
     keypad.keyArt,
     counter.src

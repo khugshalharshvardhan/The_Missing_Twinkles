@@ -17,6 +17,7 @@ import {
   cast,
   guide,
   sparks,
+  destinations,
   SPARK_SHEET,
   SPARK_CELLS,
   FRAME_W,
@@ -63,7 +64,10 @@ export function initWalk(handlers) {
   onArrive = handlers.onArrive ?? (() => {});
 }
 
-export function startWalk() {
+// `dest` picks where this walk ends up — see `destinations` in js/data/walk.js.
+// The journey is the same either way; the destination swaps the painting the
+// settle dissolves into and the guide leading the pair to it.
+export function startWalk(dest = destinations.clearing) {
   stopWalk();
   host.replaceChildren();
   strips = [];
@@ -74,7 +78,8 @@ export function startWalk() {
   scroll = 0;
 
   // Behind the pair.
-  layers.forEach((layer) => host.append(strip(layer)));
+  layers.forEach((layer) =>
+    host.append(strip(layer.key === "arrive" ? { ...layer, src: dest.arrive } : layer)));
   // Fireflies drifting through the scene, then the pair, then the one they are
   // actually following.
   // These fade out on arrival with everything else that is not in the game's
@@ -88,7 +93,7 @@ export function startWalk() {
   // other one's feet.
   cast.forEach((who) => host.append(shadow(who)));
   cast.forEach((who) => host.append(walker(who)));
-  const led = flyer(guide);
+  const led = flyer({ ...guide, ...dest.guide });
   fades.push({ el: led, base: 1, to: 0 });
   host.append(led);
   // And the nearest foliage, which passes in front of everything.

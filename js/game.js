@@ -10,10 +10,7 @@
 // player instead — the keypad for a guess, the swarm for every twinkle to
 // be tapped, the lamp for a tap — and advance once that is done.
 
-import {
-  screens, keypad, counter, numberLine,
-  FIREFLIES, FIREFLY_SRC, TOTAL, FRAME_W
-} from "./data/screens.js";
+import { levels, keypad, counter, numberLine, FRAME_W } from "./data/screens.js";
 import { gameCues } from "./data/audio.js";
 import { anchorOffset, bodyBox, castOf } from "./anchor.js";
 import { clearCues, playCues, playSfx, playVo, clipLength } from "./audio.js";
@@ -51,6 +48,12 @@ const COUNT_SETTLE = 600; // the last number grows before the line is drawn
 const LINE_WALK = 1500; // both markers travel down onto the number line
 const LINE_HOLD = 2200; // and then stay put long enough to be compared
 
+// Which round is playing. A level is the whole kit for one place: its screens,
+// what is counted (art, layout, total), what the thing is called, and the class
+// that restyles the swarm — see `levels` in js/data/screens.js. Everything
+// below reads through `level`, so the same machine plays every round.
+let round = levels[0];
+
 let index = -1;
 let front = 0;
 let busy = false;
@@ -77,15 +80,30 @@ export function releaseHold() {
   if (!hold) return;
   hold = false;
 
-  const screen = pending ?? screens[index];
+  const screen = pending ?? round.screens[index];
   pending = null;
   if (screen) speak(screen);
 }
 
-// `at` jumps straight to a beat — see the ?beat= dev shortcut in main.js.
-export function startGame(at = 0) {
+// Re-arm the hold for another arrival — the next startGame() builds its first
+// beat and waits for releaseHold(), exactly like the first hand-over did.
+export function armHold() {
+  hold = true;
+}
+
+// A jump past the keypad needs a guess to quote back. Single digit, because
+// that is all the pad can produce.
+function standInGuess(start) {
+  const pad = round.screens.findIndex((screen) => screen.interact === "keypad");
+  if (pad >= 0 && start > pad) guess = 7;
+}
+
+// `at` jumps straight to a beat — see the ?beat= dev shortcut in main.js —
+// and `levelIndex` picks which round to play (see `levels` in data/screens.js).
+export function startGame(at = 0, levelIndex = 0) {
   clearTimeout(timer);
   clearCues();
+  round = levels[Math.min(Math.max(levelIndex, 0), levels.length - 1)];
   index = -1;
   front = 0;
   pending = null;
@@ -99,29 +117,31 @@ export function startGame(at = 0) {
 
   hud.classList.add("is-active");
 
-  const start = Math.min(Math.max(at, 0), screens.length - 1);
-  // Stand in for the guess the player would have typed, so the beats that quote
-  // it back have something to say. Single digit, because that is all the pad can
-  // now produce.
-  if (start > 5) guess = 7;
+  const start = Math.min(Math.max(at, 0), round.screens.length - 1);
+  standInGuess(start);
   go(start);
 }
 
 export function next() {
   clearTimeout(timer);
-  if (index >= screens.length - 1) return finish();
+  if (index >= round.screens.length - 1) return finish();
   go(index + 1);
 }
 
 // Dev hooks (devtools/, only reached with ?dev). Jumping to a screen carries on
 // playing from it; only devPause() stops the clock.
-export function devGoto(at) {
+export function devGoto(at, levelIndex) {
   clearTimeout(timer);
   hold = false;
-  const i = Math.min(Math.max(at, 0), screens.length - 1);
-  if (i > 5) guess = 7;
+  if (levelIndex != null) {
+    const next = levels[Math.min(Math.max(levelIndex, 0), levels.length - 1)];
+    // A fresh level is a fresh run: its own count, its own guess.
+    if (next !== round) { round = next; guess = null; counted = 0; }
+  }
+  const i = Math.min(Math.max(at, 0), round.screens.length - 1);
+  standInGuess(i);
   go(i);
-  return screens[i];
+  return round.screens[i];
 }
 
 export function devPause(on) {
@@ -129,7 +149,7 @@ export function devPause(on) {
   hold = on;
   if (on) return;
 
-  const screen = pending ?? screens[index];
+  const screen = pending ?? round.screens[index];
   pending = null;
   if (screen && !screen.interact) advanceIn(readingTime(screen));
 }
@@ -137,7 +157,7 @@ export function devPause(on) {
 // "Skip" leaves the whole act, not one screen.
 export function skipGame() {
   clearTimeout(timer);
-  index = screens.length - 1;
+  index = round.screens.length - 1;
   finish();
 }
 
@@ -148,12 +168,12 @@ function advanceIn(ms) {
 }
 
 function go(target) {
-  const screen = screens[target];
+  const screen = round.screens[target];
   const back = panes[1 - front];
   // An interactive beat is left by the player acting, which they can do while
   // the line is still going. Let it finish over the next screen rather than
   // cutting it off to answer them.
-  const leaving = screens[index];
+  const leaving = round.screens[index];
 
   clearTimeout(timer);
   index = target;
@@ -297,7 +317,7 @@ const VERDICTS = {
 function verdictKey() {
   if (guess === null) return "none";
 
-  const off = Math.abs(guess - TOTAL);
+  const off = Math.abs(guess - round.total);
   if (off === 0) return "exact";
   if (off <= 2) return "near";
   return "far";
@@ -324,31 +344,39 @@ function sayNumber(n, at, pan, who = "agni") {
   return true;
 }
 
-// The beats whose voice depends on what the player did. Returns the moment its
-// last clip finishes, in ms from the start of the beat, so speak() can hold the
-// screen until then. Offsets are the stem's own measured length.
+// The beats whose voice depends on what the player did, named by `role` in the
+// screen data so every level's version of the beat gets the same treatment.
+// Returns the moment its last clip finishes, in ms from the start of the beat,
+// so speak() can hold the screen until then. The stems' timing is read off the
+// beat's own cue, so a level with a different line stays in step by itself.
 function dynamicVoice(screen) {
-  // "Hmm... I think there were {guess}." — vo_g_ithink starts at 500ms.
-  if (screen.id === "2.2") {
-    const at = 500 + clipLength("vo_g_ithink") + 120;
+  // A breath after the beat's own stem — "I think there were —", "You
+  // guessed —" — where the number that finishes the sentence goes.
+  const afterStem = () => {
+    const v = gameCues[screen.id]?.vo;
+    return v ? (v.at ?? 0) + clipLength(v.id) + 120 : 620;
+  };
+
+  // "Hmm... I think there were {guess}." — Neel's voice finishes his sentence.
+  if (screen.role === "readback") {
+    const at = afterStem();
     return sayNumber(guess, at, 0.55, "neel") ? at + clipLength(`vo_nn_${guess}`) : 0;
   }
 
-  // "You guessed {guess}." — vo_g_youguessed starts at 500ms.
-  // "You guessed —" and then the number, which drops onto the line with it.
-  if (screen.id === "16") {
-    const at = 500 + clipLength("vo_g_youguessed") + 120;
+  // "You guessed {guess}." — the number is said and drops onto the line with it.
+  if (screen.role === "guessline") {
+    const at = afterStem();
     window.setTimeout(() => dropFromCounter(panes[front], "guess", guess), at);
     return sayNumber(guess, at, -0.5) ? at + clipLength(`vo_n_${guess}`) : 0;
   }
 
-  // "There are eight twinkles." The answer goes onto the line as it is said.
-  if (screen.id === "4") {
-    window.setTimeout(() => dropFromCounter(panes[front], "total", counted || TOTAL), 620);
+  // "There are {total} …" The answer goes onto the line as it is said.
+  if (screen.role === "totalline") {
+    window.setTimeout(() => dropFromCounter(panes[front], "total", counted || round.total), 620);
     return 0;
   }
 
-  if (screen.id === "4.2") {
+  if (screen.role === "verdict") {
     const v = VERDICTS[verdictKey()];
     playSfx({ id: v.sfx, at: 260, gain: 0.85 });
     playVo({ id: v.vo, at: 560, pan: -0.5 });
@@ -361,7 +389,7 @@ function dynamicVoice(screen) {
 function fill(text) {
   return text
     .replace("{guess}", guess === null ? "?" : guess)
-    .replace("{total}", TOTAL)
+    .replace("{total}", round.total)
     .replace("{verdict}", verdict());
 }
 
@@ -441,6 +469,9 @@ function swarm(screen) {
   // guess after it something to be about. The rest just show it, still.
   const enter = screen.fireflies.enter;
   group.className = enter ? `swarm is-swarming from-${enter}` : "swarm";
+  // The level's own dressing — the glowberries' pink halo lives on this class,
+  // see .swarm.is-berries in css/game.css.
+  if (round.swarmClass) group.classList.add(round.swarmClass);
   // Drawn at the uncounted level — see .swarm.is-dim in css/game.css.
   if (screen.fireflies.dim) group.classList.add("is-dim");
   group.style.left = `${screen.fireflies.x}px`;
@@ -450,7 +481,7 @@ function swarm(screen) {
   // over this one number; see --swarm-at in css/game.css.
   group.style.setProperty("--swarm-at", `${screen.fireflies.at ?? 0}ms`);
 
-  FIREFLIES.forEach((spot, i) => {
+  round.layout.forEach((spot, i) => {
     // A countable twinkle is a real button; a decorative one is not.
     const el = document.createElement(countable ? "button" : "div");
 
@@ -459,13 +490,13 @@ function swarm(screen) {
 
     const img = document.createElement("img");
     img.className = "fill";
-    img.src = FIREFLY_SRC;
+    img.src = round.swarmSrc;
     img.alt = "";
     el.append(img);
 
     if (countable) {
       el.type = "button";
-      el.setAttribute("aria-label", `Twinkle ${i + 1}`);
+      el.setAttribute("aria-label", `${round.word} ${i + 1}`);
 
       // The number each one takes when it is tapped, sitting above it. Built
       // empty: it is the tap that gives it a value, which is what makes the
@@ -531,7 +562,7 @@ function tally(el) {
   // The tap hint has done its job once the player gets the idea.
   pane?.querySelector(".hint")?.classList.add("is-done");
 
-  if (counted === TOTAL) {
+  if (counted === round.total) {
     playSfx({ id: "count_done", at: 260, gain: 0.85 });
     finishCount(pane, el);
   }
@@ -647,7 +678,7 @@ function flock(pane, screen) {
 
     const fly = document.createElement("img");
     fly.className = "lamp-fly";
-    fly.src = FIREFLY_SRC;
+    fly.src = round.swarmSrc;
     fly.alt = "";
     fly.style.left = `${to.x}px`;
     fly.style.top = `${to.y}px`;
@@ -813,7 +844,7 @@ function counterCard(mode) {
   const value = document.createElement("span");
   value.className = "counter__value";
   value.textContent =
-    mode === "live" ? counted : mode === "guess" ? (guess ?? 0) : TOTAL;
+    mode === "live" ? counted : mode === "guess" ? (guess ?? 0) : round.total;
   card.append(value);
 
   return card;

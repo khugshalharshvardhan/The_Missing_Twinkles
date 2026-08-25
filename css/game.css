@@ -193,6 +193,8 @@
 #game .swarm.is-swarming .firefly:nth-child(6) { --d: 60ms; }
 #game .swarm.is-swarming .firefly:nth-child(7) { --d: 220ms; }
 #game .swarm.is-swarming .firefly:nth-child(8) { --d: 300ms; }
+/* Level 1 counts to nine; the tutorial's swarm simply never has a ninth. */
+#game .swarm.is-swarming .firefly:nth-child(9) { --d: 130ms; }
 
 /* Where each one comes from — off the left of frame on 1.1... */
 #game .swarm.from-left .firefly:nth-child(1) { --in-x: -1400px; --in-y: -120px; }
@@ -343,6 +345,28 @@
   opacity: 1;
   filter: saturate(1.15) brightness(1.12)
     drop-shadow(0 0 12px var(--glow)) drop-shadow(0 0 30px rgba(255, 176, 66, 0.55));
+}
+
+/* =========================================================
+   Glowberries (level 1)
+
+   The same swarm wearing the level's element. The berry art is a lit fruit,
+   not a light source, so the halo that makes it a GLOWberry is painted here —
+   warm pink, where the twinkles are gold. The dim and countable states above
+   already strip filters to their low-light look, so only the full-brightness
+   states need the berry's own colour: the free berries on the look beats, and
+   a counted one.
+   ========================================================= */
+#game .swarm.is-berries:not(.is-dim) .firefly:not(.is-countable) .fill {
+  filter: drop-shadow(0 0 14px rgba(255, 110, 165, 0.85))
+    drop-shadow(0 0 36px rgba(255, 80, 140, 0.4));
+}
+
+#game .swarm.is-berries .firefly.is-counted .fill {
+  opacity: 1;
+  filter: saturate(1.15) brightness(1.12)
+    drop-shadow(0 0 12px rgba(255, 130, 175, 0.95))
+    drop-shadow(0 0 30px rgba(255, 90, 145, 0.55));
 }
 
 /* The number it took, above it. */

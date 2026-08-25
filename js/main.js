@@ -12,6 +12,7 @@
 import { manifest, FRAME_W as STORY_W, FRAME_H as STORY_H } from "./data/scenes.js";
 import {
   manifest as gameManifest,
+  levels,
   FRAME_W as GAME_W,
   FRAME_H as GAME_H
 } from "./data/screens.js";
@@ -19,10 +20,10 @@ import { audioManifest, UI_ADVANCE } from "./data/audio.js";
 import { watchStage, setFrame } from "./stage.js";
 import { preload } from "./preload.js";
 import { initStory, startStory, advance, skip as skipStory } from "./story.js";
-import { initGame, startGame, skipGame, releaseHold } from "./game.js";
+import { initGame, startGame, skipGame, releaseHold, armHold } from "./game.js";
 import { initWalk, startWalk, endWalk } from "./walk.js";
 import { layers as walkLayers, foreground as walkFore, cast as walkCast,
-         guide as walkGuide, SPARK_SHEET, HAND_OVER_MS } from "./data/walk.js";
+         guide as walkGuide, destinations, SPARK_SHEET, HAND_OVER_MS } from "./data/walk.js";
 import {
   initAudio,
   loadAudio,
@@ -40,11 +41,12 @@ const endcard = document.getElementById("endcard");
 const hud = document.getElementById("hud");
 const soundBtn = document.getElementById("sound");
 
-// Dev routes: ?act=game opens the second act directly, and &beat=N picks the
-// screen inside it.
+// Dev routes: ?act=game opens the second act directly, &beat=N picks the
+// screen inside it and &level=N the round (0 = tutorial, 1 = glowberries).
 const params = new URLSearchParams(location.search);
 const straightToGame = params.get("act") === "game";
 const jumpTo = params.get("beat");
+const jumpLevel = Math.min(Math.max(Number(params.get("level") ?? 0) || 0, 0), levels.length - 1);
 
 // Dev tooling for laying the chapter out. It is fetched only when the URL
 // carries ?dev, so a normal run never loads or runs a byte of it — and
@@ -62,13 +64,29 @@ initStory({ onComplete: handOver });
 
 initWalk({ onArrive: arrive });
 
+// Which round is playing — an index into `levels`. The chapter runs them in
+// order, a walk leading into each: story, walk to the clearing, the tutorial,
+// walk to the meadow, the glowberries, and only then the end card.
+let chapter = straightToGame ? jumpLevel : 0;
+
 initGame({
-  onComplete: () => endcard.classList.add("is-active"),
+  onComplete: gameDone,
   // Arriving from the story, the first screen is built behind the mist and
   // waits — releaseHold() starts its reading clock once the mist has gone, so
   // none of that time is spent under a cover.
   hold: !straightToGame
 });
+
+// A round is done: walk on to the next level's place, or — after the last —
+// the chapter is over.
+function gameDone() {
+  if (chapter + 1 < levels.length) {
+    chapter += 1;
+    enterWalk(destinations[levels[chapter].walkTo]);
+    return;
+  }
+  endcard.classList.add("is-active");
+}
 
 /* ---- loading ---- */
 
@@ -83,12 +101,15 @@ function prefetchGame() {
 }
 
 // Everything the walk puts on screen. Fetched alongside the game's art, since
-// the two run back to back.
+// the two run back to back. Every destination's painting and guide are in the
+// list — the walk to level 1 starts the moment the tutorial ends, so its art
+// cannot wait to be fetched then.
 const walkManifest = [
   ...new Set([
     ...[...walkLayers, ...walkFore, ...walkCast, walkGuide]
       .map((l) => l.src)
       .filter(Boolean),
+    ...Object.values(destinations).flatMap((d) => [d.arrive, d.guide.src]),
     // Not a layer — the sheet the drifting fireflies are cut from.
     SPARK_SHEET
   ])
@@ -151,20 +172,23 @@ async function handOver() {
   document.dispatchEvent(new CustomEvent("story:complete"));
 
   await Promise.all([prefetchWalk(), prefetchGame()]);
-  enterWalk();
+  enterWalk(destinations[levels[chapter].walkTo]);
 }
 
-function enterWalk() {
+function enterWalk(dest) {
   document.body.dataset.act = "walk";
   // The walk borrows the game's frame, so arriving is a cross-fade, not a cut.
   setFrame(GAME_W, GAME_H);
   hud.classList.remove("is-waiting");
   hud.classList.add("is-active");
-  startWalk();
+  startWalk(dest);
 }
 
 // They have arrived: bring the game up underneath and fade the path out over it.
+// Every arrival holds the first beat until the hand-over is done — the walk to
+// level 1 needs the same grace the story's did.
 function arrive() {
+  armHold();
   enterGame();
   endWalk();
   window.setTimeout(releaseHold, HAND_OVER_MS);
@@ -176,7 +200,7 @@ function enterGame(at = 0) {
   // from the walk this is already the frame, so nothing moves.
   setFrame(GAME_W, GAME_H);
   hud.classList.remove("is-waiting");
-  startGame(at);
+  startGame(at, chapter);
 }
 
 function enterStory() {
@@ -256,6 +280,9 @@ const actions = {
     // Same as play: if they left full screen between chapters, go back in.
     goFullscreen();
     endcard.classList.remove("is-active");
+
+    // From the top means from the first round.
+    chapter = straightToGame ? jumpLevel : 0;
 
     if (straightToGame) {
       enterGame(jumpTo === null ? 0 : Number(jumpTo));

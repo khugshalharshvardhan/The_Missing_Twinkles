@@ -32,7 +32,8 @@ const TARGETS = {
     "#game .scene.is-active > .counter",
     "#game .scene.is-active > .numline",
     "#game .scene.is-active > .hint",
-    "#game .scene.is-active > .lamp"
+    "#game .scene.is-active > .lamp",
+    "#game .scene.is-active > .shout"
   ],
   // The walk lays itself out from js/data/walk.js rather than from Figma
   // coordinates, so the pieces worth grabbing are the pair and the firefly they
