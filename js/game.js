@@ -436,6 +436,8 @@ function swarm(screen) {
   // guess after it something to be about. The rest just show it, still.
   const enter = screen.fireflies.enter;
   group.className = enter ? `swarm is-swarming from-${enter}` : "swarm";
+  // Drawn at the uncounted level — see .swarm.is-dim in css/game.css.
+  if (screen.fireflies.dim) group.classList.add("is-dim");
   group.style.left = `${screen.fireflies.x}px`;
   group.style.top = `${screen.fireflies.y}px`;
   // When the swarm starts, ms into the beat. Everything downstream — each

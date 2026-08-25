@@ -312,7 +312,10 @@
 
 /* Waiting to be counted: turned right down, so the screen starts dark and fills
    with light as the player works. This is the other way round from before, when
-   counting one dimmed it — which made the reward for counting look like loss. */
+   counting one dimmed it — which made the reward for counting look like loss.
+   The .is-dim variant is "Let us count to check." wearing the same level, so
+   the cut onto the counting screen changes nothing about the twinkles. */
+#game .swarm.is-dim .firefly .fill,
 #game .firefly.is-countable .fill {
   opacity: 0.42;
   filter: saturate(0.5) brightness(0.72);

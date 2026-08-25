@@ -265,7 +265,7 @@ export const screens = [
       { src: `${IMG}agni_point.webp`, x: 64, y: 498, w: 525, h: 501, fill: CROP.agniPoint, fx: "breathe" },
       { src: `${IMG}neel_d.webp`, x: 1344, y: 417, w: 449, h: 581, fill: CROP.neelD, flipX: true, fx: "breathe-slow" }
     ],
-    fireflies: { x: 606, y: 120 },
+    fireflies: { x: 606, y: 120, dim: true },
     bubble: {
       art: `${IMG}bub_3.webp`, who: "agni",
       x: 220, y: 216, w: 557, h: 282,
@@ -290,7 +290,7 @@ export const screens = [
     hint: { src: `${SHARED}hand_nudge.svg`, x: 568, y: 103, w: 308.396, h: 308.396 },
     bubble: {
       art: `${IMG}bub_32.webp`, who: "agni",
-      x: 220, y: 222, w: 489, h: 256,
+      x: 190, y: 248, w: 489, h: 256,
       text: "Tap each twinkle to count."
     }
   },
