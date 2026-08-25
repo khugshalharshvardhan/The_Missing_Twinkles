@@ -59,9 +59,14 @@ export const cues = {
         vo: { id: "vo_agni_cookie", at: 560 }
   },
 
+  // No narration on this beat: it is Neel grinning, and describing a grin says
+  // less than the drawing already does. He chuckles instead — his own voice, no
+  // caption, panned to where he is standing. vo_narr_grin is still on disk,
+  // simply unreferenced, which also drops it from audioManifest since that is
+  // derived from these tables.
   "1.4": {
     sfx: [{ id: "grin_boing", at: 180, gain: 0.7, pan: 0.3 }],
-    vo: { id: "vo_narr_grin", at: 480 }
+    vo: { id: "vo_neel_hehe", at: 420, pan: 0.3 }
   },
 
   /* ---------- Screen 2 ---------- */
@@ -76,28 +81,29 @@ export const cues = {
       // step 2.1 in scenes.js — change one, change the other.
       { id: "heartbeat", at: 900, gain: 0.5 },
       { id: "heartbeat", at: 1700, gain: 0.55 },
-      { id: "heartbeat", at: 2500, gain: 0.6 }
+      { id: "heartbeat", at: 2500, gain: 0.6 },
+      // The lamp answers his line: two stutters, the pop, its sparks, and its
+      // light going out — all panned hard left, where it stands. Times match
+      // LAMP_GUTTER / LAMPS_FLARE / LAMP_SPARKS in scenes.js and the keyframes
+      // in story.css.
+      { id: "lamp_flicker", at: 4000, gain: 0.72, pan: -0.69 },
+      { id: "lamp_flicker", at: 4400, gain: 0.78, pan: -0.69 },
+      { id: "lantern_pop", at: 4950, gain: 1, rate: 0.92, pan: -0.69 },
+      { id: "sparkle", at: 4990, gain: 0.75, pan: -0.6 },
+      { id: "lamp_out", at: 5150, gain: 0.8, pan: -0.69 }
     ],
     vo: { id: "vo_neel_what", at: 3160 }
   },
 
-  // The mist rushes, four lanterns pop out from the far end in, the last one
-  // flickers and dies, then Mr. Giggles is heard. Pops get louder, lower and
-  // further left as they come nearer, tracking the POP! positions.
+  // The town follows its lamp: the lit street cross-fades to the same render
+  // with every light off, the last warmth settles off the pair, and the dark
+  // drains into the black the eyes open out of.
   "2.2": {
-    // Down to almost nothing, reaching bottom under blackout_hit at 4100 — the
-    // lights going out wants air behind it, not a cheerful loop.
-    music: { to: 0.18, at: 2500, over: 1.5 },
-    sfx: [{ id: "mist_rush", at: 0, gain: 1 },
-      // One pop per lamp in LAMP_LIST, panned to where each one stands and
-      // pitched down as they come nearer. Change one, change the other.
-      { id: "lantern_pop", at: 400, gain: 0.5, rate: 1.25, pan: 0 },
-      { id: "lantern_pop", at: 1000, gain: 0.64, rate: 1.14, pan: -0.24 },
-      { id: "lantern_pop", at: 1600, gain: 0.8, rate: 1.04, pan: -0.36 },
-      { id: "lantern_pop", at: 2300, gain: 1, rate: 0.92, pan: -0.69 },
-      { id: "lamp_flicker", at: 3300, gain: 0.8, pan: -0.69 },
-      { id: "lamp_out", at: 4000, gain: 0.9, pan: -0.69 },
-      { id: "blackout_hit", at: 4100, gain: 1 }
+    // Down to almost nothing under blackout_hit — the lights going out wants
+    // air behind it, not a cheerful loop.
+    music: { to: 0.18, at: 0, over: 1.4 },
+    sfx: [{ id: "mist_rush", at: 0, gain: 0.9 },
+      { id: "blackout_hit", at: 2750, gain: 1 }
     ]
     // No laugh here: it belongs over the eyes, and there is only ever one.
   },
@@ -114,15 +120,22 @@ export const cues = {
     vo: { id: "vo_giggles_2", at: 500, gain: 0.95, sweep: [-0.9, 0.9] }
   },
 
+  // She calls a beat sooner than she used to. The whole exchange was carrying a
+  // second of silence at the end of every line; the lines themselves have not
+  // moved, only the waiting after them. Matches the holds on 3.2 and 3.3 in
+  // scenes.js — change one, change the other.
   "3.2": {
-    sfx: [{ id: "blink", at: 700, gain: 0.55, pan: -0.42 }],
-    vo: { id: "vo_agni_neil", at: 420, pan: -0.42 }
+    sfx: [{ id: "blink", at: 620, gain: 0.55, pan: -0.42 }],
+    vo: { id: "vo_agni_neil", at: 340, pan: -0.42 }
   },
 
-  // The laugh crosses the frame, so the voice crosses the speakers with it.
+  // His answer, and one twinkle going past while he gives it — the first light
+  // in the frame since the lamp, and the one the next page follows.
   "3.3": {
-    sfx: [{ id: "blink", at: 900, gain: 0.55, pan: 0.55 }],
-    vo: { id: "vo_neel_here", at: 420, pan: 0.5 }
+    sfx: [{ id: "blink", at: 820, gain: 0.55, pan: 0.55 },
+      { id: "twinkle", at: 520, gain: 0.42, sweep: [-0.75, 0.75] }
+    ],
+    vo: { id: "vo_neel_here", at: 300, pan: 0.5 }
   },
 
   // Firefly transition — bells, and the music comes back up with them.

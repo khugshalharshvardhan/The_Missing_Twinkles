@@ -33,8 +33,12 @@ const LINES = [
   { id: 'vo_agni_cookie',  who: 'agni',     mood: 'fond exasperation',
     text: 'Oh, come on. You just had a cookie!',         rate: 1.08, pitch: '+8%',  volume: 100 },
 
-  { id: 'vo_narr_grin',    who: 'narrator', mood: 'amused aside',
-    text: 'Neil just grins.',                            rate: 0.96, pitch: '+4%',  volume: 88 },
+  // The narrator used to say "Neil just grins" here. Describing a grin says
+  // less than the drawing already does, so the beat is his own chuckle instead
+  // — no caption, just the sound of him being pleased with himself. Same
+  // prosody as his other lines, so it is plainly the same boy.
+  { id: 'vo_neel_hehe',    who: 'neel',     mood: 'pleased with himself, under his breath',
+    text: 'Heh heh heh.',                                rate: 0.86, pitch: '+24%', volume: 90 },
 
   { id: 'vo_neel_what',    who: 'neel',     mood: 'startled, frightened',
     text: 'What was that?',                              rate: 1.14, pitch: '+34%', volume: 100 },

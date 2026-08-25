@@ -114,6 +114,16 @@ const EYES = {
   x: 0, y: 0, w: 1920, h: 1080
 };
 
+// One twinkle crossing the dark while Neel answers. Same effect as the
+// fireflies that carry the reader into page 3, deliberately: smaller, dimmer,
+// slower and higher up, so it reads as the first single one to come back rather
+// than as the swarm arriving early — and so that when the swarm does arrive a
+// beat later it is plainly more of the same thing.
+const LONE_TWINKLE = {
+  key: "lone-twinkle", kind: "firefly-trail",
+  top: 250, scale: 0.78, ms: 2800, motes: 320, delay: 380
+};
+
 /* ---- page 2: shared marks, so nothing re-dissolves between its steps ---- */
 
 const TOWN_MOONLIT = { key: "bg-moonlit", src: `${IMG}bg_town_moonlit.webp`, x: 0, y: 0, w: 1920, h: 1080 };
@@ -143,25 +153,57 @@ const MIST_LOW = { key: "mist-band", src: `${IMG}mist_band.webp`, x: 0, y: 510, 
 // width, which on the blurred far bank costs nothing.
 const MIST_HIGH = { key: "mist-high", src: `${IMG}mist_band.webp`, x: -160, y: 250, w: 2240, h: 900, opacity: 0.28, fx: "mist-swell" };
 
-// The lamps are painted into the background, so putting them out means taking
-// the light back out of the picture where each one stands. Positions were
-// measured off bg_town_moonlit.webp: every entry is one lamp — or a cluster of
-// distant ones — and the pool of light it throws, ordered from the far end of
-// the lane in towards the pair's feet. `at` is when it pops, ms into the step.
-const LAMP_LIST = [
-  { x: 965, y: 578, rx: 205, ry: 100, at: 400 },  // the two farthest lamps
-  { x: 733, y: 607, rx: 145, ry: 85, at: 1000 },  // the receding row behind them
-  { x: 615, y: 570, rx: 160, ry: 205, at: 1600 }, // the mid lamp
-  { x: 300, y: 520, rx: 345, ry: 475, at: 2300 }  // the near lamp and its pool
-];
+// Only one lamp is put out by hand now: the near one, standing right beside
+// Agni. Positions were measured off bg_town_moonlit.webp — its lantern head is
+// at (304, 380) and the pool it throws lands under it on the cobbles. The rest
+// of the street no longer pops one lantern at a time; it falters, and then the
+// light simply leaves it.
+//
+// Two layers over the one lamp, because the two halves of putting it out blend
+// in opposite directions: the flare screens light on, the extinguish multiplies
+// it off. They are given separate boxes on purpose — the flare belongs to the
+// lantern head, which is the thing the reader is watching, while what has to go
+// dark is the far larger pool underneath it. The blend mode has to sit on the
+// container: the player gives every layer a z-index, which makes it a stacking
+// context, so a blend mode on the blobs inside would have no backdrop to work
+// against.
+const LAMP_FLARE_AT = { x: 304, y: 380, rx: 215, ry: 205, at: 4950 };
+const LAMP_POOL = { x: 300, y: 560, rx: 345, ry: 460, at: 4950 };
 
-// Two layers over the same list, because the two halves of putting a lamp out
-// blend in opposite directions: the flare screens light on, the extinguish
-// multiplies it off. The blend mode has to sit on the container — the player
-// gives every layer a z-index, which makes it a stacking context, so a blend
-// mode on the blobs inside would have no backdrop to work against.
-const LAMPS_FLARE = { key: "lamp-flare", kind: "lamps", mode: "flare", lamps: LAMP_LIST };
-const LAMPS_OUT = { key: "lamp-out", kind: "lamps", mode: "out", lamps: LAMP_LIST };
+// The lamp alone gutters: the same dark blob over the same pool, stuttering its
+// light off and back on twice without quite putting it out. On 2.1, straight
+// after "What was that?" lands — the line, then the answer. One lamp in trouble,
+// in a street that is otherwise still perfectly fine.
+const LAMP_GUTTER = {
+  key: "lamp-gutter", kind: "lamps", mode: "gutter",
+  lamps: [{ ...LAMP_POOL, at: 3950 }]
+};
+
+const LAMPS_FLARE = { key: "lamp-flare", kind: "lamps", mode: "flare", lamps: [LAMP_FLARE_AT] };
+const LAMPS_OUT = { key: "lamp-out", kind: "lamps", mode: "out", lamps: [LAMP_POOL] };
+
+// What the lamp lets go of as it dies: a ring of sparks out of the glass,
+// drifting up and burning out on the air.
+const LAMP_SPARKS = {
+  key: "lamp-sparks", kind: "sparkle",
+  x: 304, y: 380, count: 26, spread: 265, at: 4850
+};
+
+// The same street with every light off — bg_town_moonlight_wide is the moonlit
+// render re-done with the lamps and windows dark, pixel-registered with it (a
+// 50/50 blend of the two reads as one picture). That registration is the whole
+// transition: the lit street cross-fades to this and every edge stays exactly
+// where it was, so nothing reads as a picture being replaced — only the lights
+// in it going out. The blackout-by-hand layers this replaces (a multiply pass
+// down to black, then bg_town_dark rising out of it) existed because
+// bg_town_dark is a different camera; none of that is needed against art that
+// lines up.
+const TOWN_WIDE_OUT = { key: "bg-wide-out", src: `${IMG}bg_town_moonlight_wide.webp`, x: 0, y: 0, w: 1920, h: 1080 };
+
+// What the swap cannot do: the pair are drawn lit, and stay lit through it.
+// This takes the lamplight off them and the mist, gently, once the town behind
+// them has gone dark.
+const STREET_DUSK = { key: "street-dusk", kind: "dusk" };
 
 // The three little lights on the last page. Each one glows — see .glow--* in
 // css/story.css — because on that page they are the only light there is.
@@ -207,22 +249,20 @@ const GLIMMERS = [
 // bakery and sweeps the length of the street. Figma has no art for this — it is
 // the cartoon beat the script asks for.
 //
-// The ribbons are specified as numbers rather than bezier strings so the curls
-// stay perfectly round and the shape is tunable: `waves` is how many times it
-// undulates across the sweep, `amp` how far, `loops` the fractions along it
-// that turn a full spiral, and `radius` how big those spirals are. See
-// ribbonPath() in js/story.js. Coordinates are local to the box below.
+// Cake on the air — the supplied art, assets/images/smell.webp, rather than a
+// drawn one. The box is worked backwards from two points in the picture: the
+// thick head of the trail sits at (0.872, 0.102) of the art and has to land on
+// the bakery's chimney at (1768, 152), and its wisp of a tail sits at
+// (0.150, 0.885) and has to finish on Neel's nose at (1191, 533). Solving both
+// gives the box below. It stretches the art about 19% taller than square, which
+// on a soft glow is invisible and is what lets both ends land where they mean
+// something instead of only one of them. It unfurls from the chimney end — see
+// .fx-smell in css/story.css.
 const AROMA = {
   key: "aroma",
-  kind: "aroma",
-  x: 300, y: 100, w: 1400, h: 640,
-  ribbons: [
-    // The main ribbon: out of the shop doorway, up past the cupcake sign, then
-    // the length of the lane to the tree at the far end.
-    { from: [1270, 450], to: [60, 250], waves: 1.6, amp: 62, loops: [0.28, 0.68], radius: 42 },
-    // One strand riding above it, curling once on the offbeat.
-    { from: [1240, 360], to: [200, 220], waves: 2, amp: 40, loops: [0.5], radius: 30, phase: 2 }
-  ]
+  src: `${IMG}smell.webp`,
+  x: 1071, y: 102, w: 799, h: 487,
+  fx: "smell"
 };
 
 // Takes the brightness out of the last page, so the street and the pair read as
@@ -260,7 +300,7 @@ export const pages = [
         hold: 5200, // "do I smell cake?" ends at 2.58s; the swirl needs 4.2s
         // Agni holds her mark exactly; Neel takes the sniffing pose on the
         // same centre and ground line, so only his drawing changes.
-        layers: [AROMA, AGNI_WALKING, NEEL_SMELLING],
+        layers: [AGNI_WALKING, NEEL_SMELLING, AROMA],
         say: {
           bubble: BUBBLE_NEEL,
           text: { x: 777, y: 224, w: 342 },
@@ -302,8 +342,18 @@ export const pages = [
       // Figma 2.1 — mist at their feet.
       {
         id: "2.1",
-        hold: 5200,
-        layers: [TOWN_MOONLIT, AGNI_DOWN, NEEL_SCARED, MIST_LOW],
+        // The line lands at 3.9s; the lamp answers it — gutters to 4.95s, then
+        // flares, pops, throws its sparks and goes out, all while the rest of
+        // the town is still lit. The step turns at 6.3s with the lamp already
+        // dark, so the town going out on 2.2 plainly follows from it.
+        hold: 6300,
+        layers: [
+          TOWN_MOONLIT,
+          LAMP_GUTTER, LAMPS_FLARE, LAMPS_OUT,
+          AGNI_DOWN, NEEL_SCARED, MIST_LOW,
+          // On the lit street only — the sparks are the lamp's, not the dark's.
+          LAMP_SPARKS
+        ],
         say: {
           // The mist takes 3.2s to cover the cobbles. He speaks after it has,
           // not over the top of it — the sound cue is held back to match.
@@ -313,21 +363,19 @@ export const pages = [
           lines: ["What was that?"]
         }
       },
-
-      // Figma 2.2 — the mist thickens and the lamps go out one at a time, far
-      // end of the lane first, in towards the pair. The street is the same
-      // layer it was in 2.1 and never cross-fades: only the light leaves it,
-      // lamp by lamp, and the last of it drains away after the near one.
+      // Figma 2.2 — the near lamp has just died, and now the town goes with
+      // it. The lit street cross-fades to the same render with every light off
+      // (see TOWN_WIDE_OUT), the last warmth settles off the pair, and the dark
+      // drains into the black the eyes open out of on 3.1.
       {
         id: "2.2",
-        // Ends as the last of the light drains, so the eyes open straight out
-        // of the blackout instead of leaving the screen black and waiting.
-        hold: 4900,
+        // The swap takes the layer fade's 700ms; the dark town then has to be
+        // seen before lamp-die takes it at 2.6s. Ends as that finishes.
+        hold: 3900,
         layers: [
-          TOWN_MOONLIT,
-          // Over the street they light, under the faces they must not stain.
-          LAMPS_FLARE, LAMPS_OUT,
+          TOWN_WIDE_OUT,
           AGNI_DOWN, NEEL_SCARED, MIST_LOW, MIST_HIGH,
+          STREET_DUSK,
           { key: "lamp-die", kind: "lamp-die" }
         ]
       },
@@ -336,25 +384,38 @@ export const pages = [
       // moment the light has gone, and Mr Giggles crosses overhead: once, heard
       // and read, but never shown. A bubble would light the frame, so the two
       // lines after him are spoken in each character's own colour.
+      //
+      // The holds across these three used to be set by the round number rather
+      // than by the lines, which left roughly a second of nothing after every
+      // one of them — worst on 3.2, where "Neil?" lasts 0.69s and the beat ran
+      // for 3.8. Each now ends a beat after its own line lands, so Agni calls
+      // into the dark and Neel answers her rather than answering three seconds
+      // later.
       {
         id: "3.1",
-        hold: 4200, // he crosses at 500ms and takes 2.6s to pass
+        hold: 3400, // he crosses at 500ms and takes 2.6s to pass
         layers: [{ key: "night", kind: "night" }, EYES],
         sfx: [{ kind: "laugh", y: 70, text: "Hee-hee-hee-hee!", delay: 500 }]
       },
 
       {
         id: "3.2",
-        hold: 3800, // "Neil?", then the eyes blink on their own
+        hold: 1900, // "Neil?" runs 0.69s from 340; the rest is one blink
         layers: [{ key: "night", kind: "night" }, EYES],
         voices: [{ x: 355, y: 700, w: 400, tone: "agni", text: "Neil?" }]
       },
 
       {
-        // Last step of the page: chevron in once his answer has landed.
+        // Last step of the page: chevron in once his answer has landed. One
+        // twinkle crosses while he speaks — the first of them anyone has seen
+        // since the lane, and the thread the next page picks up.
         id: "3.3",
-        reveal: 3000,
-        layers: [{ key: "night", kind: "night" }, EYES],
+        reveal: 2900, // "I am here… I think." runs 2.04s from 300
+        layers: [
+          { key: "night", kind: "night" },
+          EYES,
+          LONE_TWINKLE
+        ],
         voices: [{ x: 1040, y: 690, w: 560, tone: "neel", text: "I am here… I think." }]
       }
     ]
@@ -363,8 +424,11 @@ export const pages = [
   {
     id: "page-3",
     name: "The Twinkles",
-    // Fireflies carry us out of the dark and into the last page.
-    enter: { id: "3.4", fx: "fireflies", hold: 2800 },
+    // A short black cover over the page swap, and the music coming back up
+    // under it. It used to run for 2.8s because there was a firefly crossing it
+    // worth watching; there is not any more, and black held that long is a
+    // pause rather than a page turn.
+    enter: { id: "3.4", fx: "fireflies", hold: 1600 },
     // Only the street belongs to the page. Everything else sits above the dim,
     // which is what makes the little lights the only light on this page — and
     // they all keep their keys, so nothing restarts between Agni's two lines.

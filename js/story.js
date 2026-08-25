@@ -37,6 +37,18 @@ const SETTLE = 380;       // how long a step is protected from a double-tap
 const FLIGHT_MS = 2600;
 const FLIGHT_TOP = 470;
 
+// The warmths in her tail, amber through to white. Four is enough to stop the
+// dust reading as one flat colour and few enough that it still reads as gold.
+const DUST_TINTS = ["#ffbe3a", "#ffd669", "#fff0bd", "#ffffff"];
+
+// A stable pseudo-random: same index, same answer, every run. Math.random would
+// make the trail different on each replay, which for a hand-placed effect reads
+// as a fault rather than as variety.
+function noise(i, k) {
+  const n = Math.sin(i * 12.9898 + k * 78.233) * 43758.5453;
+  return n - Math.floor(n);
+}
+
 const mounted = new Map(); // key -> { el, spec } for the layer showing now
 let cursor = -1;
 let busy = false;
@@ -134,10 +146,12 @@ function go(target) {
 
 // Fade a cover in, swap the page underneath it, fade it back out.
 function playTransition(cover, entry) {
-  transition.replaceChildren(
-    effect({ kind: "night" }),
-    effect({ kind: "firefly-trail" })
-  );
+  // Black, and nothing else. There is no second crossing here — one twinkle
+  // already goes past on 3.3, a beat before this — and no field of glitter
+  // either: page 2 ends on eyes in the dark and page 3 opens on an unlit street,
+  // so anything put between them is a third picture nobody asked for. A plain
+  // cover long enough to hide the swap is the whole job.
+  transition.replaceChildren(effect({ kind: "night" }));
   transition.classList.add("is-active");
 
   clearCues();
@@ -506,10 +520,23 @@ function laugh(cue) {
     const [dx, dy] = slope(t);
     const turn = (Math.atan2(dy, dx) * 180) / Math.PI;
 
+    // Every letter its own size, tilt and height off the line. A word set
+    // evenly on a curve reads as typography; the same word with each letter
+    // sitting a little wrong reads as a voice — which is the whole trick behind
+    // the lettering this is after. Off the index rather than Math.random, so it
+    // is the same laugh every time.
+    const lift = ((i * 29) % 17) - 8;
+    const tilt = ((i * 47) % 21) - 10;
+    const size = 0.84 + ((i * 13) % 10) / 22;
+
     // The seat carries the placement; the glyph inside it does the waving, so
     // each letter bobs along its own local up rather than straight up the frame.
     const seat = document.createElementNS(SVG_NS, "g");
-    seat.setAttribute("transform", `translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${turn.toFixed(1)})`);
+    seat.setAttribute(
+      "transform",
+      `translate(${x.toFixed(1)} ${(y + lift).toFixed(1)}) ` +
+        `rotate(${(turn + tilt).toFixed(1)}) scale(${size.toFixed(3)})`
+    );
 
     const glyph = document.createElementNS(SVG_NS, "text");
     glyph.setAttribute("class", "laugh__ch");
@@ -538,44 +565,6 @@ function laugh(cue) {
 // actually closes is the weighting below: the sweep almost stops while a curl is
 // being drawn, so the circular offset laps the forward travel instead of being
 // stretched out into a bump.
-function ribbonPath({
-  from, to, waves = 2, amp = 40, loops = [], radius = 30,
-  phase = 0, window: win = 0.11, samples = 340
-}) {
-  const [x1, y1] = from;
-  const [x2, y2] = to;
-  const inLoop = (t) => loops.some((at) => t >= at && t <= at + win);
-
-  // Pass one: how fast the sweep travels at each sample.
-  const speed = [];
-  for (let i = 0; i <= samples; i++) speed.push(inLoop(i / samples) ? 0.12 : 1);
-  const total = speed.reduce((a, b) => a + b, 0);
-
-  // Pass two: place each sample, adding the spiral offset where one is due.
-  const points = [];
-  let travelled = 0;
-
-  for (let i = 0; i <= samples; i++) {
-    const t = i / samples;
-    travelled += speed[i];
-    const s = travelled / total;
-
-    let x = x1 + (x2 - x1) * s;
-    let y = y1 + (y2 - y1) * s + amp * Math.sin(s * waves * Math.PI * 2 + phase);
-
-    for (const at of loops) {
-      if (t < at || t > at + win) continue;
-      const a = ((t - at) / win) * Math.PI * 2;
-      x += radius * Math.sin(a);
-      y -= radius * (1 - Math.cos(a));
-    }
-
-    points.push([Number(x.toFixed(1)), Number(y.toFixed(1))]);
-  }
-
-  return { d: `M ${points.map(([x, y]) => `${x},${y}`).join(" L ")}`, points };
-}
-
 function effect(layer) {
   const el = document.createElement("div");
   el.className = `fxlayer fxlayer--${layer.kind}`;
@@ -595,6 +584,33 @@ function effect(layer) {
     // multiply blob over the pool of light it was throwing. Multiply rather
     // than a flat patch is the whole trick — it darkens the cobbles and the
     // leaves while keeping their texture, where a solid shape reads as a smudge.
+    // The near lamp letting go: a ring of sparks thrown out of the glass,
+    // drifting up and burning out on the air. Angles and reach come off the
+    // index rather than Math.random, so the burst is identical on a replay —
+    // a scene that sparkles differently every time reads as a fault.
+    case "sparkle": {
+      el.style.left = `${layer.x}px`;
+      el.style.top = `${layer.y}px`;
+
+      const count = layer.count ?? 16;
+      const spread = layer.spread ?? 160;
+
+      for (let i = 0; i < count; i++) {
+        const angle = (i / count) * Math.PI * 2 + (i % 3) * 0.21;
+        const reach = spread * (0.45 + ((i * 37) % 55) / 100);
+        const bit = document.createElement("i");
+        bit.className = "sparkle__bit";
+        bit.style.setProperty("--dx", `${(Math.cos(angle) * reach).toFixed(1)}px`);
+        // Squashed vertically and lifted, so the ring reads as sparks on rising
+        // air rather than as a firework going off flat against the street.
+        bit.style.setProperty("--dy", `${(Math.sin(angle) * reach * 0.7 - 46).toFixed(1)}px`);
+        bit.style.width = bit.style.height = `${6 + (i % 4) * 3.5}px`;
+        bit.style.animationDelay = `${(layer.at ?? 0) + (i % 5) * 70}ms`;
+        el.append(bit);
+      }
+      break;
+    }
+
     case "lamps":
       // One pass per blend direction — see LAMPS_FLARE / LAMPS_OUT in the data
       // for why the mode cannot just be a class on the blobs.
@@ -640,109 +656,80 @@ function effect(layer) {
     // Each ribbon is drawn twice — a wide blurred pass for the glow, a thin
     // crisp pass for the filament — which is what makes it read as luminous
     // rather than as a line.
-    case "aroma": {
-      const uid = `aroma-${++ids}`;
-
-      el.style.left = `${layer.x}px`;
-      el.style.top = `${layer.y}px`;
-      el.style.width = `${layer.w}px`;
-      el.style.height = `${layer.h}px`;
-
-      el.innerHTML = `
-        <svg viewBox="0 0 ${layer.w} ${layer.h}" aria-hidden="true">
-          <defs>
-            <filter id="${uid}-glow" x="-15%" y="-25%" width="130%" height="150%">
-              <feGaussianBlur stdDeviation="12" />
-            </filter>
-            <!-- Brightest at the bakery, thinning as it travels down the lane. -->
-            <linearGradient id="${uid}-halo" gradientUnits="userSpaceOnUse"
-                            x1="${layer.w}" y1="0" x2="0" y2="0">
-              <stop offset="0"    stop-color="#ffa22e" stop-opacity="1" />
-              <stop offset="0.55" stop-color="#ffb347" stop-opacity="0.8" />
-              <stop offset="1"    stop-color="#ffc46b" stop-opacity="0.3" />
-            </linearGradient>
-            <linearGradient id="${uid}-core" gradientUnits="userSpaceOnUse"
-                            x1="${layer.w}" y1="0" x2="0" y2="0">
-              <stop offset="0"    stop-color="#fff6df" stop-opacity="1" />
-              <stop offset="0.55" stop-color="#ffe7b0" stop-opacity="0.92" />
-              <stop offset="1"    stop-color="#ffdb96" stop-opacity="0.45" />
-            </linearGradient>
-          </defs>
-          <g class="aroma__halo" filter="url(#${uid}-glow)"></g>
-          <g class="aroma__core"></g>
-        </svg>`;
-
-      const halo = el.querySelector(".aroma__halo");
-      const core = el.querySelector(".aroma__core");
-      const sparks = [];
-
-      layer.ribbons.forEach((spec, i) => {
-        const { d, points } = ribbonPath(spec);
-
-        // The same geometry twice: haze underneath, filament on top.
-        [halo, core].forEach((group) => {
-          const path = document.createElementNS(SVG_NS, "path");
-          path.setAttribute("class", "aroma__ribbon");
-          path.setAttribute("d", d);
-          path.setAttribute("stroke", `url(#${uid}-${group === halo ? "halo" : "core"})`);
-          // Normalised, so one dash can unfurl the whole ribbon whatever its
-          // real length, and all three unfurl at the same rate.
-          path.setAttribute("pathLength", "1000");
-          path.style.animationDelay = `${i * 220}ms`;
-          group.append(path);
-        });
-
-        // Sparks sit on the ribbon itself, so they always look carried by it.
-        if (i === 0) {
-          for (let k = 0; k < 6; k++) {
-            sparks.push(points[Math.round(((k + 0.5) / 6) * (points.length - 1))]);
-          }
-        }
-      });
-
-      sparks.forEach(([x, y], k) => {
-        const spark = document.createElement("i");
-        spark.className = "aroma__spark";
-        spark.style.left = `${x}px`;
-        spark.style.top = `${y}px`;
-        spark.style.width = spark.style.height = `${5 + (k % 3) * 3}px`;
-        // Staggered so the ribbon twinkles along its length rather than at once.
-        spark.style.animationDelay = `${1100 + k * 420}ms`;
-        el.append(spark);
-      });
-      break;
-    }
 
     // One twinkle crosses the dark, shedding glitter as she goes. The
     // sparks are laid along her flight path rather than parented to her, so
     // they stay where they fell and wink out behind her.
+    // The crossing. Used twice: full size as the cover that carries the reader
+    // from page 2 into page 3, and small, slow and dim as the single twinkle
+    // that goes past while Neel answers in the dark. Everything the two differ
+    // by is a field on the layer, so they cannot drift apart.
+    // The crossing, and the dust she leaves behind her.
+    //
+    // The tail is not a row of sparks any more, it is a cloud: a few hundred
+    // motes scattered around her flight path, most of them a pixel or two of
+    // gold and a handful of them full four-pointed glints, in four warmths from
+    // amber through to white. Each lights as she reaches it and drifts outward
+    // as it dies, so the ribbon spreads on the air behind her instead of
+    // sitting there as a dotted line. Everything is drawn from a hash of the
+    // index rather than Math.random, so the same dust falls on every replay.
     case "firefly-trail": {
-      const SPARKS = 40;
+      const top = layer.top ?? FLIGHT_TOP;
+      const ms = layer.ms ?? FLIGHT_MS;
+      const scale = layer.scale ?? 1;
+      const delay = layer.delay ?? 0;
+      const MOTES = layer.motes ?? 340;
 
-      for (let i = 0; i < SPARKS; i++) {
-        const t = i / (SPARKS - 1);
-        const spark = document.createElement("i");
+      for (let i = 0; i < MOTES; i++) {
+        const t = i / (MOTES - 1);
 
-        spark.className = "spark";
-        // Same curve as fly-across, sampled: out to the right, rising to the
-        // halfway mark, then easing back down.
-        spark.style.left = `${t * 2260}px`;
-        spark.style.top = `${FLIGHT_TOP + (t <= 0.5 ? -220 * t : -110 + 340 * (t - 0.5))}px`;
-        // Scatter them off the line so the trail has body rather than reading
-        // as a dotted rule. No random seed — the offsets just have to differ.
-        spark.style.marginLeft = `${((i * 37) % 54) - 27}px`;
-        spark.style.marginTop = `${((i * 53) % 62) - 31}px`;
-        spark.style.width = spark.style.height = `${9 + ((i * 11) % 13)}px`;
-        // Each lights as she reaches it, then fades.
-        spark.style.animationDelay = `${Math.round(t * FLIGHT_MS)}ms`;
-        el.append(spark);
+        // Where she is at t. The same curve as fly-across, and deliberately
+        // unscaled: her own flight is a fixed keyframe, so scaling the dust's
+        // arc would slide the cloud off the thing that is supposed to be
+        // shedding it. Only the sizes and the drift take the scale.
+        const x = t * 2260 - 190;
+        const y = top + (t <= 0.5 ? -220 * t : -110 + 340 * (t - 0.5));
+
+        const angle = noise(i, 1) * Math.PI * 2;
+        // Biased hard toward the middle, so the cloud is dense along her line
+        // and thins into a haze at its edges rather than filling a tube evenly.
+        const reach = Math.pow(noise(i, 2), 1.8) * 96 * scale;
+        // A tenth of them are glints. The rest are dust, sized on a cubed roll
+        // so nearly all are specks and just a few are bright enough to bloom.
+        const glint = noise(i, 3) > 0.88;
+        const size = glint
+          ? (8 + noise(i, 4) * 10) * scale
+          : (1.5 + Math.pow(noise(i, 4), 3) * 9) * scale;
+
+        const bit = document.createElement("i");
+        bit.className = glint ? "spark" : "dust";
+        bit.style.left = `${(x + Math.cos(angle) * reach * 1.7).toFixed(1)}px`;
+        bit.style.top = `${(y + Math.sin(angle) * reach * 0.9).toFixed(1)}px`;
+        bit.style.width = bit.style.height = `${size.toFixed(1)}px`;
+        bit.style.setProperty("--tint", DUST_TINTS[Math.floor(noise(i, 5) * DUST_TINTS.length)]);
+        // Outward and a little upward: dust that only fades reads as switching
+        // off, dust that drifts reads as being carried away.
+        bit.style.setProperty("--dx", `${(Math.cos(angle) * 26 * scale).toFixed(1)}px`);
+        bit.style.setProperty("--dy", `${(Math.sin(angle) * 18 * scale - 20 * scale).toFixed(1)}px`);
+        if (glint) bit.style.setProperty("--turn", `${Math.round(noise(i, 6) * 90)}deg`);
+        // She lights each one as she passes it; the jitter keeps the leading
+        // edge of the cloud ragged rather than a clean advancing rule.
+        bit.style.animationDelay = `${delay + Math.round(t * ms + noise(i, 7) * 200)}ms`;
+        bit.style.animationDuration = `${1400 + Math.round(noise(i, 8) * 1500)}ms`;
+        el.append(bit);
       }
 
       const fly = document.createElement("img");
       fly.className = "firefly";
       fly.src = "assets/images/firefly.webp";
       fly.alt = "";
-      fly.style.top = `${FLIGHT_TOP}px`;
+      fly.style.top = `${top}px`;
+      fly.style.animationDuration = `${ms}ms`;
+      fly.style.animationDelay = `${delay}ms`;
+      if (scale !== 1) {
+        fly.style.width = `${135 * scale}px`;
+        fly.style.height = `${90 * scale}px`;
+      }
       el.append(fly);
       break;
     }
