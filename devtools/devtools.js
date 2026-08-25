@@ -187,8 +187,13 @@ function parts(screen) {
   if (screen.keypad) bits.add("keypad");
   if (screen.counter) bits.add(`counter:${screen.counter}`);
   if (screen.numberLine) bits.add("number line");
-  if (screen.fireflies) bits.add(screen.fireflies.enter ? `swarm ⇢ ${screen.fireflies.enter}` : "swarm");
-  if (screen.lamp) bits.add("lamp");
+  if (screen.fireflies) {
+    const f = screen.fireflies;
+    bits.add(`swarm${f.enter ? ` ⇢ ${f.enter}` : ""}${f.at ? ` @${f.at}ms` : ""}${f.dim ? " · dim" : ""}`);
+  }
+  if (screen.keypadAt) bits.add(`pad @${screen.keypadAt}ms`);
+  if (screen.lamp) bits.add(screen.lampLit ? "lamp ⇢ lit" : "lamp");
+  if (screen.shout) bits.add(`shout "${screen.shout.text}"`);
   if (screen.hint) bits.add("hint");
   if (screen.bubble) bits.add("bubble");
   return bits.size ? `  ·  ${[...bits].join("  ·  ")}` : "";

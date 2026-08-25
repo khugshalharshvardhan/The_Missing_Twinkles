@@ -75,9 +75,12 @@ const LINES = [
   { id: "vo_g_tryagain", who: "agni", screen: "4.2", mood: "gentle, no disappointment in it",
     text: "Let us try again!", rate: 0.96, pitch: "+10%", volume: 94 },
 
-  // ---- 5.1 — the lamp ----
+  // ---- 5.1, 5.2 — the lamp, and Neel's cheer when it catches ----
   { id: "vo_g_taplamp", who: "agni", screen: "5.1", mood: "excited, urging them on",
     text: "Tap the lamp!", rate: 1.06, pitch: "+20%", volume: 100 },
+
+  { id: "vo_neel_yay", who: "neel", screen: "5.2", mood: "celebrating, arms up",
+    text: "Yaaay!", rate: 1.04, pitch: "+32%", volume: 100 },
 
   // ---- 6.1, 6.2 — handing the game over ----
   { id: "vo_g_yourturn", who: "agni", screen: "6.1", mood: "warm, handing something over",

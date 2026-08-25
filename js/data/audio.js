@@ -267,8 +267,11 @@ export const gameCues = {
     sfx: [{ id: "page_air", at: 0, gain: 0.5 }],
     vo: { id: "vo_g_taplamp", at: 500, pan: -0.5 }
   },
+  // He cheers as he spins to the lit lamp — his own voice, from his side of
+  // the frame, landing with the YAY! lettering (screens.js draws it from 180ms).
   "5.2": {
-    sfx: [{ id: "catch_pop", at: 120, gain: 0.8 }, { id: "twinkle", at: 500, gain: 0.45 }]
+    sfx: [{ id: "catch_pop", at: 120, gain: 0.8 }, { id: "twinkle", at: 500, gain: 0.45 }],
+    vo: { id: "vo_neel_yay", at: 260, pan: 0.5 }
   },
 
   // ---- the town is theirs to light ----

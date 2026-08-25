@@ -379,6 +379,7 @@ function render(screen) {
   if (screen.numberLine) frag.append(numberLineStrip(screen));
   if (screen.hint) frag.append(imageLayer(screen.hint, "layer hint"));
   if (screen.bubble) frag.append(bubble(screen.bubble, screen));
+  if (screen.shout) frag.append(shout(screen.shout));
 
   return frag;
 }
@@ -567,6 +568,27 @@ function burst(el) {
   }
   el.append(fx);
   window.setTimeout(() => fx.remove(), 900);
+}
+
+// Comic-burst lettering — a cheer drawn on the frame. Each letter is its own
+// element so they can pop up the word one after another, at their own small
+// tilts, the way a comic sets an exclamation rather than a caption.
+function shout(spec) {
+  const wrap = document.createElement("div");
+  wrap.className = "shout";
+  wrap.style.left = `${spec.x}px`;
+  wrap.style.top = `${spec.y}px`;
+  wrap.style.setProperty("--tilt", `${spec.tilt ?? 0}deg`);
+
+  [...spec.text].forEach((ch, i) => {
+    const b = document.createElement("b");
+    b.textContent = ch;
+    b.style.animationDelay = `${180 + i * 90}ms`;
+    b.style.setProperty("--ch-tilt", `${((i * 47) % 15) - 7}deg`);
+    wrap.append(b);
+  });
+
+  return wrap;
 }
 
 /* ---- the lamp ---- */

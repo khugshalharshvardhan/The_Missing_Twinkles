@@ -392,7 +392,10 @@ export const screens = [
       { src: `${IMG}neel_turn.webp`, x: 1125, y: 391, w: 735, h: 610, fill: CROP.neelTurn, flipX: true, fx: "breathe-slow" },
       { src: `${IMG}lamp_on.webp`, x: 799, y: 74, w: 287, h: 927, fill: CROP.lampOn, fx: "lamp-glow" },
       { src: FIREFLY_SRC, x: 832, y: 263, w: 25, h: 26, fx: "flicker" }
-    ]
+    ],
+    // Neel's cheer, drawn as well as heard: comic-burst lettering over his
+    // head as he spins to the lit lamp. Matches vo_neel_yay in the cue table.
+    shout: { text: "YAY!", x: 1264, y: 258, tilt: -9 }
   },
 
   // ---- SCREEN 6.1 — handing over (99:587) ----
