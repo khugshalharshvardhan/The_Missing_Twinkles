@@ -287,7 +287,7 @@ export const pages = [
       // opening frame rather than a bare street.
       {
         id: "1.1",
-        hold: 3000,
+        hold: 3500, // "…taking a walk" ends at 2.54s; a beat of air after it
         layers: [
           { ...AGNI_WALKING, fx: "walk-in-left" },
           { ...NEEL_WALKING, fx: "walk-in-right" }
@@ -312,7 +312,10 @@ export const pages = [
       // walking pose all the way through her line, and reacts after it.
       {
         id: "1.3",
-        hold: 3800, // "…had a cookie!" ends at 3.68s — his pose turns on that beat
+        // "…had a cookie!" ends at 3.68s. At 3800 the line had 120ms to land
+        // before his grin and the chuckle walked over it; now it gets a full
+        // beat, and the grin reads as an answer instead of an interruption.
+        hold: 4700,
         layers: [NEEL_SMELLING, AGNI_TALKING],
         say: {
           bubble: { src: `${IMG}bubble_agni.webp`, x: 128, y: 190, w: 586, h: 294, flipX: true },

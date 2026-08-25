@@ -747,9 +747,7 @@
      number off the oval. */
   left: 29.6%;
   right: 17.2%;
-  /* A hair below the face's true middle: a digit's glyph box carries unused
-     descender space, so geometric centre renders optically high. */
-  top: 44%;
+  top: 38%;
   bottom: 18.3%;
   display: grid;
   place-items: center;
