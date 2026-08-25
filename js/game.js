@@ -28,14 +28,19 @@ const CROSSFADE = 620; // must track --speed-slow in css/game.css
 
 // Reading pace for a dialogue beat: a beat to take in the picture, plus time
 // per character, held between a comfortable floor and ceiling.
-const READ_BASE = 1150;
-const READ_PER_CHAR = 58;
-const READ_MIN = 1900;
+const READ_BASE = 1400;
+const READ_PER_CHAR = 70;
+const READ_MIN = 3000;
 const READ_MAX = 6200;
 
 const AFTER_COUNT = 950; // let the last twinkle land before moving on
 const AFTER_LAMP = 900; // hold on the lit lamp for a moment
-const VO_TAIL = 650; // breath between the end of a line and the next beat
+// The breath between the end of a line and the next beat. This is most of the
+// game's pacing: the next line starts 500ms into its own beat, and the 620ms
+// cross-fade eats into whatever sits between them, so at 650 one line ended and
+// the next was speaking about a second later — nothing had time to land. 1700
+// leaves a genuine pause: line, a moment to take it in, then the answer.
+const VO_TAIL = 1700;
 const GUESS_FLIGHT = 1500; // the tapped digit's trip across — slow enough to watch
 const GUESS_LANDS = 2200; // and a beat to see it sitting there before moving on
 const COUNT_SETTLE = 600; // the last number grows before the line is drawn
