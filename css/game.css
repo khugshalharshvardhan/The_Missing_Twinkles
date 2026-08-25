@@ -98,6 +98,16 @@
   transform: scale(1);
 }
 
+/* The outgoing balloon leaves faster than the pose dissolves. Both panes are on
+   screen for the whole 620ms cross-fade, and two lines of text laid over each
+   other for that long is the muddiest thing on the screen — the art underneath
+   cross-fades cleanly, but words do not. */
+#game .scene:not(.is-active) .bubble {
+  opacity: 0;
+  transform: scale(0.97);
+  transition: opacity 170ms var(--ease), transform 170ms var(--ease);
+}
+
 /* Balloon art and text are siblings so the art can be mirrored on its own —
    Figma mirrors the balloon on most screens, never the words. */
 #game .bubble__art {

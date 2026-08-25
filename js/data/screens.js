@@ -74,6 +74,34 @@ const CROP = {
   numDisplay: { left: "0%", top: "-5.48%", width: "100%", height: "111.23%" }
 };
 
+/* Where each character stands, for a whole run of beats.
+   
+   Every pose is a separate file drawn at its own Figma box with its own
+   transparent margin, so placed as exported they put the character somewhere
+   different on every beat — measured, Agni's body centre wanders 118px and her
+   feet 30px across the first scene, Neel's 133px and 41px. Cross-fading between
+   two poses that far apart reads as the character sliding, not as a change of
+   expression.
+   
+   So the Figma coordinates below stay exactly as exported, and js/anchor.js
+   shifts each character onto the mark for its scene. Only centre-x and the feet
+   are pinned: arms going up genuinely makes a pose taller, and flattening that
+   would squash the gesture out of it.
+   
+   THE_CLEARING is where the walk sets them down — the same marks the arrival
+   was built against, so the pair never move from the moment they stop walking
+   until the town is theirs. TOGETHER is the deliberate re-stage on 6.1, where
+   they come in from the edges to hand the game over. */
+const THE_CLEARING = {
+  agni: { cx: 329, feet: 989 },
+  neel: { cx: 1618, feet: 984 }
+};
+
+const TOGETHER = {
+  agni: { cx: 635, feet: 992 },
+  neel: { cx: 1307, feet: 977 }
+};
+
 /* Speech bubbles.
    Each screen has its own balloon art, so `art` is per beat. `mirror` matches
    the design's flip — Figma mirrors the balloon on most screens but not on the
@@ -87,6 +115,7 @@ export const screens = [
   // ---- SCREEN 1.1 — the swarm is out, both of them spot it (99:388) ----
   {
     id: "1.1",
+    anchor: THE_CLEARING,
     layers: [
       BG,
       { src: `${IMG}agni_point.webp`, x: 64, y: 498, w: 525, h: 501, fill: CROP.agniPoint, fx: "breathe" },
@@ -112,6 +141,7 @@ export const screens = [
   // ---- SCREEN 1.2 — the swarm is gone (99:426) ----
   {
     id: "1.2",
+    anchor: THE_CLEARING,
     layers: [
       BG,
       { src: `${IMG}agni_talk.webp`, x: 10, y: 485, w: 576, h: 532, fill: CROP.agniTalk, flipX: true, fx: "breathe" },
@@ -127,6 +157,7 @@ export const screens = [
   // ---- SCREEN 1.3 — the problem is stated (99:436) ----
   {
     id: "1.3",
+    anchor: THE_CLEARING,
     layers: [
       BG,
       { src: `${IMG}agni_a.webp`, x: 25, y: 415, w: 590, h: 612, fill: CROP.agniA, fx: "breathe" },
@@ -143,6 +174,7 @@ export const screens = [
   // ---- SCREEN 1.4 — Neel supplies the motive (99:601) ----
   {
     id: "1.4",
+    anchor: THE_CLEARING,
     layers: [
       BG,
       { src: `${IMG}agni_f.webp`, x: 34, y: 461, w: 605, h: 553, fx: "breathe" },
@@ -158,6 +190,7 @@ export const screens = [
   // ---- SCREEN 1.5 — look before you guess (99:620) ----
   {
     id: "1.5",
+    anchor: THE_CLEARING,
     layers: [
       BG,
       { src: `${IMG}agni_b.webp`, x: 25, y: 445, w: 553, h: 614, fill: CROP.agniB, fx: "breathe" },
@@ -179,6 +212,7 @@ export const screens = [
   // ---- SCREEN 2 — the keypad. First interaction (99:449) ----
   {
     id: "2",
+    anchor: THE_CLEARING,
     interact: "keypad",
     counter: "guess",
     layers: [
@@ -196,6 +230,7 @@ export const screens = [
   // ---- SCREEN 2.2 — Neel reads the guess back (101:642) ----
   {
     id: "2.2",
+    anchor: THE_CLEARING,
     counter: "guess",
     layers: [
       BG,
@@ -212,6 +247,7 @@ export const screens = [
   // ---- SCREEN 3 — the swarm is back, time to count (99:459) ----
   {
     id: "3",
+    anchor: THE_CLEARING,
     counter: "guess",
     layers: [
       BG,
@@ -230,6 +266,7 @@ export const screens = [
   // ---- SCREEN 3.2 — tap each one. Second interaction (99:469) ----
   {
     id: "3.2",
+    anchor: THE_CLEARING,
     interact: "count",
     layers: [
       BG,
@@ -250,6 +287,7 @@ export const screens = [
   // ---- SCREEN 4 — the true count (99:491) ----
   {
     id: "4",
+    anchor: THE_CLEARING,
     layers: [
       BG,
       { src: `${IMG}agni_f.webp`, x: 9, y: 481, w: 605, h: 553, fx: "breathe" },
@@ -267,6 +305,7 @@ export const screens = [
   // ---- SCREEN 16 — the guess, next to the truth (119:734) ----
   {
     id: "16",
+    anchor: THE_CLEARING,
     layers: [
       BG,
       { src: `${IMG}agni_f.webp`, x: 9, y: 481, w: 605, h: 553, fx: "breathe" },
@@ -284,6 +323,7 @@ export const screens = [
   // ---- SCREEN 4.2 — the verdict (106:657) ----
   {
     id: "4.2",
+    anchor: THE_CLEARING,
     layers: [
       BG,
       { src: `${IMG}agni_d.webp`, x: 84, y: 474, w: 342, h: 560, fill: CROP.agniD, fx: "breathe" },
@@ -299,6 +339,7 @@ export const screens = [
   // ---- SCREEN 5.1 — tap the lamp. Third interaction (99:575) ----
   {
     id: "5.1",
+    anchor: THE_CLEARING,
     interact: "lamp",
     layers: [
       BG,
@@ -316,6 +357,7 @@ export const screens = [
   // ---- SCREEN 5.2 — the lamp catches one (112:132) ----
   {
     id: "5.2",
+    anchor: THE_CLEARING,
     layers: [
       BG,
       { src: `${IMG}agni_g.webp`, x: 70, y: 489, w: 554, h: 512, fill: CROP.agniG, fx: "breathe" },
@@ -328,6 +370,7 @@ export const screens = [
   // ---- SCREEN 6.1 — handing over (99:587) ----
   {
     id: "6.1",
+    anchor: TOGETHER,
     layers: [
       BG,
       { src: `${IMG}agni_b.webp`, x: 398, y: 460, w: 495, h: 549, fill: CROP.agniB, fx: "breathe" },
@@ -343,6 +386,7 @@ export const screens = [
   // ---- SCREEN 6.1b — the loop restated (106:672) ----
   {
     id: "6.2",
+    anchor: TOGETHER,
     layers: [
       BG,
       { src: `${IMG}agni_e.webp`, x: 441, y: 389, w: 450, h: 623, fill: CROP.agniE, fx: "breathe" },

@@ -15,6 +15,7 @@ import {
   FIREFLIES, FIREFLY_SRC, TOTAL, FRAME_W
 } from "./data/screens.js";
 import { gameCues } from "./data/audio.js";
+import { anchorOffset } from "./anchor.js";
 import { clearCues, playCues, playSfx, playVo, clipLength } from "./audio.js";
 
 const panes = [
@@ -293,7 +294,7 @@ function fill(text) {
 function render(screen) {
   const frag = document.createDocumentFragment();
 
-  screen.layers.forEach((layer) => frag.append(imageLayer(layer)));
+  screen.layers.forEach((layer) => frag.append(imageLayer(layer, "layer", screen.anchor)));
 
   if (screen.fireflies) frag.append(swarm(screen));
   if (screen.lamp) frag.append(lamp(screen.lamp));
@@ -311,13 +312,20 @@ function render(screen) {
 // here as it does on the canvas. The mirror goes on the BOX, not the image —
 // Figma wraps the whole clipped box in the flip, and with an off-centre crop
 // the two are not the same thing.
-function imageLayer(layer, className = "layer") {
+function imageLayer(layer, className = "layer", anchors = null) {
   const box = document.createElement("div");
 
   box.className = layer.fx ? `${className} fx-${layer.fx}` : className;
   // Names what this is, so devtools/ can report edits against the data.
   if (layer.src) box.dataset.key = layer.src.split("/").pop().replace(/\.\w+$/, "");
-  place(box, layer);
+
+  // A change of pose should change the pose and nothing else. Each pose is drawn
+  // at its own Figma box with its own transparent margin, so left alone they put
+  // the character somewhere different every beat — measured, 118px of drift
+  // across one scene. Shifting the layer onto the scene's anchor turns the
+  // cross-fade into what it should be: the same character, a different pose.
+  const nudge = anchorOffset(layer, anchors);
+  place(box, nudge ? { ...layer, x: layer.x + nudge.dx, y: layer.y + nudge.dy } : layer);
   if (layer.flipX) box.classList.add("is-flipped");
 
   const img = document.createElement("img");

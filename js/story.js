@@ -18,6 +18,7 @@
 import { pages, timeline } from "./data/scenes.js";
 import { cues } from "./data/audio.js";
 import { clearCues, playCues, stopAudio } from "./audio.js";
+import { anchorOffset } from "./anchor.js";
 
 const layerHost = document.getElementById("layers");
 const overlayHost = document.getElementById("overlays");
@@ -358,8 +359,14 @@ function image(layer, className) {
   // a shadow drawn on it would be cut off at the edge. The box's own filter is
   // applied after that clip and is free to spill past it.
   if (layer.glow) box.classList.add(`glow--${layer.glow}`);
-  box.style.left = `${layer.x}px`;
-  box.style.top = `${layer.y}px`;
+  // A change of pose should change the pose and nothing else. Each pose is
+  // drawn at its own Figma box with its own margin, so left alone they put the
+  // character somewhere different from one beat to the next — and the box then
+  // glides between the two, which is the movement rather than the fix. Anchored,
+  // there is nothing to glide and the art simply dissolves in place.
+  const nudge = anchorOffset(layer, layer.anchor);
+  box.style.left = `${layer.x + (nudge ? nudge.dx : 0)}px`;
+  box.style.top = `${layer.y + (nudge ? nudge.dy : 0)}px`;
   box.style.width = `${layer.w}px`;
   box.style.height = `${layer.h}px`;
 

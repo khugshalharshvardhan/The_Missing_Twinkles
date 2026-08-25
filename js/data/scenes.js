@@ -46,7 +46,35 @@ const VID = "assets/videos/";
 const TOWN_LIT = { key: "bg-lit", src: `${IMG}bg_town_lit.webp`, x: 0, y: 0, w: 1920, h: 1080 };
 const TOWN_DARK = { key: "bg-dark", src: `${IMG}bg_town_dark.webp`, x: 0, y: 0, w: 1920, h: 1080 };
 
+/* Where each character stands for a whole page.
+   
+   Every pose is a separate file drawn at its own Figma box with its own
+   transparent margin, so placed as exported they put the character somewhere
+   different on every beat — Neel's body centre moves 54px and his feet 34px
+   across page one alone. story.js then glides the box between the two marks,
+   which makes the movement the thing you watch instead of the change of
+   expression.
+   
+   The Figma coordinates below stay exactly as exported; js/anchor.js shifts each
+   character onto its page's mark. Only centre-x and the feet are pinned — arms
+   going up genuinely makes a pose taller, and flattening that would squash the
+   gesture out of it. Page two is not listed because neither of them changes pose
+   on it, so there is nothing to hold still.
+   
+   The marks are each page's opening pose, so the first thing the reader sees is
+   where everyone stays. */
+const LANE = {
+  agni: { cx: 609, feet: 959 },
+  neel: { cx: 1090, feet: 1006 }
+};
+
+// Page three draws the pair as one picture, so they anchor as one group.
+const CLEARING = {
+  cast: { cx: 888, feet: 992 }
+};
+
 const AGNI_WALKING = {
+  anchor: LANE,
   key: "agni", src: `${IMG}agni_walking.webp`, x: 380, y: 442, w: 460, h: 539,
   fill: { left: "-22.65%", top: "0%", width: "175.74%", height: "100%" }
 };
@@ -54,21 +82,25 @@ const AGNI_WALKING = {
 // Figma Screen 1.1 › neel_walking (124:2). The art is trimmed to the box's own
 // aspect, so the fill covers it exactly and needs no crop transform.
 const NEEL_WALKING = {
+  anchor: LANE,
   key: "neel", src: `${IMG}neel_walking.webp`, x: 835, y: 388, w: 510, h: 627
 };
 
 // Figma-matched mark for the walking box's centre (1090) and ground line
 // (1015), so the pose change reads as a reaction rather than a reposition.
 const NEEL_SMELLING = {
+  anchor: LANE,
   key: "neel", src: `${IMG}neel_smelling.webp`, x: 836, y: 388, w: 508, h: 627
 };
 
 const NEEL_CHEEKY = {
+  anchor: LANE,
   key: "neel", src: `${IMG}neel_cheeky.webp`, x: 908, y: 371, w: 472, h: 622,
   fill: { left: "-16.4%", top: "-0.06%", width: "126.88%", height: "100.13%" }
 };
 
 const AGNI_TALKING = {
+  anchor: LANE,
   key: "agni", src: `${IMG}agni_talking.webp`, x: 358, y: 443, w: 550, h: 557
 };
 
@@ -332,7 +364,7 @@ export const pages = [
         id: "4.1",
         hold: 5200, // "…the little twinkles!" ends at 3.83s (VO at 560 + 3.27s)
         layers: [
-          { key: "cast", src: `${IMG}scene_shock.webp`, x: 239, y: 191, w: 1276, h: 851 },
+          { key: "cast", anchor: CLEARING, src: `${IMG}scene_shock.webp`, x: 239, y: 191, w: 1276, h: 851 },
           DIM,
           ...GLIMMERS,
           FIREFLY_IN_HAND.shock,
@@ -351,7 +383,7 @@ export const pages = [
         id: "4.2",
         reveal: 3100,
         layers: [
-          { key: "cast", src: `${IMG}scene_cheer.webp`, x: 273, y: 241, w: 1258, h: 839 },
+          { key: "cast", anchor: CLEARING, src: `${IMG}scene_cheer.webp`, x: 273, y: 241, w: 1258, h: 839 },
           DIM,
           ...GLIMMERS,
           FIREFLY_IN_HAND.cheer,

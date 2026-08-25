@@ -127,6 +127,58 @@
 /* The wider, higher pass of the same mist art thickening over the lane. */
 .fx-mist-swell { animation: mist-swell 5.5s var(--ease) both; }
 
+/* ---- keeping the mist from reading as a picture ----
+   
+   Both banks are the same file, mist_band.webp, and that is what gives it away
+   when the second one arrives: the same swirls appear twice, at two sizes, a
+   few hundred pixels apart, and the eye recognises them. The art itself is
+   fine — soft, wispy, with a properly torn top edge. It is the reuse, and the
+   fact that it stops moving once it is up, that make it look placed.
+   
+   Three things fix that without touching the art:
+   
+   * the far bank is mirrored, so the same swirls are not the same swirls
+   * both banks crawl, slowly and forever, in opposite directions — fog that
+     keeps shearing against itself cannot read as one sheet
+   * the far bank is blurred, so it sits behind rather than beside
+   
+   The crawl goes on the fill rather than on the layer box, because the box is
+   already animating a transform for the rise and two transform animations on
+   one element fight. Translations are percentages of the fill's own size, and
+   the fill is scaled up first so there is slack to move into — without that,
+   drifting would pull its edge into frame. */
+.fx-mist-rise > .fill {
+  animation: mist-crawl-near 64s ease-in-out infinite alternate;
+}
+
+@keyframes mist-crawl-near {
+  from { transform: scale(1.16) translate(-2.2%, 0.7%); }
+  to { transform: scale(1.16) translate(2.2%, -0.7%); }
+}
+
+.fx-mist-swell > .fill {
+  /* Enough to read as distance; not so much that the wisps turn to soup. */
+  filter: blur(6px);
+  animation: mist-crawl-far 97s ease-in-out infinite alternate;
+}
+
+/* Negative x scale is the mirror. It also reverses which way the translation
+   reads on screen, which is exactly what is wanted — the two banks pass each
+   other rather than travelling together. */
+@keyframes mist-crawl-far {
+  from { transform: scale(-1.2, 1.2) translate(-1.7%, 0.5%); }
+  to { transform: scale(-1.2, 1.2) translate(1.7%, -0.5%); }
+}
+
+/* The top of each bank dissolves into the night instead of ending. The art
+   already fades out up there; this stops the upscale from leaving it as a
+   readable edge. */
+.fx-mist-rise,
+.fx-mist-swell {
+  -webkit-mask-image: linear-gradient(to top, #000 52%, rgba(0, 0, 0, 0.45) 80%, transparent 97%);
+  mask-image: linear-gradient(to top, #000 52%, rgba(0, 0, 0, 0.45) 80%, transparent 97%);
+}
+
 @keyframes pop {
   0%   { opacity: 0; transform: scale(0.62) translateY(24px); }
   62%  { opacity: 1; transform: scale(1.05) translateY(0); }
