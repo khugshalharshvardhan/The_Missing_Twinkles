@@ -19,8 +19,8 @@ import {
 import { audioManifest, UI_ADVANCE } from "./data/audio.js";
 import { watchStage, setFrame } from "./stage.js";
 import { preload } from "./preload.js";
-import { initStory, startStory, advance, skip as skipStory } from "./story.js";
-import { initGame, startGame, skipGame, releaseHold, armHold } from "./game.js";
+import { initStory, startStory, nextPage, prevPage } from "./story.js";
+import { initGame, startGame, releaseHold, armHold } from "./game.js";
 import { initWalk, startWalk, endWalk } from "./walk.js";
 import { layers as walkLayers, foreground as walkFore, cast as walkCast,
          guide as walkGuide, destinations, SPARK_SHEET, HAND_OVER_MS } from "./data/walk.js";
@@ -261,19 +261,13 @@ const actions = {
     }
     enterStory();
   },
-  // Only click back if the tap actually turned the page — a mid-page tap does
-  // nothing, and a sound would suggest otherwise.
+  // Only click back if the press actually turned a page — a press the story
+  // is not ready for does nothing, and a sound would suggest otherwise.
   next: () => {
-    if (advance()) playUi(UI_ADVANCE, 0.5);
+    if (nextPage()) playUi(UI_ADVANCE, 0.5);
   },
-  // Skip leaves the act you are in. Skipping the story still hands over to the
-  // game: it is one chapter, not two things to opt out of separately.
-  skip: () => {
-    playUi(UI_ADVANCE, 0.5);
-    const act = document.body.dataset.act;
-    if (act === "game") skipGame();
-    else if (act === "walk") arrive();
-    else skipStory();
+  prev: () => {
+    if (prevPage()) playUi(UI_ADVANCE, 0.5);
   },
   replay: () => {
     unlockAudio();
@@ -322,12 +316,21 @@ document.addEventListener("click", (event) => {
   actions[trigger.dataset.action]?.();
 });
 
-// Space / Enter / Right arrow turn a story page, matching the tap target. The
-// game's own beats read themselves, so there is nothing to advance there.
+// Space / Enter / Right arrow turn a story page forward, Left arrow turns it
+// back — matching the two buttons. The game's own beats read themselves, so
+// there is nothing to advance there.
 document.addEventListener("keydown", (event) => {
+  if (event.code === "ArrowLeft") {
+    // Only where the Prev button is live, so the key matches the button.
+    if (!hud.classList.contains("has-prev")) return;
+    event.preventDefault();
+    actions.prev();
+    return;
+  }
+
   if (!["Space", "Enter", "ArrowRight"].includes(event.code)) return;
-  // Only where the chevron is showing, so the keys match the tap target and
-  // the loader and end-card buttons keep their native keyboard behaviour.
+  // Only where the Next button is showing, so the keys match it and the
+  // loader and end-card buttons keep their native keyboard behaviour.
   if (!hud.classList.contains("is-waiting")) return;
 
   event.preventDefault();

@@ -120,13 +120,13 @@ body {
   display: none;
 }
 
-/* The storybook furniture — narration, page dots, the page-turn target — has
-   nothing to do in either of the later acts. Skip and the sound toggle stay. */
+/* The storybook furniture — narration, page dots, the page-turn buttons — has
+   nothing to do in either of the later acts. Only the sound toggle stays. */
 [data-act="walk"] .beat,
 [data-act="walk"] .dots,
-[data-act="walk"] .tap,
+[data-act="walk"] .nav,
 [data-act="game"] .beat,
 [data-act="game"] .dots,
-[data-act="game"] .tap {
+[data-act="game"] .nav {
   display: none;
 }

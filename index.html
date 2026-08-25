@@ -60,11 +60,20 @@
       <div class="hud" id="hud">
         <p class="beat" id="beat"></p>
 
-        <button class="tap" id="tap" data-action="next" aria-label="Continue">
-          <span class="tap__chevron"></span>
+        <!-- Page turning, story only. Next appears once a page has finished
+             playing — or straight away on a page already read — and Prev
+             whenever there is a page behind this one; see js/story.js. One
+             piece of supplied art for both, so the pair can never drift apart:
+             nav_arrow.svg (amber), mirrored in CSS to point back. A blue
+             variant ships alongside it as nav_arrow_blue.svg — switching a
+             button's colour is one filename here. -->
+        <button class="nav nav--prev" id="nav-prev" data-action="prev" aria-label="Previous page">
+          <img class="nav__art" src="assets/images/nav_arrow.svg" alt="" />
+        </button>
+        <button class="nav nav--next" id="nav-next" data-action="next" aria-label="Next page">
+          <img class="nav__art" src="assets/images/nav_arrow.svg" alt="" />
         </button>
 
-        <button class="skip" data-action="skip">Skip</button>
         <ol class="dots" id="dots" aria-hidden="true"></ol>
       </div>
 

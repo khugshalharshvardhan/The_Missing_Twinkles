@@ -712,58 +712,68 @@
 
 .hud.is-active { opacity: 1; }
 
-/* A faded-out HUD must not keep swallowing clicks. Skip is offered throughout;
-   the stage-wide tap target only exists while a page is waiting to be turned,
-   so a stray tap mid-page cannot skip a line. */
-.hud.is-active .skip { pointer-events: auto; }
-.hud.is-waiting .tap { pointer-events: auto; }
+/* ---- page turning ----
 
-/* Whole-stage advance target; the chevron is just its visible hint. */
-.tap {
+   Two round arrow buttons in the bottom corners, the supplied art (the blue
+   one mirrored to point back, the amber one pointing on). Next shows under
+   .is-waiting, exactly as the old chevron did: at the end of a page on a first
+   read, from the start on a page already read. Prev is live under .has-prev
+   (any page with one behind it) and merely present under .has-prev-off —
+   page 1 once it has been read, so coming back from page 2 shows the pair. */
+.nav {
   position: absolute;
-  inset: 0;
-  z-index: 1;
-  cursor: pointer;
-}
-
-/* Shown three times in the chapter: once at the end of each page. */
-.tap__chevron {
-  position: absolute;
+  bottom: 40px;
+  z-index: 2;
+  width: 122px;
   opacity: 0;
   visibility: hidden;
-  right: 74px;
-  bottom: 66px;
-  width: 62px;
-  height: 62px;
-  border-radius: 50%;
-  background: rgba(253, 246, 230, 0.9);
-  box-shadow: 0 0 0 10px rgba(253, 246, 230, 0.14);
-  animation: nudge 1.6s ease-in-out infinite;
-  transition: opacity var(--speed-slow) var(--ease), visibility var(--speed-slow);
+  pointer-events: none;
+  transition: opacity var(--speed-slow) var(--ease), visibility var(--speed-slow),
+    transform var(--speed) var(--ease);
 }
 
-.hud.is-waiting .tap__chevron {
+.nav__art {
+  display: block;
+  width: 100%;
+}
+
+.nav--next { right: 58px; }
+.nav--prev { left: 58px; }
+
+/* The blue art points right; back means the mirror of it. */
+.nav--prev .nav__art { transform: scaleX(-1); }
+
+.hud.is-waiting .nav--next {
   opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+/* The old chevron's sideways nudge, kept — on the art, so it cannot fight the
+   button's own hover scale. */
+.hud.is-waiting .nav--next .nav__art {
+  animation: nudge 1.6s ease-in-out infinite;
+}
+
+.hud.has-prev .nav--prev {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+/* Present but not live: the first page has nothing behind it, and once it has
+   been read the pair of buttons still reads as a pair. */
+.hud.has-prev-off .nav--prev {
+  opacity: 0.35;
   visibility: visible;
 }
 
-/* The chevron glyph itself */
-.tap__chevron::after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 46%;
-  width: 17px;
-  height: 17px;
-  border-right: 6px solid var(--dusk);
-  border-bottom: 6px solid var(--dusk);
-  transform: translate(-50%, -50%) rotate(-45deg);
-}
-
-.tap:hover .tap__chevron  { background: #fff; }
-.tap:focus-visible        { outline: none; }
-.tap:focus-visible .tap__chevron {
-  box-shadow: 0 0 0 10px rgba(239, 90, 36, 0.45);
+.nav:hover { transform: scale(1.08); }
+.nav:active { transform: scale(0.96); }
+.nav:focus-visible {
+  outline: none;
+  border-radius: 50%;
+  box-shadow: 0 0 0 8px rgba(239, 90, 36, 0.45);
 }
 
 @keyframes nudge {
@@ -794,29 +804,6 @@
 
 .beat:empty { opacity: 0; }
 
-/* ---- skip ---- */
-/* Paired with the sound toggle in the bottom-left, which no scene paints in. */
-.skip {
-  position: absolute;
-  bottom: 62px;
-  left: 176px;
-  z-index: 2;
-  padding: 14px 34px;
-  border-radius: 999px;
-  border: 3px solid rgba(253, 246, 230, 0.45);
-  color: rgba(253, 246, 230, 0.9);
-  font-size: 26px;
-  letter-spacing: 0.06em;
-  transition: border-color var(--speed) var(--ease), color var(--speed) var(--ease);
-}
-
-.skip:hover,
-.skip:focus-visible {
-  border-color: var(--ember);
-  color: #fff;
-  outline: none;
-}
-
 /* ---- progress ---- */
 .dots {
   position: absolute;
@@ -846,12 +833,13 @@
    Sound toggle — above the loader and end card, so it is always reachable
    ========================================================= */
 
-/* Bottom-left with Skip: the top corners carry the firefly prop on the
-   Screen 4 beats and a speech bubble on 1.3 / 4.1 / 4.2. */
+/* Top-right, tucked into the corner. A few scenes paint near it (the smell
+   art on page 1, the game's counter card), so it stays small and translucent
+   rather than solid. */
 .sound {
   position: absolute;
-  bottom: 52px;
-  left: 74px;
+  top: 34px;
+  right: 40px;
   z-index: 8;
   width: 74px;
   height: 74px;

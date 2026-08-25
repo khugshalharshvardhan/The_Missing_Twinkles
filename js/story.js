@@ -50,6 +50,13 @@ function noise(i, k) {
 }
 
 const mounted = new Map(); // key -> { el, spec } for the layer showing now
+// Pages already read to the end. A read page hands its Next button over
+// immediately on a revisit instead of making the reader sit through it again.
+const completed = new Set();
+// The deepest page reached, for the first page's Prev: on a first read it
+// shows nothing but Next, and only coming BACK to it puts the dim Prev beside
+// the live one — finishing page 1 is not the same as returning to it.
+let reached = 0;
 let cursor = -1;
 let busy = false;
 let holdTimer = 0;
@@ -69,6 +76,8 @@ export function startStory() {
   clearTimers();
   stopAudio();
   setWaiting(false);
+  completed.clear();
+  reached = 0;
 
   mounted.clear();
   layerHost.replaceChildren();
@@ -95,6 +104,36 @@ function next() {
 export function advance() {
   if (!waiting) return false;
   next();
+  return true;
+}
+
+// The Next button. On a first read it is only offered where the old chevron
+// was — the step that closes a page — and turning it is advance(). On a page
+// already read it is offered from the first step, and pressing it mid-page
+// jumps to the head of the NEXT page rather than to the next step: the button
+// says "next page", so that is what it must do wherever it is pressed.
+export function nextPage() {
+  if (busy || !waiting) return false;
+
+  const entry = timeline[cursor];
+  if (!entry) return false;
+  if (entry.last) { next(); return true; }
+
+  const target = timeline.findIndex((e) => e.p === entry.p + 1);
+  // Past the last page (only reachable re-reading it): the chapter is over.
+  if (target < 0) { finish(); return true; }
+  go(target);
+  return true;
+}
+
+// The Prev button: back to the top of the page before this one, replaying it.
+// Offered on any page with one behind it, finished or not.
+export function prevPage() {
+  if (busy) return false;
+
+  const entry = timeline[cursor];
+  if (!entry || entry.p === 0) return false;
+  go(timeline.findIndex((e) => e.p === entry.p - 1));
   return true;
 }
 
@@ -132,7 +171,10 @@ function go(target) {
 
   clearTimers();
   endTransition();
-  setWaiting(false);
+  // A page already read to the end offers its Next button from the first
+  // step — the reader has seen this one, so they may move on at will. A page
+  // being read for the first time earns it at the end, as ever.
+  setWaiting(completed.has(entry.p));
   cursor = target;
   busy = true;
 
@@ -174,17 +216,35 @@ function paint(entry, { silent = false } = {}) {
 
   beatLine.textContent = step.beat ?? "";
   markProgress(entry);
+  reached = Math.max(reached, entry.p);
+  paintNav(entry);
 
   // A transition already scheduled its own cues, so don't wipe them.
   if (!silent) clearCues();
   playCues(cues[step.id]);
 
   if (entry.last) {
-    // Closes the page: hand control back once the line has finished.
-    revealTimer = window.setTimeout(() => setWaiting(true), step.reveal ?? 0);
+    // Closes the page: hand control back once the line has finished, and
+    // remember the page has been read — from here on it offers Next at once.
+    revealTimer = window.setTimeout(() => {
+      completed.add(entry.p);
+      setWaiting(true);
+      paintNav(entry);
+    }, step.reveal ?? 0);
   } else {
     holdTimer = window.setTimeout(next, step.hold ?? 2400);
   }
+}
+
+// Which page-turn buttons this step offers. Prev is live wherever there is a
+// page behind this one. On the first page it has nothing to point at: a first
+// read shows nothing but Next, and only coming back to it from further on puts
+// the dim, dead Prev beside the live one, so the return presents the pair
+// rather than one orphan. Next's own visibility is `waiting`, handled by
+// setWaiting().
+function paintNav(entry) {
+  hud.classList.toggle("has-prev", entry.p > 0);
+  hud.classList.toggle("has-prev-off", entry.p === 0 && reached > 0);
 }
 
 // The chevron and the whole-stage tap target live or die together, so the
@@ -746,7 +806,7 @@ function effect(layer) {
 function finish() {
   clearTimers();
   setWaiting(false);
-  hud.classList.remove("is-active");
+  hud.classList.remove("is-active", "has-prev", "has-prev-off");
   markProgress(timeline[timeline.length - 1]);
   onComplete();
 }
