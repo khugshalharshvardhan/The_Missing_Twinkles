@@ -182,6 +182,10 @@ function go(target) {
   // Both are per-beat states and the pane is reused: is-cleared left behind
   // would arrive with the next screen and hide a bubble that was never shown.
   back.classList.remove("is-begun", "is-cleared");
+  // The lamp beat is staged as a small camera move — the scene eases a step
+  // right while the lamp comes in from the left edge (see game.css). Only the
+  // tap beat pans; the lit beat after it holds the frame it settled on.
+  back.classList.toggle("is-lampstage", screen.interact === "lamp");
 
   panes[front].classList.remove("is-active");
   back.classList.add("is-active");
@@ -674,9 +678,14 @@ function flock(pane, screen) {
   const FLYERS = 5;
   const FLY_MS = 1400;
 
+  // They come in from the side of frame the lamp is NOT on, so the flight
+  // sweeps the whole scene — with the lamp at the left edge, that is past the
+  // watching pair from the right.
+  const fromRight = to.x < FRAME_W / 2;
   for (let i = 0; i < FLYERS; i++) {
     const delay = i * 170;
-    const from = { x: -70 - (i % 3) * 40, y: 150 + ((i * 89) % 330) };
+    const edge = 70 + (i % 3) * 40;
+    const from = { x: fromRight ? FRAME_W + edge : -edge, y: 150 + ((i * 89) % 330) };
     // The arc: a straight line lifted at its midpoint, higher for the flyers
     // that start lower, so the paths fan instead of stacking.
     const lift = 60 + ((i * 53) % 70);
@@ -933,9 +942,11 @@ function counterCard(mode) {
 function numberLineStrip(screen) {
   const wrap = document.createElement("div");
   wrap.className = "numline";
-  // The counting beat draws it empty and reveals it once the last twinkle is
-  // in; the two beats after it are already showing it when they arrive.
-  if (screen && screen.id !== "3.2") wrap.classList.add("is-live");
+  // The counting beat draws it empty and reveals it once the last one is in;
+  // the two beats after it are already showing it when they arrive. Keyed by
+  // the interaction, not the tutorial's id, so every level's counting beat
+  // behaves the same.
+  if (screen && screen.interact !== "count") wrap.classList.add("is-live");
   place(wrap, { x: numberLine.x, y: numberLine.y, w: numberLine.w, h: 130 });
 
   const rule = document.createElement("i");
@@ -957,8 +968,10 @@ function numberLineStrip(screen) {
   }
 
   // What the earlier beats already put there. Marked `is-placed`, so it does
-  // not fly in a second time — only the beat's own number arrives.
-  if (screen && screen.id === "16" && counted) {
+  // not fly in a second time — only the beat's own number arrives. Keyed by
+  // role, not the tutorial's id ("16"), so the guess lands NEXT TO the answer
+  // on every level's readback of it, not just the tutorial's.
+  if (screen && screen.role === "guessline" && counted) {
     level(mark(wrap, "total", counted), true);
   }
 

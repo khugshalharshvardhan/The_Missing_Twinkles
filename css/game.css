@@ -952,6 +952,30 @@
   animation: none;
 }
 
+/* The lamp beat's camera move. The whole pane eases a step to the right while
+   the lamp slides in from the left edge and settles — so the lamp reads as
+   walked up to, not as materialising mid-frame. The pan lives on the PANE, not
+   the layers: a layer animation would stomp the transform a flipped layer
+   (is-flipped) carries, and child transforms compose with the pane's anyway. */
+#game .scene.is-lampstage {
+  animation: g-stage-pan 1100ms cubic-bezier(0.22, 0.9, 0.3, 1) both;
+}
+
+#game .scene.is-lampstage .lamp {
+  animation: g-lamp-arrive 1000ms cubic-bezier(0.22, 0.9, 0.3, 1) 150ms both;
+}
+
+@keyframes g-stage-pan {
+  from { transform: translateX(-46px); }
+  to   { transform: translateX(0); }
+}
+
+@keyframes g-lamp-arrive {
+  from { transform: translateX(-380px); opacity: 0; }
+  55%  { opacity: 1; }
+  to   { transform: translateX(0); opacity: 1; }
+}
+
 #game .fx-flicker { animation: g-flicker 2.4s ease-in-out infinite; }
 #game .fx-lamp-glow { animation: g-lamp-glow 3.2s ease-in-out infinite; }
 
@@ -986,6 +1010,8 @@
    ========================================================= */
 
 @media (prefers-reduced-motion: reduce) {
+  #game .scene.is-lampstage,
+  #game .scene.is-lampstage .lamp,
   #game .fx-breathe,
   #game .fx-breathe-slow,
   #game .fx-flicker,

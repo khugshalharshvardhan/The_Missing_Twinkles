@@ -36,10 +36,10 @@ element change):
 | # | Place (bg art) | Element (art) | Count | Status |
 |---|---|---|---|---|
 | 0 | Mystery Town clearing (`bg_night.webp`) | Twinkles/fireflies (`firefly.webp`) | 8 | ✅ built (tutorial: Neel models the guess, extra intro/handover beats) |
-| 1 | Glowberry meadow (`bg_meadow.webp`) | Glowberries (`glowberry.webp`) | 10 (the sheet's number, since the pad takes two digits) | ✅ built |
-| 2 | Starlight Valley (`bg_valley.webp`) | Starlights (`starlight.webp`) | 6 | ✅ built — **three VO stems still to generate, see §7** |
-| 3 | Magic Seed Forest (`bg_forest.webp`) | Magic seeds (`magicseed.webp`) | 9 | ✅ built — **three VO stems still to generate, see §7** |
-| 4 | Glowflower Meadow (`bg_flowermeadow.webp`) | Glow flowers (`glowflower.webp`) | 11 | ✅ built — **VO stems still to generate, see §7** |
+| 1 | Glowberry meadow (`bg_meadow.webp`) | Glowberries (`glowberry.webp`) | 7 (the sheet's formation diagram) | ✅ built |
+| 2 | Starlight Valley (`bg_valley.webp`) | Starlights (`starlight.webp`) | 6 | ✅ built |
+| 3 | Magic Seed Forest (`bg_forest.webp`) | Magic seeds (`magicseed.webp`) | 9 | ✅ built |
+| 4 | Glowflower Meadow (`bg_flowermeadow.webp`) | Glow flowers (`glowflower.webp`) | 11 | ✅ built |
 | — | Post-game: town shining again, Neel drifts to the bakery, The End | | | ⬜ prompt 4 |
 
 Sheet order is starlight → flowers → seeds. Flowers (11) needed the multi-digit
@@ -49,10 +49,11 @@ All four rounds are in; only the post-game screens (prompt 4) remain.
 **Formations as built** (sheet rule: equal spacing, gentle bob allowed, home
 positions fixed). Every group centres on (998, 357), so the countable is always
 in the same place on screen whatever it happens to be that round:
-- Glowberries 10 → 3 staggered rows of 3 on a 250px pitch, plus a tenth on a
-  fourth row under the middle column. It shipped as nine; the tenth was added
-  when the pad learned two digits, and the nine above it kept their measured
-  positions rather than being re-spaced.
+- Fireflies 8 → two rows of 4 (210px across — 250 runs the row into the
+  characters — 250 down); replaced the original loose scatter to match the
+  sheet's diagram.
+- Glowberries 7 → the sheet's zigzag: one / a pair / one / a pair / one,
+  singles centred between the pair columns (pairs 340 apart, rows every 115).
 - Starlights 6 → two rows of 3, 250px pitch across and down
 - Magic seeds 9 → 3 × 3 grid, 250px pitch across and down
 - Glow flowers 11 → 5 / 1 / 5, on a **160px** pitch, not 250: five across at
@@ -126,6 +127,13 @@ Game engine facts that matter when adding a level:
 - Animations that must stay in sync are clocked by CSS vars (`--swarm-at`,
   `--d`); randomness is deterministic (`noise(i,k)` sin-hash — **never
   Math.random**, replays must be identical).
+- The lamp beats are staged with the lamp at the LEFT of frame and both
+  characters on the right (`LAMP_STAGE` anchor in screens.js; Agni's pose is
+  flipped so she points at it). The tap beat plays a small camera move — the
+  pane pans right while the lamp slides in from the left edge (`is-lampstage`
+  in game.js/game.css) — and the flock sweeps in from whichever side of frame
+  the lamp is not on. NOTE: the pan animation lives on the PANE; putting a
+  transform animation on `.layer` stomps the `is-flipped` transform.
 
 ---
 
@@ -211,31 +219,10 @@ the tutorial's `lamp_off.webp`/`lamp_on.webp` at their existing coordinates**
 
 ## 7. Parked / open items
 
-- **VO still to record — one batch covers all of it.** Everything below is
-  already written into `tools/gen-vo-game.js` and wired into
-  `js/data/audio.js`; the machine levels 2–4 were built on has no Node, so the
-  generator could not be run. The game plays correctly without them —
-  `loadAudio` skips a missing clip with a warning and `clipLength` returns 0,
-  so those beats fall back to their reading-time hold — but Agni or Neel is
-  silent on exactly these lines:
-  - `vo_l2_*`, `vo_l3_*`, `vo_l4_*` — the three element-naming lines per level
-    (nine clips)
-  - `vo_nn_10` … `vo_nn_19` — Neel's read-back, now reachable because the pad
-    takes two digits (ten clips)
-  - `vo_l1_total` — **an existing clip that is now wrong.** It says "There are
-    nine glowberries" and level 1 totals ten. The bubble reads the total from
-    the level so the words on screen were right the moment `BERRY_TOTAL`
-    changed; only the audio is stale. Re-record it with the rest.
-
-  To finish, on a machine with Node:
-
-      npm i msedge-tts
-      node tools/gen-vo-game.js vo_game_raw
-
-  then normalise the new files as §4 step 6 describes (silence-trim +
-  two-pass loudnorm to −16 LUFS, padding clips under ~3s first) and drop them
-  into `assets/audios/vo/`. No code change is needed — the cue ids are already
-  wired, so the lines start speaking as soon as the files exist.
+- ~~VO to record~~ **Done.** All 20 clips (`vo_l2/3/4_*`, `vo_nn_10..19`, and a
+  re-take of `vo_l1_total` saying "seven") were generated with the same
+  msedge-tts casting, silence-trimmed and loudness-matched to −16 LUFS like the
+  rest. `tools/gen-vo-game.js` stays the source of truth for a full regen.
 
 - **Two things headless verification cannot see**, so don't read their absence
   from a screenshot as a bug: the `enter: "magic"` materialise-in on every

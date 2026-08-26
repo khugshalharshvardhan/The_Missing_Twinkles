@@ -104,7 +104,7 @@ const LINES = [
   // bubble reads the total from the level, so the words on screen were right
   // the moment BERRY_TOTAL changed — only the audio still says nine.
   { id: "vo_l1_total", who: "agni", screen: "p4", mood: "announcing it, pleased",
-    text: "There are ten glowberries.", rate: 0.98, pitch: "+12%", volume: 98 },
+    text: "There are seven glowberries.", rate: 0.98, pitch: "+12%", volume: 98 },
 
   // ---- Level 2 — the starlights, in the valley. Same three lines again, and
   // the same prosody as their twinkle and glowberry versions: across the whole
