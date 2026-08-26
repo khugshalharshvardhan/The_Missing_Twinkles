@@ -49,6 +49,7 @@ const TOTAL_SCROLL = (PACE * (WALK_MS - SETTLE_MS + SETTLE_MS / 2.7)) / 1000;
 
 let scroll = 0;
 let raf = 0;
+let liveRaf = 0;
 let startedAt = 0;
 let lastNow = 0;
 let heldAt = 0;
@@ -102,7 +103,12 @@ export function startWalk(dest = destinations.clearing) {
   // Put everyone at their opening mark before the first paint, so the walk
   // never shows a frame with the pair at their arrival positions.
   place(0, 0);
-  host.classList.add("is-live");
+  // A frame late on purpose: the act flip has just taken #walk out of
+  // display:none, and an opacity set in that same style pass does not
+  // transition — the walk popped to full instead of fading, and a strip still
+  // decoding showed as a blank flash. One frame later the 0 -> 1 fade really
+  // runs, with the outgoing act visible underneath it the whole way.
+  liveRaf = requestAnimationFrame(() => host.classList.add("is-live"));
 
   clearCues();
   playCues(cues["walk"]);
@@ -114,7 +120,9 @@ export function startWalk(dest = destinations.clearing) {
 
 export function stopWalk() {
   cancelAnimationFrame(raf);
+  cancelAnimationFrame(liveRaf);
   raf = 0;
+  liveRaf = 0;
 }
 
 export function endWalk() {

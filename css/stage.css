@@ -107,12 +107,20 @@ body {
 }
 
 [data-act="story"] #game,
-[data-act="walk"] #game {
+[data-act="story"] #walk {
   display: none;
 }
 
-[data-act="story"] #walk {
-  display: none;
+/* Leaving a level for the walk is a cross-fade, not a cut: the game stays
+   painted underneath while the path fades up over it. display:none here
+   blanked the screen for the first frames of the walk, while its strips were
+   still decoding and had nothing to show. */
+#game {
+  transition: opacity var(--speed-slow) var(--ease);
+}
+
+[data-act="walk"] #game {
+  opacity: 0;
 }
 
 [data-act="walk"] #transition,
