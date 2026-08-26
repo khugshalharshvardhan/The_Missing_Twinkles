@@ -241,7 +241,7 @@ const THE_CLEARING = {
    of them stand together on the right, watching it light. Mirrors TOGETHER's
    trick — a deliberate move between beats reads as staging, not sliding. */
 const LAMP_STAGE = {
-  agni: { cx: 1160, feet: 989 },
+  agni: { cx: 1059, feet: 978 },
   neel: { cx: 1618, feet: 984 }
 };
 
@@ -419,7 +419,7 @@ export const screens = [
     fireflies: { x: 631, y: 177, dim: true },
     bubble: {
       art: `${IMG}bub_3.webp`, who: "agni",
-      x: 220, y: 216, w: 557, h: 282,
+      x: 127, y: 229, w: 557, h: 282,
       artInset: [18.09, 9.69, 0, 17.06],
       text: "Let us count to check."
     }
@@ -441,7 +441,7 @@ export const screens = [
     hint: { src: `${SHARED}hand_nudge.svg`, x: 593, y: 160, w: 308.396, h: 308.396 },
     bubble: {
       art: `${IMG}bub_32.webp`, who: "agni",
-      x: 190, y: 248, w: 489, h: 256,
+      x: 172, y: 252, w: 489, h: 256,
       text: "Tap each twinkle to count."
     }
   },
@@ -465,7 +465,7 @@ export const screens = [
     counter: "total",
     bubble: {
       art: `${IMG}bub_4.webp`, who: "agni",
-      x: 254, y: 251, w: 417, h: 201,
+      x: 199, y: 269, w: 417, h: 201,
       text: "There are {total} twinkles"
     }
   },
@@ -489,7 +489,7 @@ export const screens = [
     counter: "guess",
     bubble: {
       art: `${IMG}bub_4.webp`, who: "agni",
-      x: 254, y: 251, w: 417, h: 201,
+      x: 199, y: 269, w: 417, h: 201,
       text: "You guessed {guess}."
     }
   },
@@ -521,14 +521,14 @@ export const screens = [
       { src: `${IMG}agni_g.webp`, x: 70, y: 489, w: 554, h: 512, fill: CROP.agniG, flipX: true, fx: "breathe" },
       { src: `${IMG}neel_f.webp`, x: 1294, y: 412, w: 465, h: 589, fx: "breathe-slow" }
     ],
-    lamp: { src: `${IMG}lamp_off.webp`, x: 150, y: 74, w: 272, h: 927, fill: CROP.lampOff },
+    lamp: { src: `${IMG}lamp_off.webp`, x: 195, y: 74, w: 272, h: 927, fill: CROP.lampOff },
     // What the tap turns it into — the exact art screen 5.2 stands on, so the
     // cut after it changes nothing about the lamp. It fades up as the flock
     // arrives; see strike() in js/game.js.
-    lampLit: { src: `${IMG}lamp_on.webp`, x: 142, y: 74, w: 287, h: 927, fill: CROP.lampOn },
+    lampLit: { src: `${IMG}lamp_on.webp`, x: 187, y: 74, w: 287, h: 927, fill: CROP.lampOn },
     // Where the glass is, in frame coordinates — the point the flock pours
     // into. Matches the element 5.2 draws inside it.
-    lampGlass: { x: 245, y: 254 },
+    lampGlass: { x: 290, y: 254 },
     bubble: {
       art: `${IMG}bub_51.webp`, who: "agni",
       x: 806, y: 210, w: 383, h: 184,
@@ -544,8 +544,8 @@ export const screens = [
       BG,
       { src: `${IMG}agni_g.webp`, x: 70, y: 489, w: 554, h: 512, fill: CROP.agniG, flipX: true, fx: "breathe" },
       { src: `${IMG}neel_turn.webp`, x: 1125, y: 391, w: 735, h: 610, fill: CROP.neelTurn, flipX: true, fx: "breathe-slow" },
-      { src: `${IMG}lamp_on.webp`, x: 142, y: 74, w: 287, h: 927, fill: CROP.lampOn, fx: "lamp-glow" },
-      { src: FIREFLY_SRC, x: 175, y: 263, w: 25, h: 26, fx: "flicker" }
+      { src: `${IMG}lamp_on.webp`, x: 187, y: 74, w: 287, h: 927, fill: CROP.lampOn, fx: "lamp-glow" },
+      { src: FIREFLY_SRC, x: 220, y: 263, w: 25, h: 26, fx: "flicker" }
     ],
     // Neel's cheer, drawn as well as heard: comic-burst lettering over his
     // head as he spins to the lit lamp. Matches vo_neel_yay in the cue table.
@@ -652,7 +652,7 @@ export const level1 = [
     fireflies: { x: 773, y: 140, dim: true },
     bubble: {
       art: `${IMG}bub_3.webp`, who: "agni",
-      x: 220, y: 216, w: 557, h: 282,
+      x: 127, y: 229, w: 557, h: 282,
       artInset: [18.09, 9.69, 0, 17.06],
       text: "Let us count to check."
     }
@@ -674,7 +674,7 @@ export const level1 = [
     hint: { src: `${SHARED}hand_nudge.svg`, x: 909, y: 123, w: 308.396, h: 308.396 },
     bubble: {
       art: `${IMG}bub_32.webp`, who: "agni",
-      x: 190, y: 248, w: 489, h: 256,
+      x: 172, y: 252, w: 489, h: 256,
       text: "Tap each glowberry to count."
     }
   },
@@ -695,7 +695,7 @@ export const level1 = [
     counter: "total",
     bubble: {
       art: `${IMG}bub_4.webp`, who: "agni",
-      x: 254, y: 251, w: 417, h: 201,
+      x: 199, y: 269, w: 417, h: 201,
       text: "There are {total} glowberries"
     }
   },
@@ -716,7 +716,7 @@ export const level1 = [
     counter: "guess",
     bubble: {
       art: `${IMG}bub_4.webp`, who: "agni",
-      x: 254, y: 251, w: 417, h: 201,
+      x: 199, y: 269, w: 417, h: 201,
       text: "You guessed {guess}."
     }
   },
@@ -748,9 +748,9 @@ export const level1 = [
       { src: `${IMG}agni_g.webp`, x: 70, y: 489, w: 554, h: 512, fill: CROP.agniG, flipX: true, fx: "breathe" },
       { src: `${IMG}neel_f.webp`, x: 1294, y: 412, w: 465, h: 589, fx: "breathe-slow" }
     ],
-    lamp: { src: `${IMG}lamp_off.webp`, x: 150, y: 74, w: 272, h: 927, fill: CROP.lampOff },
-    lampLit: { src: `${IMG}lamp_on.webp`, x: 142, y: 74, w: 287, h: 927, fill: CROP.lampOn },
-    lampGlass: { x: 245, y: 254 },
+    lamp: { src: `${IMG}lamp_off.webp`, x: 205, y: 74, w: 272, h: 927, fill: CROP.lampOff },
+    lampLit: { src: `${IMG}lamp_on.webp`, x: 197, y: 74, w: 287, h: 927, fill: CROP.lampOn },
+    lampGlass: { x: 300, y: 254 },
     bubble: {
       art: `${IMG}bub_51.webp`, who: "agni",
       x: 806, y: 210, w: 383, h: 184,
@@ -766,10 +766,10 @@ export const level1 = [
       BG_MEADOW,
       { src: `${IMG}agni_g.webp`, x: 70, y: 489, w: 554, h: 512, fill: CROP.agniG, flipX: true, fx: "breathe" },
       { src: `${IMG}neel_turn.webp`, x: 1125, y: 391, w: 735, h: 610, fill: CROP.neelTurn, flipX: true, fx: "breathe-slow" },
-      { src: `${IMG}lamp_on.webp`, x: 142, y: 74, w: 287, h: 927, fill: CROP.lampOn, fx: "lamp-glow" },
+      { src: `${IMG}lamp_on.webp`, x: 197, y: 74, w: 287, h: 927, fill: CROP.lampOn, fx: "lamp-glow" },
       // The caught one, glowing in the glass where the tutorial kept its
       // firefly.
-      { src: BERRY_SRC, x: 176, y: 262, w: 24, h: 27, fx: "flicker" }
+      { src: BERRY_SRC, x: 231, y: 262, w: 24, h: 27, fx: "flicker" }
     ],
     shout: { text: "YAY!", x: 1420, y: 236, tilt: -9 }
   }
@@ -842,7 +842,7 @@ export const level2 = [
     fireflies: { x: 688, y: 174, dim: true },
     bubble: {
       art: `${IMG}bub_3.webp`, who: "agni",
-      x: 220, y: 216, w: 557, h: 282,
+      x: 127, y: 229, w: 557, h: 282,
       artInset: [18.09, 9.69, 0, 17.06],
       text: "Let us count to check."
     }
@@ -867,7 +867,7 @@ export const level2 = [
     hint: { src: `${SHARED}hand_nudge.svg`, x: 654, y: 157, w: 308.396, h: 308.396 },
     bubble: {
       art: `${IMG}bub_32.webp`, who: "agni",
-      x: 190, y: 248, w: 489, h: 256,
+      x: 172, y: 252, w: 489, h: 256,
       text: "Tap each starlight to count."
     }
   },
@@ -888,7 +888,7 @@ export const level2 = [
     counter: "total",
     bubble: {
       art: `${IMG}bub_4.webp`, who: "agni",
-      x: 254, y: 251, w: 417, h: 201,
+      x: 199, y: 269, w: 417, h: 201,
       text: "There are {total} starlights"
     }
   },
@@ -909,7 +909,7 @@ export const level2 = [
     counter: "guess",
     bubble: {
       art: `${IMG}bub_4.webp`, who: "agni",
-      x: 254, y: 251, w: 417, h: 201,
+      x: 199, y: 269, w: 417, h: 201,
       text: "You guessed {guess}."
     }
   },
@@ -941,9 +941,9 @@ export const level2 = [
       { src: `${IMG}agni_g.webp`, x: 70, y: 489, w: 554, h: 512, fill: CROP.agniG, flipX: true, fx: "breathe" },
       { src: `${IMG}neel_f.webp`, x: 1294, y: 412, w: 465, h: 589, fx: "breathe-slow" }
     ],
-    lamp: { src: `${IMG}lamp_off.webp`, x: 150, y: 74, w: 272, h: 927, fill: CROP.lampOff },
-    lampLit: { src: `${IMG}lamp_on.webp`, x: 142, y: 74, w: 287, h: 927, fill: CROP.lampOn },
-    lampGlass: { x: 245, y: 254 },
+    lamp: { src: `${IMG}lamp_off.webp`, x: 205, y: 74, w: 272, h: 927, fill: CROP.lampOff },
+    lampLit: { src: `${IMG}lamp_on.webp`, x: 197, y: 74, w: 287, h: 927, fill: CROP.lampOn },
+    lampGlass: { x: 300, y: 254 },
     bubble: {
       art: `${IMG}bub_51.webp`, who: "agni",
       x: 806, y: 210, w: 383, h: 184,
@@ -959,11 +959,11 @@ export const level2 = [
       BG_VALLEY,
       { src: `${IMG}agni_g.webp`, x: 70, y: 489, w: 554, h: 512, fill: CROP.agniG, flipX: true, fx: "breathe" },
       { src: `${IMG}neel_turn.webp`, x: 1125, y: 391, w: 735, h: 610, fill: CROP.neelTurn, flipX: true, fx: "breathe-slow" },
-      { src: `${IMG}lamp_on.webp`, x: 142, y: 74, w: 287, h: 927, fill: CROP.lampOn, fx: "lamp-glow" },
+      { src: `${IMG}lamp_on.webp`, x: 197, y: 74, w: 287, h: 927, fill: CROP.lampOn, fx: "lamp-glow" },
       // The caught one, in the glass where level 1 keeps its berry. Sized to
       // the star's aspect on the same centre (845, 276), so all three levels
       // hold their catch in exactly the same spot.
-      { src: STARLIGHT_SRC, x: 175, y: 263, w: 26, h: 25, fx: "flicker" }
+      { src: STARLIGHT_SRC, x: 230, y: 263, w: 26, h: 25, fx: "flicker" }
     ],
     shout: { text: "YAY!", x: 1420, y: 236, tilt: -9 }
   }
@@ -991,7 +991,7 @@ export const level3 = [
     ],
     // Same clock as p1 and s1: her line ends (vo_g_guess runs 500 to 2581),
     // the bubble goes, the seeds materialise, hold five seconds, vanish.
-    fireflies: { x: 696, y: 40, enter: "magic", at: 2650 },
+    fireflies: { x: 696, y: 85, enter: "magic", at: 2650 },
     dwell: 10000,
     bubble: {
       art: `${IMG}bub_15.webp`, who: "agni",
@@ -1031,10 +1031,10 @@ export const level3 = [
       { src: `${IMG}agni_point.webp`, x: 64, y: 498, w: 525, h: 501, fill: CROP.agniPoint, fx: "breathe" },
       { src: `${IMG}neel_d.webp`, x: 1344, y: 417, w: 449, h: 581, fill: CROP.neelD, flipX: true, fx: "breathe-slow" }
     ],
-    fireflies: { x: 696, y: 40, dim: true },
+    fireflies: { x: 696, y: 85, dim: true },
     bubble: {
       art: `${IMG}bub_3.webp`, who: "agni",
-      x: 220, y: 216, w: 557, h: 282,
+      x: 127, y: 229, w: 557, h: 282,
       artInset: [18.09, 9.69, 0, 17.06],
       text: "Let us count to check."
     }
@@ -1050,15 +1050,15 @@ export const level3 = [
       { src: `${IMG}agni_g.webp`, x: 80, y: 490, w: 554, h: 512, fill: CROP.agniG, fx: "breathe" },
       { src: `${IMG}neel_c.webp`, x: 1385, y: 484, w: 396, h: 557, fill: CROP.neelC, fx: "breathe-slow" }
     ],
-    fireflies: { x: 696, y: 40 },
+    fireflies: { x: 696, y: 85 },
     counter: "guess",
     numberLine: true,
     // The hand keeps level 1's offset from the first countable's own box
     // origin (-34, -17), so it points at the first seed the same way.
-    hint: { src: `${SHARED}hand_nudge.svg`, x: 662, y: 23, w: 308.396, h: 308.396 },
+    hint: { src: `${SHARED}hand_nudge.svg`, x: 662, y: 68, w: 308.396, h: 308.396 },
     bubble: {
       art: `${IMG}bub_32.webp`, who: "agni",
-      x: 190, y: 248, w: 489, h: 256,
+      x: 172, y: 252, w: 489, h: 256,
       text: "Tap each magic seed to count."
     }
   },
@@ -1075,11 +1075,11 @@ export const level3 = [
       { src: `${IMG}agni_f.webp`, x: 9, y: 481, w: 605, h: 553, fx: "breathe" },
       { src: `${IMG}neel_f.webp`, x: 1372, y: 424, w: 465, h: 589, fx: "breathe-slow" }
     ],
-    fireflies: { x: 696, y: 40 },
+    fireflies: { x: 696, y: 85 },
     counter: "total",
     bubble: {
       art: `${IMG}bub_4.webp`, who: "agni",
-      x: 254, y: 251, w: 417, h: 201,
+      x: 199, y: 269, w: 417, h: 201,
       text: "There are {total} magic seeds"
     }
   },
@@ -1096,11 +1096,11 @@ export const level3 = [
       { src: `${IMG}agni_f.webp`, x: 9, y: 481, w: 605, h: 553, fx: "breathe" },
       { src: `${IMG}neel_f.webp`, x: 1372, y: 424, w: 465, h: 589, fx: "breathe-slow" }
     ],
-    fireflies: { x: 696, y: 40 },
+    fireflies: { x: 696, y: 85 },
     counter: "guess",
     bubble: {
       art: `${IMG}bub_4.webp`, who: "agni",
-      x: 254, y: 251, w: 417, h: 201,
+      x: 199, y: 269, w: 417, h: 201,
       text: "You guessed {guess}."
     }
   },
@@ -1224,7 +1224,7 @@ export const level4 = [
     fireflies: { x: 623, y: 138, dim: true },
     bubble: {
       art: `${IMG}bub_3.webp`, who: "agni",
-      x: 220, y: 216, w: 557, h: 282,
+      x: 127, y: 229, w: 557, h: 282,
       artInset: [18.09, 9.69, 0, 17.06],
       text: "Let us count to check."
     }
@@ -1248,7 +1248,7 @@ export const level4 = [
     hint: { src: `${SHARED}hand_nudge.svg`, x: 589, y: 121, w: 308.396, h: 308.396 },
     bubble: {
       art: `${IMG}bub_32.webp`, who: "agni",
-      x: 190, y: 248, w: 489, h: 256,
+      x: 172, y: 252, w: 489, h: 256,
       text: "Tap each glow flower to count."
     }
   },
@@ -1269,7 +1269,7 @@ export const level4 = [
     counter: "total",
     bubble: {
       art: `${IMG}bub_4.webp`, who: "agni",
-      x: 254, y: 251, w: 417, h: 201,
+      x: 199, y: 269, w: 417, h: 201,
       text: "There are {total} glow flowers"
     }
   },
@@ -1290,7 +1290,7 @@ export const level4 = [
     counter: "guess",
     bubble: {
       art: `${IMG}bub_4.webp`, who: "agni",
-      x: 254, y: 251, w: 417, h: 201,
+      x: 199, y: 269, w: 417, h: 201,
       text: "You guessed {guess}."
     }
   },

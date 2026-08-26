@@ -135,10 +135,14 @@ export function devGoto(at, levelIndex) {
   hold = false;
   if (levelIndex != null) {
     const next = levels[Math.min(Math.max(levelIndex, 0), levels.length - 1)];
-    // A fresh level is a fresh run: its own count, its own guess.
-    if (next !== round) { round = next; guess = null; counted = 0; }
+    if (next !== round) round = next;
   }
   const i = Math.min(Math.max(at, 0), round.screens.length - 1);
+  // Every jump is a fresh run of the beat, same level or not: a stale count
+  // left the counter starting full and completion unable to fire, and a stale
+  // guess quoted a number the player never typed on this pass.
+  guess = null;
+  counted = 0;
   standInGuess(i);
   go(i);
   return round.screens[i];
@@ -179,9 +183,12 @@ function go(target) {
   index = target;
   busy = true;
   back.replaceChildren(render(screen));
-  // Both are per-beat states and the pane is reused: is-cleared left behind
-  // would arrive with the next screen and hide a bubble that was never shown.
-  back.classList.remove("is-begun", "is-cleared");
+  // All are per-beat states and the pane is reused: is-cleared left behind
+  // would arrive with the next screen and hide a bubble that was never shown,
+  // and is-counted-out left behind hides every count number on the NEXT count
+  // beat that lands on this pane — which is why the numbers showed on some
+  // levels and not others: it depended on pane parity.
+  back.classList.remove("is-begun", "is-cleared", "is-line", "is-counted-out");
   // The lamp beat is staged as a small camera move — the scene eases a step
   // right while the lamp comes in from the left edge (see game.css). Only the
   // tap beat pans; the lit beat after it holds the frame it settled on.
@@ -227,6 +234,16 @@ function speak(screen) {
   // caption, and a caption is a poor guide to how long it takes to say.
   const lineEnd = cue?.vo ? (cue.vo.at ?? 0) + clipLength(cue.vo.id) : 0;
   const wait = Math.max(readingTime(screen), lineEnd + VO_TAIL, spokenEnd + VO_TAIL);
+
+  // The count beat's swarm cannot be tapped over the instruction — the pane
+  // holds .is-line until the line has been said, which also holds the hint
+  // hand back, so the invitation appears at the moment tapping starts working.
+  if (screen.interact === "count") {
+    panes[front].classList.add("is-line");
+    revealTimers.push(window.setTimeout(() => {
+      panes[front].classList.remove("is-line");
+    }, Math.max(lineEnd + 250, 800)));
+  }
 
   // Dialogue reads itself; an interactive beat waits for the player, and its
   // own handler queues the advance once the player is done.
@@ -544,6 +561,7 @@ function swarm(screen) {
 
 function tally(el) {
   if (el.classList.contains("is-counted")) return;
+  if (el.closest(".scene")?.classList.contains("is-line")) return;
 
   el.classList.add("is-counted");
   el.disabled = true;

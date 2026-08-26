@@ -415,12 +415,17 @@
   left: 50%;
   bottom: 100%;
   transform: translate(-50%, 6px) scale(0.6);
-  margin-bottom: 2px;
-  color: var(--paper);
-  font-size: 40px;
+  margin-bottom: 4px;
+  color: #ffe9ad;
+  font-size: 56px;
   line-height: 1;
   opacity: 0;
-  text-shadow: 0 0 12px rgba(255, 176, 66, 0.9), 0 3px 0 rgba(0, 0, 0, 0.45);
+  /* Comic-set like the YAY: a heavy dark outline under a warm fill, so the
+     number reads against every element — white alone vanished into the bright
+     ones (star, berry, flower). */
+  -webkit-text-stroke: 7px #3a2313;
+  paint-order: stroke;
+  text-shadow: 0 0 16px rgba(255, 176, 66, 0.95), 0 4px 0 rgba(0, 0, 0, 0.4);
   transition: opacity 220ms var(--ease), transform 220ms var(--ease),
     font-size 420ms var(--ease);
   pointer-events: none;
@@ -916,6 +921,17 @@
 /* The tap hand. The file is a still — the one it replaces was an animated
    WebP — so the tap is done here: down onto the twinkle, held for a beat, and
    back up, with a pause before it asks again. */
+/* While the count beat's line is still being said, the swarm is not tappable
+   and the hint hand is held back — both open together when the line ends. */
+#game .scene.is-line .swarm .firefly {
+  pointer-events: none;
+  cursor: default;
+}
+
+#game .scene.is-line .hint {
+  opacity: 0;
+}
+
 #game .hint {
   pointer-events: none;
   transition: opacity var(--speed-slow) var(--ease);
