@@ -99,8 +99,12 @@ const LINES = [
   { id: "vo_l1_tapcount", who: "agni", screen: "p3.2", mood: "showing how, kind",
     text: "Tap each glowberry to count.", rate: 0.94, pitch: "+8%", volume: 96 },
 
+  // TEN, not nine: the glowberries went up to the sheet's ten when the pad
+  // learned two digits, so this clip has to be re-recorded along with it. The
+  // bubble reads the total from the level, so the words on screen were right
+  // the moment BERRY_TOTAL changed — only the audio still says nine.
   { id: "vo_l1_total", who: "agni", screen: "p4", mood: "announcing it, pleased",
-    text: "There are nine glowberries.", rate: 0.98, pitch: "+12%", volume: 98 },
+    text: "There are ten glowberries.", rate: 0.98, pitch: "+12%", volume: 98 },
 
   // ---- Level 2 — the starlights, in the valley. Same three lines again, and
   // the same prosody as their twinkle and glowberry versions: across the whole
@@ -124,7 +128,17 @@ const LINES = [
     text: "Tap each magic seed to count.", rate: 0.94, pitch: "+8%", volume: 96 },
 
   { id: "vo_l3_total", who: "agni", screen: "m4", mood: "announcing it, pleased",
-    text: "There are nine magic seeds.", rate: 0.98, pitch: "+12%", volume: 98 }
+    text: "There are nine magic seeds.", rate: 0.98, pitch: "+12%", volume: 98 },
+
+  // ---- Level 4 — the glow flowers. The last of these three, same prosody.
+  { id: "vo_l4_howmany", who: "agni", screen: "f2", mood: "asking the player, open and unhurried",
+    text: "How many glow flowers were there?", rate: 0.92, pitch: "+10%", volume: 94 },
+
+  { id: "vo_l4_tapcount", who: "agni", screen: "f3.2", mood: "showing how, kind",
+    text: "Tap each glow flower to count.", rate: 0.94, pitch: "+8%", volume: 96 },
+
+  { id: "vo_l4_total", who: "agni", screen: "f4", mood: "announcing it, pleased",
+    text: "There are eleven glow flowers.", rate: 0.98, pitch: "+12%", volume: 98 }
 ];
 
 // Counting out loud is the point of the game, so Agni says each number as the
@@ -144,12 +158,18 @@ const NUMBERS = [
   text: word, rate: 1.0, pitch: "+14%", volume: 98
 }));
 
-// Neel needs his own nought to nine. He is the one who says "Hmm... I think
+// Neel needs his own nought to nineteen. He is the one who says "Hmm... I think
 // there were —" and the number that finishes his sentence has to be his voice,
 // not hers. Same prosody as vo_g_ithink, so the stem and the number are one
-// breath rather than two takes. Only single digits: the pad cannot make more.
+// breath rather than two takes.
+//
+// Ten to nineteen are new: the pad used to take a single tap, so ten was the
+// first number he could not be asked to read. It caps at nineteen because that
+// is where the pad caps (keypad.maxValue in js/data/screens.js).
 const NEEL_NUMBERS = [
-  "zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"
+  "zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine",
+  "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen",
+  "seventeen", "eighteen", "nineteen"
 ].map((word, n) => ({
   id: `vo_nn_${n}`, who: "neel", screen: "2.2", mood: "still thinking it over",
   text: word, rate: 0.86, pitch: "+24%", volume: 92

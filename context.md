@@ -36,20 +36,28 @@ element change):
 | # | Place (bg art) | Element (art) | Count | Status |
 |---|---|---|---|---|
 | 0 | Mystery Town clearing (`bg_night.webp`) | Twinkles/fireflies (`firefly.webp`) | 8 | ✅ built (tutorial: Neel models the guess, extra intro/handover beats) |
-| 1 | Glowberry meadow (`bg_meadow.webp`) | Glowberries (`glowberry.webp`) | 9 (sheet says 10 — see §7 keypad) | ✅ built |
+| 1 | Glowberry meadow (`bg_meadow.webp`) | Glowberries (`glowberry.webp`) | 10 (the sheet's number, since the pad takes two digits) | ✅ built |
 | 2 | Starlight Valley (`bg_valley.webp`) | Starlights (`starlight.webp`) | 6 | ✅ built — **three VO stems still to generate, see §7** |
 | 3 | Magic Seed Forest (`bg_forest.webp`) | Magic seeds (`magicseed.webp`) | 9 | ✅ built — **three VO stems still to generate, see §7** |
-| 4 | Glowflower Meadow (`GlowflowerMeadow.png` → convert) | Glow flowers (`flower.png` → convert) | 11 — **needs multi-digit keypad first** | ⬜ prompt 3 |
+| 4 | Glowflower Meadow (`bg_flowermeadow.webp`) | Glow flowers (`glowflower.webp`) | 11 | ✅ built — **VO stems still to generate, see §7** |
 | — | Post-game: town shining again, Neel drifts to the bakery, The End | | | ⬜ prompt 4 |
 
-Sheet order is starlight → flowers → seeds, but flowers (11) is blocked on the
-single-digit keypad, so the prompts below do starlight → seeds → (keypad + flowers).
+Sheet order is starlight → flowers → seeds. Flowers (11) needed the multi-digit
+keypad first, so they were built last: starlight → seeds → (keypad + flowers).
+All four rounds are in; only the post-game screens (prompt 4) remain.
 
-**Formations** (sheet rule: equal spacing, gentle bob allowed, home positions fixed):
-- Starlights 6 → two rows of 3
-- Magic seeds 9 → 3 × 3 grid
-- Glow flowers 11 → 5 / 1 / 5 (a row of 5, one alone in the middle, a row of 5)
-- (Glowberries shipped as 3 staggered rows of 3 on a 250px pitch — copy that pitch.)
+**Formations as built** (sheet rule: equal spacing, gentle bob allowed, home
+positions fixed). Every group centres on (998, 357), so the countable is always
+in the same place on screen whatever it happens to be that round:
+- Glowberries 10 → 3 staggered rows of 3 on a 250px pitch, plus a tenth on a
+  fourth row under the middle column. It shipped as nine; the tenth was added
+  when the pad learned two digits, and the nine above it kept their measured
+  positions rather than being re-spaced.
+- Starlights 6 → two rows of 3, 250px pitch across and down
+- Magic seeds 9 → 3 × 3 grid, 250px pitch across and down
+- Glow flowers 11 → 5 / 1 / 5, on a **160px** pitch, not 250: five across at
+  250 is 1116px wide and runs through both characters, who leave about 750px of
+  clear frame between them. At 160 the group is exactly 750 wide.
 
 **Verdict tiers as built** (js/game.js `VERDICTS`): exact → "Spot on!", off ≤2 →
 "That was close!", further → "Good try — now we know!", no guess → "Let us try
@@ -203,20 +211,28 @@ the tutorial's `lamp_off.webp`/`lamp_on.webp` at their existing coordinates**
 
 ## 7. Parked / open items
 
-- **Levels 2 and 3 have six VO stems not yet recorded** — `vo_l2_howmany`,
-  `vo_l2_tapcount`, `vo_l2_total`, `vo_l3_howmany`, `vo_l3_tapcount` and
-  `vo_l3_total`. All six are written into `tools/gen-vo-game.js` and referenced
-  from `js/data/audio.js`, but the machine these levels were built on has no
-  Node installed, so the generator could not be run. Both levels play correctly
-  without them — `loadAudio` skips a missing clip with a warning and
-  `clipLength` returns 0, so those beats fall back to their reading-time hold —
-  but Agni is silent on exactly those six lines. To finish, on a machine with
-  Node:
+- **VO still to record — one batch covers all of it.** Everything below is
+  already written into `tools/gen-vo-game.js` and wired into
+  `js/data/audio.js`; the machine levels 2–4 were built on has no Node, so the
+  generator could not be run. The game plays correctly without them —
+  `loadAudio` skips a missing clip with a warning and `clipLength` returns 0,
+  so those beats fall back to their reading-time hold — but Agni or Neel is
+  silent on exactly these lines:
+  - `vo_l2_*`, `vo_l3_*`, `vo_l4_*` — the three element-naming lines per level
+    (nine clips)
+  - `vo_nn_10` … `vo_nn_19` — Neel's read-back, now reachable because the pad
+    takes two digits (ten clips)
+  - `vo_l1_total` — **an existing clip that is now wrong.** It says "There are
+    nine glowberries" and level 1 totals ten. The bubble reads the total from
+    the level so the words on screen were right the moment `BERRY_TOTAL`
+    changed; only the audio is stale. Re-record it with the rest.
+
+  To finish, on a machine with Node:
 
       npm i msedge-tts
       node tools/gen-vo-game.js vo_game_raw
 
-  then normalise the six new files as §4 step 6 describes (silence-trim +
+  then normalise the new files as §4 step 6 describes (silence-trim +
   two-pass loudnorm to −16 LUFS, padding clips under ~3s first) and drop them
   into `assets/audios/vo/`. No code change is needed — the cue ids are already
   wired, so the lines start speaking as soon as the files exist.
@@ -230,14 +246,15 @@ the tutorial's `lamp_off.webp`/`lamp_on.webp` at their existing coordinates**
   for `clearing` and `meadow` too). Verify the walk by riding the previous
   level's last beat to its end instead; that path renders correctly.
 
-- **Multi-digit keypad**: the pad takes ONE digit (tapping a number is the whole
-  interaction — no readout, no Next key). That caps every total at 9: it's why
-  glowberries shipped as 9 (sheet: 10) and why glow flowers (11) is blocked.
-  The sheet's answer: child types digits, readout shows them, a **Next/✓ key**
-  confirms. The keypad art (`keypad.webp`) has room where the readout used to
-  be; `key_ok.webp` exists for the confirm key. Neel's number VO
-  (`vo_nn_*`) only covers 0–9 — generate 10–19 when this lands. Agni's
-  (`vo_n_*`) covers 0–20.
+- **Multi-digit keypad — done.** The pad now builds a number: digits land in the
+  readout (`keypad.display`, back in the place Figma drew it, which is why the
+  key rows returned to their designed y), clear empties it, and the tick
+  submits. Capped at 2 digits and 19 (`keypad.maxDigits` / `maxValue`). Neel's
+  read-back range followed it (`NEEL_SPOKEN_MAX` in js/game.js). One digit plus
+  the tick is two taps, so the tutorial and levels 1–3 cost one extra tap and
+  gain a readout showing the choice before it is committed. Clear was added
+  alongside confirm — it is not in the sheet's note, but a mistyped digit had
+  to be survivable once a guess takes two taps to build.
 - Five-tier verdicts (§1) — deviation, upgrade on request.
 - On-screen counts spoken during tapping go through `sayNumber()` — already
   handles any total ≤ 20 for Agni.
@@ -245,6 +262,10 @@ the tutorial's `lamp_off.webp`/`lamp_on.webp` at their existing coordinates**
 ---
 
 ## 8. Prompts for the remaining work — give ONE at a time
+
+**Prompts 1, 2 and 3 are done** (levels 2, 3, the multi-digit keypad and level
+4). Only **prompt 4** below is outstanding. The three finished prompts are kept
+for the record of what was asked.
 
 ---
 

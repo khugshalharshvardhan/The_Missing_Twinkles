@@ -711,6 +711,10 @@
   pointer-events: none;
 }
 
+/* The guess being built, centred in the readout plate. Sits inside the
+   readout's own layer box, so it is centred on the art rather than on the
+   panel. Empty until the first digit — an empty readout is the honest state,
+   and a placeholder there would read as a number the child had not typed. */
 #game .keypad__value {
   position: absolute;
   inset: 0;
@@ -766,17 +770,21 @@
   animation: key-invite 2.1s ease-in-out infinite;
 }
 
-/* Left to right, top to bottom, so the swell travels across the pad. */
-#game .key:nth-child(2) { animation-delay: 0ms; }
-#game .key:nth-child(3) { animation-delay: 90ms; }
-#game .key:nth-child(4) { animation-delay: 180ms; }
-#game .key:nth-child(5) { animation-delay: 120ms; }
-#game .key:nth-child(6) { animation-delay: 210ms; }
-#game .key:nth-child(7) { animation-delay: 300ms; }
+/* Left to right, top to bottom, so the swell travels across the pad. The panel
+   holds its frame AND its readout before the keys, so the twelve keys are
+   children 3 to 14 — 90ms a column, 60ms a row. */
+#game .key:nth-child(3) { animation-delay: 0ms; }
+#game .key:nth-child(4) { animation-delay: 90ms; }
+#game .key:nth-child(5) { animation-delay: 180ms; }
+#game .key:nth-child(6) { animation-delay: 60ms; }
+#game .key:nth-child(7) { animation-delay: 150ms; }
 #game .key:nth-child(8) { animation-delay: 240ms; }
-#game .key:nth-child(9) { animation-delay: 330ms; }
-#game .key:nth-child(10) { animation-delay: 420ms; }
-#game .key:nth-child(11) { animation-delay: 360ms; }
+#game .key:nth-child(9) { animation-delay: 120ms; }
+#game .key:nth-child(10) { animation-delay: 210ms; }
+#game .key:nth-child(11) { animation-delay: 300ms; }
+#game .key:nth-child(12) { animation-delay: 180ms; }
+#game .key:nth-child(13) { animation-delay: 270ms; }
+#game .key:nth-child(14) { animation-delay: 360ms; }
 
 /* Once a guess is in, every key is disabled — it should stop asking. */
 #game .key:disabled { animation: none; }

@@ -436,6 +436,56 @@ export const gameCues = {
   "m5.2": {
     sfx: [{ id: "catch_pop", at: 120, gain: 0.8 }, { id: "twinkle", at: 500, gain: 0.45 }],
     vo: { id: "vo_neel_yay", at: 260, pan: 0.5 }
+  },
+
+  /* ---------- Level 4 — the glow flowers ----------
+     The cue sheet a fourth and last time, offsets unchanged. Only the three
+     lines that name the element are new (vo_l4_*). */
+
+  // Look closely — the flowers open after the line (fireflies.at 2650 in
+  // screens.js) and vanish on their sparkle 5.9s later.
+  "f1": {
+    bed: "bed_main",
+    sfx: [{ id: "twinkle", at: 2750, gain: 0.4, pan: 0.2 },
+      { id: "sparkle", at: 8600, gain: 0.6 }],
+    vo: { id: "vo_g_guess", at: 500, pan: -0.5 }
+  },
+  // The keypad — the pad appears once the question is asked (keypadAt 2350).
+  "f2": {
+    sfx: [{ id: "page_air", at: 0, gain: 0.5 },
+      { id: "sparkle", at: 2350, gain: 0.55 }],
+    vo: { id: "vo_l4_howmany", at: 500, pan: -0.6 }
+  },
+
+  // ---- counting ----
+  "f3": {
+    vo: { id: "vo_g_count", at: 500, pan: -0.5 }
+  },
+  "f3.2": {
+    sfx: [{ id: "page_air", at: 0, gain: 0.5 }],
+    vo: { id: "vo_l4_tapcount", at: 500, pan: -0.5 }
+  },
+
+  // ---- the total, and how the guess did ----
+  "f4": {
+    sfx: [{ id: "sparkle", at: 420, gain: 0.5 }],
+    vo: { id: "vo_l4_total", at: 500, pan: -0.5 }
+  },
+  // Stem only: js/game.js says the number after it (role "guessline").
+  "f16": {
+    vo: { id: "vo_g_youguessed", at: 500, pan: -0.5 }
+  },
+  // The verdict line and its chime are chosen in js/game.js.
+  "f4.2": {},
+
+  // ---- the lamp ----
+  "f5.1": {
+    sfx: [{ id: "page_air", at: 0, gain: 0.5 }],
+    vo: { id: "vo_g_taplamp", at: 500, pan: -0.5 }
+  },
+  "f5.2": {
+    sfx: [{ id: "catch_pop", at: 120, gain: 0.8 }, { id: "twinkle", at: 500, gain: 0.45 }],
+    vo: { id: "vo_neel_yay", at: 260, pan: 0.5 }
   }
 };
 

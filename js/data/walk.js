@@ -226,5 +226,11 @@ export const destinations = {
     // it is fitted to the berry guide's height, which is what keeps every
     // guide travelling the weave at the same apparent size.
     guide: { src: `${GAME}magicseed.webp`, w: 82, h: 105 }
+  },
+  flowermeadow: {
+    arrive: `${GAME}bg_flowermeadow.webp`,
+    // Fitted to the berry guide's height like the other two, so all four
+    // guides travel the weave at the same apparent size.
+    guide: { src: `${GAME}glowflower.webp`, w: 99, h: 105 }
   }
 };

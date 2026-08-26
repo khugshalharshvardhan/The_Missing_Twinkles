@@ -332,14 +332,19 @@ function verdict() {
 // bubble, which is showing the figure anyway.
 const SPOKEN_MAX = 20;
 
+// Neel's own range. It stopped at nine while the pad took a single tap; with
+// two digits it follows the pad's own ceiling (keypad.maxValue), so whatever a
+// child can type, he can read back.
+const NEEL_SPOKEN_MAX = 19;
+
 // `who` picks whose voice says it. Agni counts the twinkles and reads the
-// total; Neel has his own nought to nine, because he is the one who says "Hmm...
+// total; Neel has his own numbers too, because he is the one who says "Hmm...
 // I think there were —" and the number that finishes his sentence cannot be in
-// her voice. His only go to nine, which is all the pad can make.
+// her voice.
 function sayNumber(n, at, pan, who = "agni") {
   if (!Number.isInteger(n) || n < 0) return false;
   const neel = who === "neel";
-  if (n > (neel ? 9 : SPOKEN_MAX)) return false;
+  if (n > (neel ? NEEL_SPOKEN_MAX : SPOKEN_MAX)) return false;
   playVo({ id: `${neel ? "vo_nn_" : "vo_n_"}${n}`, at, pan });
   return true;
 }
@@ -725,6 +730,11 @@ function flock(pane, screen) {
 // The panel and ten digits. The guess is a single number, so tapping one is the
 // whole interaction: it lands in the counter and the beat moves on. No readout
 // above them, and nothing to clear or confirm.
+// The pad builds a number rather than taking a single tap: digits land in the
+// readout, clear empties it, and the tick sends it to the counter. One digit
+// plus the tick is still only two taps, so the tutorial and levels 1-3 — where
+// every answer is a single digit — cost the child one extra tap and gain a
+// readout that shows what they have chosen before they commit to it.
 function keypadPanel(screen) {
   const panel = document.createElement("div");
   panel.className = "keypad";
@@ -733,49 +743,113 @@ function keypadPanel(screen) {
 
   panel.append(imageLayer(keypad.frame, "layer"));
 
+  // The readout, and the digits so far inside it.
+  const display = imageLayer(keypad.display, "layer");
+  const value = document.createElement("span");
+  value.className = "keypad__value";
+  display.append(value);
+  panel.append(display);
+
+  let entry = "";
+  const confirmKeys = [];
+
+  const paint = () => {
+    value.textContent = entry;
+    // The tick has nothing to send until at least one digit is in.
+    confirmKeys.forEach((k) => {
+      k.classList.toggle("is-off", entry.length === 0);
+      k.disabled = entry.length === 0;
+    });
+  };
+
+  const commit = (btn) => {
+    if (guess !== null || !entry.length) return;
+
+    guess = Number(entry);
+    playSfx({ id: "key_confirm", gain: 0.85 });
+
+    // The number is seen going where it is going: a copy of it lifts off the
+    // readout and flies to the counter, and only when it arrives does the
+    // counter take the value. Without that the figure simply appeared in the
+    // corner and nothing connected the two. It flies from the readout now
+    // rather than from a key, because the readout is where the child last saw
+    // the number they chose.
+    const pane = panel.closest(".scene");
+    pane?.querySelectorAll(".key").forEach((k) => { k.disabled = true; });
+    pane?.querySelector(".hint")?.classList.add("is-done");
+    flyToCounter(pane, value.textContent ? value : btn, guess);
+    advanceIn(GUESS_LANDS);
+  };
+
   keypad.keys.forEach((key) => {
     const btn = document.createElement("button");
+    const action = key.clear ? "clear" : key.confirm ? "confirm" : "digit";
 
     btn.type = "button";
-    btn.className = "key";
+    btn.className = `key${key.clear ? " key--clear" : ""}${key.confirm ? " key--confirm" : ""}`;
     place(btn, { x: key.x, y: key.y, w: keypad.keyW, h: keypad.keyH });
-    btn.setAttribute("aria-label", key.label);
+    btn.setAttribute("aria-label",
+      key.clear ? "Clear" : key.confirm ? "Confirm guess" : key.label);
 
+    // A digit key's art carries Figma's crop; the two action keys fill their
+    // own box, as their art is drawn to it.
     const img = document.createElement("img");
-    img.className = "fill fill--crop";
-    img.src = keypad.keyArt;
+    img.src = key.clear ? keypad.clearArt : key.confirm ? keypad.confirmArt : keypad.keyArt;
     img.alt = "";
-    img.style.left = keypad.keyFill.left;
-    img.style.top = keypad.keyFill.top;
-    img.style.width = keypad.keyFill.width;
-    img.style.height = keypad.keyFill.height;
+    if (action === "digit") {
+      img.className = "fill fill--crop";
+      img.style.left = keypad.keyFill.left;
+      img.style.top = keypad.keyFill.top;
+      img.style.width = keypad.keyFill.width;
+      img.style.height = keypad.keyFill.height;
+    } else {
+      img.className = "fill";
+    }
     btn.append(img);
 
-    const label = document.createElement("span");
-    label.className = "key__label";
-    label.textContent = key.label;
-    btn.append(label);
+    if (key.confirm) {
+      // The tick is art, not a glyph, and keeps its designed box.
+      const tick = document.createElement("img");
+      tick.className = "key__tick";
+      tick.src = keypad.tick.src;
+      tick.alt = "";
+      place(tick, keypad.tick);
+      btn.append(tick);
+      confirmKeys.push(btn);
+    } else {
+      const label = document.createElement("span");
+      label.className = "key__label";
+      label.textContent = key.label;
+      btn.append(label);
+    }
 
     btn.addEventListener("click", () => {
-      if (guess !== null) return; // one guess; ignore a second tap mid-advance
+      if (guess !== null) return; // committed; ignore taps mid-advance
 
-      guess = Number(key.label);
-      playSfx({ id: "key_confirm", gain: 0.85 });
+      if (action === "confirm") return commit(btn);
 
-      // The number is seen going where it is going: a copy of the digit lifts
-      // off the key and flies to the counter, and only when it arrives does the
-      // counter take the value. Without that the figure simply appeared in the
-      // corner and nothing connected the two.
-      const pane = panel.closest(".scene");
-      pane?.querySelectorAll(".key").forEach((k) => { k.disabled = true; });
-      pane?.querySelector(".hint")?.classList.add("is-done");
-      flyToCounter(pane, btn, guess);
-      advanceIn(GUESS_LANDS);
+      if (action === "clear") {
+        if (!entry.length) return;
+        entry = "";
+        playSfx({ id: "key_clear", gain: 0.7 });
+        return paint();
+      }
+
+      // A digit. Refuse the tap rather than silently dropping it once the
+      // guess is as long or as large as it is allowed to be.
+      if (entry.length >= keypad.maxDigits) return;
+      const next = (entry + key.label).replace(/^0+(?=\d)/, "");
+      if (Number(next) > keypad.maxValue) return;
+
+      entry = next;
+      playSfx({ id: "key_press", gain: 0.6 });
+      paint();
     });
 
     panel.append(btn);
   });
 
+  paint();
   return panel;
 }
 

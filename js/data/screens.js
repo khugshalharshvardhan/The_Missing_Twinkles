@@ -54,15 +54,22 @@ const BG = { src: `${IMG}bg_night.webp`, x: 0, y: 0, w: FRAME_W, h: FRAME_H };
    (assets/images/location2.png, cut to the frame) stands in for bg_night, and
    the swarm slots hold glowberries instead of twinkles.
 
-   NINE for now, not the sheet's ten: the pad takes a single digit, so until
-   multi-digit entry lands (parked, per discussion) every total has to stay
-   below ten. Bump BERRY_TOTAL and add a row when it does.
+   TEN, the sheet's number, now that the pad takes two digits. It shipped as
+   nine while a guess was a single tap and no total could exceed the pad.
 
    The layout is the sheet's design rule made literal — "keep equal spacing" —
    three staggered rows on a 250px pitch, against the tutorial's loose scatter.
    Boxes are 112x123 to match the berry art's own aspect (224x246), since the
-   fill covers the box. */
-export const BERRY_TOTAL = 9;
+   fill covers the box.
+
+   The tenth sits on a fourth row of its own, under the middle column. The nine
+   above it keep the exact positions they were measured into, and the swarm
+   origin on level 1's beats is unchanged, so nothing that was already right
+   has moved — the group simply grows downward, from 423px tall to 573, which
+   still leaves it clear of the number line at y 866. A fourth row of one is
+   not the tidiest shape for ten; the alternative was re-spacing all nine, and
+   keeping nine hand-placed positions was worth more than the symmetry. */
+export const BERRY_TOTAL = 10;
 export const BERRY_SRC = `${IMG}glowberry.webp`;
 
 export const BERRIES = [
@@ -74,7 +81,8 @@ export const BERRIES = [
   { x: 625, y: 150, w: 112, h: 123 },
   { x: 0, y: 300, w: 112, h: 123 },
   { x: 250, y: 300, w: 112, h: 123 },
-  { x: 500, y: 300, w: 112, h: 123 }
+  { x: 500, y: 300, w: 112, h: 123 },
+  { x: 250, y: 450, w: 112, h: 123 }
 ];
 
 const BG_MEADOW = { src: `${IMG}bg_meadow.webp`, x: 0, y: 0, w: FRAME_W, h: FRAME_H };
@@ -137,6 +145,42 @@ export const MAGICSEEDS = [
 ];
 
 const BG_FOREST = { src: `${IMG}bg_forest.webp`, x: 0, y: 0, w: FRAME_W, h: FRAME_H };
+
+/* ---- Level 4 — the glow flowers, in the meadow ----
+
+   ELEVEN, from the design sheet, in its formation for eleven: a row of five, a
+   single one centred below them, and a row of five under that. Spacing is
+   equal across and down, as the sheet asks.
+
+   The pitch is 160 rather than the 250 levels 2 and 3 use, because five across
+   at 250 would be 1116px wide and run straight through both characters — Agni's
+   box ends at 634 and Neel's starts at 1385, leaving about 750px of clear
+   frame between them. At 160 the group is exactly 750 wide and 437 tall, which
+   is the same band the berries occupy (737 x 573), so the widest formation in
+   the game still sits in the same window as the others.
+
+   Boxes are 110x117, close to the flower art's own aspect (1794x1900 of the
+   source, cropped from its transparent margin). That is 12,870 square pixels
+   against a berry's 13,776 — slightly smaller, which is what buys the 50px of
+   air between five flowers in a row. */
+export const FLOWER_TOTAL = 11;
+export const FLOWER_SRC = `${IMG}glowflower.webp`;
+
+export const GLOWFLOWERS = [
+  { x: 0, y: 0, w: 110, h: 117 },
+  { x: 160, y: 0, w: 110, h: 117 },
+  { x: 320, y: 0, w: 110, h: 117 },
+  { x: 480, y: 0, w: 110, h: 117 },
+  { x: 640, y: 0, w: 110, h: 117 },
+  { x: 320, y: 160, w: 110, h: 117 },
+  { x: 0, y: 320, w: 110, h: 117 },
+  { x: 160, y: 320, w: 110, h: 117 },
+  { x: 320, y: 320, w: 110, h: 117 },
+  { x: 480, y: 320, w: 110, h: 117 },
+  { x: 640, y: 320, w: 110, h: 117 }
+];
+
+const BG_FLOWERMEADOW = { src: `${IMG}bg_flowermeadow.webp`, x: 0, y: 0, w: FRAME_W, h: FRAME_H };
 
 /* ---- crop transforms, named where a pose is reused ---- */
 
@@ -1103,6 +1147,196 @@ export const level3 = [
   }
 ];
 
+/* ---- Level 4 — the glow flowers, in the meadow ----
+
+   The last round, and the nine beats one final time. Held identical to the
+   three before it in everything but place, countable, name and ids: the pair
+   stand on THE_CLEARING marks, and the keypad, counter, number line and lamp
+   keep their coordinates.
+
+   This is the round the two-digit keypad exists for — eleven is the first total
+   a child cannot type with one tap. The number line runs to twelve for the
+   same reason (see `numberLine`), so eleven has a tick of its own to land on. */
+export const level4 = [
+  // ---- F1 — look before you guess ----
+  {
+    id: "f1",
+    anchor: THE_CLEARING,
+    layers: [
+      BG_FLOWERMEADOW,
+      { src: `${IMG}agni_b.webp`, x: 25, y: 445, w: 553, h: 614, fill: CROP.agniB, fx: "breathe" },
+      { src: `${IMG}neel_think.webp`, x: 1327, y: 395, w: 372, h: 617, fill: CROP.neelThink, flipX: true, fx: "breathe-slow" }
+    ],
+    // Same clock as every other look beat: her line ends (vo_g_guess runs 500
+    // to 2581), the bubble goes, the flowers open, hold five seconds, vanish.
+    fireflies: { x: 623, y: 138, enter: "magic", at: 2650 },
+    dwell: 10000,
+    bubble: {
+      art: `${IMG}bub_15.webp`, who: "agni",
+      x: 224, y: 107, w: 514, h: 277,
+      text: "Look closely and make a guess!"
+    }
+  },
+
+  // ---- F2 — the keypad. Two digits, for the first time in the game ----
+  {
+    id: "f2",
+    anchor: THE_CLEARING,
+    interact: "keypad",
+    counter: "guess",
+    layers: [
+      BG_FLOWERMEADOW,
+      { src: `${IMG}agni_talk.webp`, x: 10, y: 485, w: 576, h: 532, fill: CROP.agniTalk, flipX: true, fx: "breathe" },
+      { src: `${IMG}neel_think.webp`, x: 1369, y: 386, w: 372, h: 617, fill: CROP.neelThink, flipX: true, fx: "breathe-slow" }
+    ],
+    keypad: true,
+    // vo_l4_howmany runs 500 to 2250, as the other three questions do.
+    keypadAt: 2350,
+    bubble: {
+      art: `${IMG}bub_15.webp`, who: "agni",
+      x: 0, y: 185, w: 514, h: 277,
+      text: "How many glow flowers were there?"
+    }
+  },
+
+  // ---- F3 — the flowers come back, dim, to be counted ----
+  {
+    id: "f3",
+    anchor: THE_CLEARING,
+    counter: "guess",
+    layers: [
+      BG_FLOWERMEADOW,
+      { src: `${IMG}agni_point.webp`, x: 64, y: 498, w: 525, h: 501, fill: CROP.agniPoint, fx: "breathe" },
+      { src: `${IMG}neel_d.webp`, x: 1344, y: 417, w: 449, h: 581, fill: CROP.neelD, flipX: true, fx: "breathe-slow" }
+    ],
+    fireflies: { x: 623, y: 138, dim: true },
+    bubble: {
+      art: `${IMG}bub_3.webp`, who: "agni",
+      x: 220, y: 216, w: 557, h: 282,
+      artInset: [18.09, 9.69, 0, 17.06],
+      text: "Let us count to check."
+    }
+  },
+
+  // ---- F3.2 — tap each one ----
+  {
+    id: "f3.2",
+    anchor: THE_CLEARING,
+    interact: "count",
+    layers: [
+      BG_FLOWERMEADOW,
+      { src: `${IMG}agni_g.webp`, x: 80, y: 490, w: 554, h: 512, fill: CROP.agniG, fx: "breathe" },
+      { src: `${IMG}neel_c.webp`, x: 1385, y: 484, w: 396, h: 557, fill: CROP.neelC, fx: "breathe-slow" }
+    ],
+    fireflies: { x: 623, y: 138 },
+    counter: "guess",
+    numberLine: true,
+    // The hand keeps level 1's offset from the first countable's own box
+    // origin (-34, -17), so it points at the first flower the same way.
+    hint: { src: `${SHARED}hand_nudge.svg`, x: 589, y: 121, w: 308.396, h: 308.396 },
+    bubble: {
+      art: `${IMG}bub_32.webp`, who: "agni",
+      x: 190, y: 248, w: 489, h: 256,
+      text: "Tap each glow flower to count."
+    }
+  },
+
+  // ---- F4 — the true count ----
+  {
+    id: "f4",
+    anchor: THE_CLEARING,
+    role: "totalline",
+    numberLine: true,
+    dwell: 3800,
+    layers: [
+      BG_FLOWERMEADOW,
+      { src: `${IMG}agni_f.webp`, x: 9, y: 481, w: 605, h: 553, fx: "breathe" },
+      { src: `${IMG}neel_f.webp`, x: 1372, y: 424, w: 465, h: 589, fx: "breathe-slow" }
+    ],
+    fireflies: { x: 623, y: 138 },
+    counter: "total",
+    bubble: {
+      art: `${IMG}bub_4.webp`, who: "agni",
+      x: 254, y: 251, w: 417, h: 201,
+      text: "There are {total} glow flowers"
+    }
+  },
+
+  // ---- F16 — the guess, next to the truth ----
+  {
+    id: "f16",
+    anchor: THE_CLEARING,
+    role: "guessline",
+    numberLine: true,
+    dwell: 4600,
+    layers: [
+      BG_FLOWERMEADOW,
+      { src: `${IMG}agni_f.webp`, x: 9, y: 481, w: 605, h: 553, fx: "breathe" },
+      { src: `${IMG}neel_f.webp`, x: 1372, y: 424, w: 465, h: 589, fx: "breathe-slow" }
+    ],
+    fireflies: { x: 623, y: 138 },
+    counter: "guess",
+    bubble: {
+      art: `${IMG}bub_4.webp`, who: "agni",
+      x: 254, y: 251, w: 417, h: 201,
+      text: "You guessed {guess}."
+    }
+  },
+
+  // ---- F4.2 — the verdict ----
+  {
+    id: "f4.2",
+    anchor: THE_CLEARING,
+    role: "verdict",
+    layers: [
+      BG_FLOWERMEADOW,
+      { src: `${IMG}agni_d.webp`, x: 84, y: 474, w: 342, h: 560, fill: CROP.agniD, fx: "breathe" },
+      { src: `${IMG}neel_f.webp`, x: 1355, y: 408, w: 465, h: 589, fx: "breathe-slow" }
+    ],
+    bubble: {
+      art: `${IMG}bub_42.webp`, who: "agni",
+      x: 276, y: 222, w: 376, h: 226,
+      text: "{verdict}"
+    }
+  },
+
+  // ---- F5.1 — tap the lamp ----
+  {
+    id: "f5.1",
+    anchor: THE_CLEARING,
+    interact: "lamp",
+    layers: [
+      BG_FLOWERMEADOW,
+      { src: `${IMG}agni_g.webp`, x: 70, y: 489, w: 554, h: 512, fill: CROP.agniG, fx: "breathe" },
+      { src: `${IMG}neel_f.webp`, x: 1294, y: 412, w: 465, h: 589, fx: "breathe-slow" }
+    ],
+    lamp: { src: `${IMG}lamp_off.webp`, x: 807, y: 74, w: 272, h: 927, fill: CROP.lampOff },
+    lampLit: { src: `${IMG}lamp_on.webp`, x: 799, y: 74, w: 287, h: 927, fill: CROP.lampOn },
+    lampGlass: { x: 902, y: 254 },
+    bubble: {
+      art: `${IMG}bub_51.webp`, who: "agni",
+      x: 314, y: 300, w: 383, h: 184,
+      text: "Tap the lamp!"
+    }
+  },
+
+  // ---- F5.2 — the lamp catches a flower, and Neel cheers ----
+  {
+    id: "f5.2",
+    anchor: THE_CLEARING,
+    layers: [
+      BG_FLOWERMEADOW,
+      { src: `${IMG}agni_g.webp`, x: 70, y: 489, w: 554, h: 512, fill: CROP.agniG, fx: "breathe" },
+      { src: `${IMG}neel_turn.webp`, x: 1125, y: 391, w: 735, h: 610, fill: CROP.neelTurn, flipX: true, fx: "breathe-slow" },
+      { src: `${IMG}lamp_on.webp`, x: 799, y: 74, w: 287, h: 927, fill: CROP.lampOn, fx: "lamp-glow" },
+      // The caught one, sized to the flower's aspect on the shared centre
+      // (845, 276) — the same spot all four levels hold their catch.
+      { src: FLOWER_SRC, x: 832, y: 262, w: 25, h: 27, fx: "flicker" }
+    ],
+    shout: { text: "YAY!", x: 1264, y: 258, tilt: -9 }
+  }
+];
+
 /* ---- the levels, in playing order ----
 
    Everything js/game.js needs to run a round with a different element in a
@@ -1155,6 +1389,18 @@ export const levels = [
     swarmClass: "is-seeds",
     walkTo: "forest",
     screens: level3
+  },
+  {
+    name: "Level 4 — the glow flowers",
+    word: "Glow flower",
+    total: FLOWER_TOTAL,
+    swarmSrc: FLOWER_SRC,
+    layout: GLOWFLOWERS,
+    // Violet petals round a gold face: the glow the swarm styling was built for
+    // is already drawn into the art, so it needs no restyling of its own.
+    swarmClass: "",
+    walkTo: "flowermeadow",
+    screens: level4
   }
 ];
 
@@ -1170,32 +1416,53 @@ export const keypad = {
   // The panel behind the keys, back where Figma has it. Without it the digits
   // floated on the background with nothing holding them together.
   frame: { src: `${IMG}keypad.webp`, x: 665, y: 184, w: 553, h: 691 },
+  // The readout, back in the place Figma drew it (the `num` layer, 108:51).
+  // A guess can now be two digits, so there has to be somewhere to see it
+  // being built — and with the readout back, the key rows return to their own
+  // designed y rather than the 60px lift they were given while the top of the
+  // panel was empty.
+  display: { src: `${IMG}num_display.webp`, x: 766, y: 289, w: 356, h: 121, fill: CROP.numDisplay },
   keyW: 116,
   keyH: 85,
   keyArt: `${IMG}key.webp`,
   keyFill: CROP.key,
-  // Every row is 60px above where Figma has it. The readout used to fill the top
-  // of the panel and the keys sat under it; with the readout gone that left a
-  // third of the panel empty. Measured off the art: the cream face runs from
-  // y 267 to 802, centre 534, and the key block's own centre was 594.
+  // Both action keys are back too, in the bottom row Figma gives them: clear
+  // on the left, confirm on the right. Confirm is what a two-digit guess needs
+  // — nothing else can know whether "1" is the whole answer or the start of
+  // "11" — and clear is what makes a mistyped digit survivable, which matters
+  // more now that a guess takes two taps to build.
+  clearArt: `${IMG}key_x.webp`,
+  confirmArt: `${IMG}key_ok.webp`,
+  // The tick sits inset inside its key, at the size Figma gives it (146:12).
+  tick: { src: `${IMG}tick.svg`, x: 30, y: 14, w: 56, h: 56 },
+  // A guess is capped at two digits and at 19 — the largest number Neel can
+  // read back (vo_nn_0..19), and comfortably past every total in the game.
+  maxDigits: 2,
+  maxValue: 19,
   keys: [
-    { label: "1", x: 766, y: 361 },
-    { label: "2", x: 886, y: 361 },
-    { label: "3", x: 1006, y: 361 },
-    { label: "4", x: 766, y: 448 },
-    { label: "5", x: 886, y: 448 },
-    { label: "6", x: 1006, y: 448 },
-    { label: "7", x: 766, y: 535 },
-    { label: "8", x: 886, y: 535 },
-    { label: "9", x: 1006, y: 535 },
-    { label: "0", x: 886, y: 622 }
+    { label: "1", x: 766, y: 421 },
+    { label: "2", x: 886, y: 421 },
+    { label: "3", x: 1006, y: 421 },
+    { label: "4", x: 766, y: 508 },
+    { label: "5", x: 886, y: 508 },
+    { label: "6", x: 1006, y: 508 },
+    { label: "7", x: 766, y: 595 },
+    { label: "8", x: 886, y: 595 },
+    { label: "9", x: 1006, y: 595 },
+    { label: "X", x: 766, y: 682, clear: true },
+    { label: "0", x: 886, y: 682 },
+    { label: "OK", x: 1006, y: 682, confirm: true }
   ]
 };
 
 /* The number line under the count, where the guess and the answer are put side
    by side. Eleven marks, 0 to 10, kept clear of both characters — Agni's box
    ends at 634 and Neel's begins at 1385. */
-export const numberLine = { x: 500, y: 866, w: 900, max: 10 };
+// Runs to twelve, which is the largest total in the game (eleven glow flowers)
+// with one tick to spare. A guess above twelve simply is not placed — mark()
+// returns null past `max` — so the line never has to squeeze in a number no
+// round is about. The counter still shows whatever was typed.
+export const numberLine = { x: 500, y: 866, w: 900, max: 12 };
 
 // The counter card (99:487).
 export const counter = { src: `${IMG}counter.webp`, x: 1490, y: 57, w: 338, h: 190 };
