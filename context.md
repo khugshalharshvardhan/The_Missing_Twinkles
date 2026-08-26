@@ -37,7 +37,7 @@ element change):
 |---|---|---|---|---|
 | 0 | Mystery Town clearing (`bg_night.webp`) | Twinkles/fireflies (`firefly.webp`) | 8 | ✅ built (tutorial: Neel models the guess, extra intro/handover beats) |
 | 1 | Glowberry meadow (`bg_meadow.webp`) | Glowberries (`glowberry.webp`) | 9 (sheet says 10 — see §7 keypad) | ✅ built |
-| 2 | Starlight Valley (`StarlightValley.png` → convert) | Starlights (`starlight.png` → convert) | 6 | ⬜ prompt 1 |
+| 2 | Starlight Valley (`bg_valley.webp`) | Starlights (`starlight.webp`) | 6 | ✅ built — **three VO stems still to generate, see §7** |
 | 3 | Magic Seed Forest (`MagicSeedForest.png` → convert) | Magic seeds (`seed.png` → convert) | 9 | ⬜ prompt 2 |
 | 4 | Glowflower Meadow (`GlowflowerMeadow.png` → convert) | Glow flowers (`flower.png` → convert) | 11 — **needs multi-digit keypad first** | ⬜ prompt 3 |
 | — | Post-game: town shining again, Neel drifts to the bakery, The End | | | ⬜ prompt 4 |
@@ -202,6 +202,23 @@ the tutorial's `lamp_off.webp`/`lamp_on.webp` at their existing coordinates**
 ---
 
 ## 7. Parked / open items
+
+- **Level 2's three VO stems are not yet recorded.** `vo_l2_howmany`,
+  `vo_l2_tapcount` and `vo_l2_total` are written into
+  `tools/gen-vo-game.js` and referenced from `js/data/audio.js`, but the
+  machine level 2 was built on has no Node installed, so the generator could
+  not be run. The level plays correctly without them — `loadAudio` skips a
+  missing clip with a warning and `clipLength` returns 0, so those three beats
+  fall back to their reading-time hold — but Agni is silent on exactly those
+  three lines. To finish, on a machine with Node:
+
+      npm i msedge-tts
+      node tools/gen-vo-game.js vo_game_raw
+
+  then normalise the three new files as §4 step 6 describes (silence-trim +
+  two-pass loudnorm to −16 LUFS, padding clips under ~3s first) and drop them
+  into `assets/audios/vo/`. No code change is needed — the cue ids are already
+  wired, so the lines start speaking as soon as the files exist.
 
 - **Multi-digit keypad**: the pad takes ONE digit (tapping a number is the whole
   interaction — no readout, no Next key). That caps every total at 9: it's why

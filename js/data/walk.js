@@ -212,5 +212,12 @@ export const destinations = {
     // The berry art is 224x246; kept near the firefly's size so the weave
     // keyframes read the same.
     guide: { src: `${GAME}glowberry.webp`, w: 96, h: 105 }
+  },
+  valley: {
+    arrive: `${GAME}bg_valley.webp`,
+    // The star art is 240x230 — wider than it is tall, unlike the other two —
+    // so it is fitted to the same height as the berry guide rather than the
+    // same width, which is what keeps the weave keyframes reading the same.
+    guide: { src: `${GAME}starlight.webp`, w: 110, h: 105 }
   }
 };

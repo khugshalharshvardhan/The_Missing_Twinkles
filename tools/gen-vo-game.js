@@ -100,7 +100,20 @@ const LINES = [
     text: "Tap each glowberry to count.", rate: 0.94, pitch: "+8%", volume: 96 },
 
   { id: "vo_l1_total", who: "agni", screen: "p4", mood: "announcing it, pleased",
-    text: "There are nine glowberries.", rate: 0.98, pitch: "+12%", volume: 98 }
+    text: "There are nine glowberries.", rate: 0.98, pitch: "+12%", volume: 98 },
+
+  // ---- Level 2 — the starlights, in the valley. Same three lines again, and
+  // the same prosody as their twinkle and glowberry versions: across the whole
+  // chapter these questions have to sound like one person asking them, not
+  // like a new take per place.
+  { id: "vo_l2_howmany", who: "agni", screen: "s2", mood: "asking the player, open and unhurried",
+    text: "How many starlights were there?", rate: 0.92, pitch: "+10%", volume: 94 },
+
+  { id: "vo_l2_tapcount", who: "agni", screen: "s3.2", mood: "showing how, kind",
+    text: "Tap each starlight to count.", rate: 0.94, pitch: "+8%", volume: 96 },
+
+  { id: "vo_l2_total", who: "agni", screen: "s4", mood: "announcing it, pleased",
+    text: "There are six starlights.", rate: 0.98, pitch: "+12%", volume: 98 }
 ];
 
 // Counting out loud is the point of the game, so Agni says each number as the

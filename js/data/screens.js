@@ -79,6 +79,32 @@ export const BERRIES = [
 
 const BG_MEADOW = { src: `${IMG}bg_meadow.webp`, x: 0, y: 0, w: FRAME_W, h: FRAME_H };
 
+/* ---- Level 2 — the starlights, in Starlight Valley ----
+
+   SIX, from the design sheet, in its formation for six: two rows of three.
+   Spacing is genuinely equal here — the same 250px pitch across AND down,
+   where the berries' three rows had to sit closer (150) to fit nine in.
+
+   Boxes are 120x115 to match the star art's own aspect. starlight.png ships
+   with a wide transparent margin (the drawing occupies 984x942 of its
+   1536x1024), so it was cropped to that box before scaling: placed untrimmed
+   the star would have floated small inside a mostly-empty tap target. At
+   120x115 it carries the same visual weight as a 112x123 berry — 13,800 square
+   pixels against 13,776 — so no level's swarm reads bigger than another's. */
+export const STARLIGHT_TOTAL = 6;
+export const STARLIGHT_SRC = `${IMG}starlight.webp`;
+
+export const STARLIGHTS = [
+  { x: 0, y: 0, w: 120, h: 115 },
+  { x: 250, y: 0, w: 120, h: 115 },
+  { x: 500, y: 0, w: 120, h: 115 },
+  { x: 0, y: 250, w: 120, h: 115 },
+  { x: 250, y: 250, w: 120, h: 115 },
+  { x: 500, y: 250, w: 120, h: 115 }
+];
+
+const BG_VALLEY = { src: `${IMG}bg_valley.webp`, x: 0, y: 0, w: FRAME_W, h: FRAME_H };
+
 /* ---- crop transforms, named where a pose is reused ---- */
 
 const CROP = {
@@ -660,6 +686,200 @@ export const level1 = [
   }
 ];
 
+/* ---- Level 2 — the starlights, in Starlight Valley ----
+
+   Level 1's nine beats again, in the valley. Everything the round does not
+   care about is held identical on purpose — the pair keep THE_CLEARING marks
+   (on the valley they land on the stone path and the grass beside it), and the
+   keypad, counter, number line and lamp keep their coordinates, so the child
+   meets the same machine in a new place. Only four things move: the painting
+   behind them, what there is to count, the word for it, and the ids.
+
+   The swarm origin puts the two rows of three exactly where the berries sat —
+   both groups centre on (998, 356), so the eye does not have to re-find the
+   countable when the place changes. */
+export const level2 = [
+  // ---- S1 — look before you guess ----
+  {
+    id: "s1",
+    anchor: THE_CLEARING,
+    layers: [
+      BG_VALLEY,
+      { src: `${IMG}agni_b.webp`, x: 25, y: 445, w: 553, h: 614, fill: CROP.agniB, fx: "breathe" },
+      { src: `${IMG}neel_think.webp`, x: 1327, y: 395, w: 372, h: 617, fill: CROP.neelThink, flipX: true, fx: "breathe-slow" }
+    ],
+    // Same clock as level 1's p1: her line ends (vo_g_guess runs 500 to 2581),
+    // the bubble goes, the stars materialise, hold five seconds, vanish.
+    fireflies: { x: 688, y: 174, enter: "magic", at: 2650 },
+    dwell: 10000,
+    bubble: {
+      art: `${IMG}bub_15.webp`, who: "agni",
+      x: 224, y: 107, w: 514, h: 277,
+      text: "Look closely and make a guess!"
+    }
+  },
+
+  // ---- S2 — the keypad ----
+  {
+    id: "s2",
+    anchor: THE_CLEARING,
+    interact: "keypad",
+    counter: "guess",
+    layers: [
+      BG_VALLEY,
+      { src: `${IMG}agni_talk.webp`, x: 10, y: 485, w: 576, h: 532, fill: CROP.agniTalk, flipX: true, fx: "breathe" },
+      { src: `${IMG}neel_think.webp`, x: 1369, y: 386, w: 372, h: 617, fill: CROP.neelThink, flipX: true, fx: "breathe-slow" }
+    ],
+    keypad: true,
+    // vo_l2_howmany runs 500 to 2250 — same length as level 1's question.
+    keypadAt: 2350,
+    bubble: {
+      art: `${IMG}bub_15.webp`, who: "agni",
+      x: 0, y: 185, w: 514, h: 277,
+      text: "How many starlights were there?"
+    }
+  },
+
+  // ---- S3 — the stars come back, dim, to be counted ----
+  {
+    id: "s3",
+    anchor: THE_CLEARING,
+    counter: "guess",
+    layers: [
+      BG_VALLEY,
+      { src: `${IMG}agni_point.webp`, x: 64, y: 498, w: 525, h: 501, fill: CROP.agniPoint, fx: "breathe" },
+      { src: `${IMG}neel_d.webp`, x: 1344, y: 417, w: 449, h: 581, fill: CROP.neelD, flipX: true, fx: "breathe-slow" }
+    ],
+    fireflies: { x: 688, y: 174, dim: true },
+    bubble: {
+      art: `${IMG}bub_3.webp`, who: "agni",
+      x: 220, y: 216, w: 557, h: 282,
+      artInset: [18.09, 9.69, 0, 17.06],
+      text: "Let us count to check."
+    }
+  },
+
+  // ---- S3.2 — tap each one ----
+  {
+    id: "s3.2",
+    anchor: THE_CLEARING,
+    interact: "count",
+    layers: [
+      BG_VALLEY,
+      { src: `${IMG}agni_g.webp`, x: 80, y: 490, w: 554, h: 512, fill: CROP.agniG, fx: "breathe" },
+      { src: `${IMG}neel_c.webp`, x: 1385, y: 484, w: 396, h: 557, fill: CROP.neelC, fx: "breathe-slow" }
+    ],
+    fireflies: { x: 688, y: 174 },
+    counter: "guess",
+    numberLine: true,
+    // The hand keeps the offset it has from the first countable on level 1
+    // (-34, -17 from that box's own origin), so it points at the first star
+    // the same way it points at the first berry.
+    hint: { src: `${SHARED}hand_nudge.svg`, x: 654, y: 157, w: 308.396, h: 308.396 },
+    bubble: {
+      art: `${IMG}bub_32.webp`, who: "agni",
+      x: 190, y: 248, w: 489, h: 256,
+      text: "Tap each starlight to count."
+    }
+  },
+
+  // ---- S4 — the true count ----
+  {
+    id: "s4",
+    anchor: THE_CLEARING,
+    role: "totalline",
+    numberLine: true,
+    dwell: 3800,
+    layers: [
+      BG_VALLEY,
+      { src: `${IMG}agni_f.webp`, x: 9, y: 481, w: 605, h: 553, fx: "breathe" },
+      { src: `${IMG}neel_f.webp`, x: 1372, y: 424, w: 465, h: 589, fx: "breathe-slow" }
+    ],
+    fireflies: { x: 688, y: 174 },
+    counter: "total",
+    bubble: {
+      art: `${IMG}bub_4.webp`, who: "agni",
+      x: 254, y: 251, w: 417, h: 201,
+      text: "There are {total} starlights"
+    }
+  },
+
+  // ---- S16 — the guess, next to the truth ----
+  {
+    id: "s16",
+    anchor: THE_CLEARING,
+    role: "guessline",
+    numberLine: true,
+    dwell: 4600,
+    layers: [
+      BG_VALLEY,
+      { src: `${IMG}agni_f.webp`, x: 9, y: 481, w: 605, h: 553, fx: "breathe" },
+      { src: `${IMG}neel_f.webp`, x: 1372, y: 424, w: 465, h: 589, fx: "breathe-slow" }
+    ],
+    fireflies: { x: 688, y: 174 },
+    counter: "guess",
+    bubble: {
+      art: `${IMG}bub_4.webp`, who: "agni",
+      x: 254, y: 251, w: 417, h: 201,
+      text: "You guessed {guess}."
+    }
+  },
+
+  // ---- S4.2 — the verdict ----
+  {
+    id: "s4.2",
+    anchor: THE_CLEARING,
+    role: "verdict",
+    layers: [
+      BG_VALLEY,
+      { src: `${IMG}agni_d.webp`, x: 84, y: 474, w: 342, h: 560, fill: CROP.agniD, fx: "breathe" },
+      { src: `${IMG}neel_f.webp`, x: 1355, y: 408, w: 465, h: 589, fx: "breathe-slow" }
+    ],
+    bubble: {
+      art: `${IMG}bub_42.webp`, who: "agni",
+      x: 276, y: 222, w: 376, h: 226,
+      text: "{verdict}"
+    }
+  },
+
+  // ---- S5.1 — tap the lamp ----
+  {
+    id: "s5.1",
+    anchor: THE_CLEARING,
+    interact: "lamp",
+    layers: [
+      BG_VALLEY,
+      { src: `${IMG}agni_g.webp`, x: 70, y: 489, w: 554, h: 512, fill: CROP.agniG, fx: "breathe" },
+      { src: `${IMG}neel_f.webp`, x: 1294, y: 412, w: 465, h: 589, fx: "breathe-slow" }
+    ],
+    lamp: { src: `${IMG}lamp_off.webp`, x: 807, y: 74, w: 272, h: 927, fill: CROP.lampOff },
+    lampLit: { src: `${IMG}lamp_on.webp`, x: 799, y: 74, w: 287, h: 927, fill: CROP.lampOn },
+    lampGlass: { x: 902, y: 254 },
+    bubble: {
+      art: `${IMG}bub_51.webp`, who: "agni",
+      x: 314, y: 300, w: 383, h: 184,
+      text: "Tap the lamp!"
+    }
+  },
+
+  // ---- S5.2 — the lamp catches a star, and Neel cheers ----
+  {
+    id: "s5.2",
+    anchor: THE_CLEARING,
+    layers: [
+      BG_VALLEY,
+      { src: `${IMG}agni_g.webp`, x: 70, y: 489, w: 554, h: 512, fill: CROP.agniG, fx: "breathe" },
+      { src: `${IMG}neel_turn.webp`, x: 1125, y: 391, w: 735, h: 610, fill: CROP.neelTurn, flipX: true, fx: "breathe-slow" },
+      { src: `${IMG}lamp_on.webp`, x: 799, y: 74, w: 287, h: 927, fill: CROP.lampOn, fx: "lamp-glow" },
+      // The caught one, in the glass where level 1 keeps its berry. Sized to
+      // the star's aspect on the same centre (845, 276), so all three levels
+      // hold their catch in exactly the same spot.
+      { src: STARLIGHT_SRC, x: 832, y: 263, w: 26, h: 25, fx: "flicker" }
+    ],
+    shout: { text: "YAY!", x: 1264, y: 258, tilt: -9 }
+  }
+];
+
 /* ---- the levels, in playing order ----
 
    Everything js/game.js needs to run a round with a different element in a
@@ -687,6 +907,18 @@ export const levels = [
     swarmClass: "is-berries",
     walkTo: "meadow",
     screens: level1
+  },
+  {
+    name: "Level 2 — the starlights",
+    word: "Starlight",
+    total: STARLIGHT_TOTAL,
+    swarmSrc: STARLIGHT_SRC,
+    layout: STARLIGHTS,
+    // The star art already glows gold, like the firefly the swarm styling was
+    // built for, so it needs no restyling of its own.
+    swarmClass: "",
+    walkTo: "valley",
+    screens: level2
   }
 ];
 

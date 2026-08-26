@@ -334,6 +334,58 @@ export const gameCues = {
   "p5.2": {
     sfx: [{ id: "catch_pop", at: 120, gain: 0.8 }, { id: "twinkle", at: 500, gain: 0.45 }],
     vo: { id: "vo_neel_yay", at: 260, pan: 0.5 }
+  },
+
+  /* ---------- Level 2 — the starlights ----------
+     Level 1's cue sheet on the valley's beats, offsets unchanged. Again only
+     the three lines that name the element are new (vo_l2_*); every line that
+     does not say "starlight" out loud is the same clip the tutorial and the
+     meadow use, which is what keeps one narrator across three places. */
+
+  // Look closely — the stars materialise after the line (fireflies.at 2650 in
+  // screens.js) and vanish on their sparkle 5.9s later.
+  "s1": {
+    bed: "bed_main",
+    sfx: [{ id: "twinkle", at: 2750, gain: 0.4, pan: 0.2 },
+      { id: "sparkle", at: 8600, gain: 0.6 }],
+    vo: { id: "vo_g_guess", at: 500, pan: -0.5 }
+  },
+  // The keypad — the pad appears once the question is asked (keypadAt 2350).
+  "s2": {
+    sfx: [{ id: "page_air", at: 0, gain: 0.5 },
+      { id: "sparkle", at: 2350, gain: 0.55 }],
+    vo: { id: "vo_l2_howmany", at: 500, pan: -0.6 }
+  },
+
+  // ---- counting ----
+  "s3": {
+    vo: { id: "vo_g_count", at: 500, pan: -0.5 }
+  },
+  "s3.2": {
+    sfx: [{ id: "page_air", at: 0, gain: 0.5 }],
+    vo: { id: "vo_l2_tapcount", at: 500, pan: -0.5 }
+  },
+
+  // ---- the total, and how the guess did ----
+  "s4": {
+    sfx: [{ id: "sparkle", at: 420, gain: 0.5 }],
+    vo: { id: "vo_l2_total", at: 500, pan: -0.5 }
+  },
+  // Stem only: js/game.js says the number after it (role "guessline").
+  "s16": {
+    vo: { id: "vo_g_youguessed", at: 500, pan: -0.5 }
+  },
+  // The verdict line and its chime are chosen in js/game.js.
+  "s4.2": {},
+
+  // ---- the lamp ----
+  "s5.1": {
+    sfx: [{ id: "page_air", at: 0, gain: 0.5 }],
+    vo: { id: "vo_g_taplamp", at: 500, pan: -0.5 }
+  },
+  "s5.2": {
+    sfx: [{ id: "catch_pop", at: 120, gain: 0.8 }, { id: "twinkle", at: 500, gain: 0.45 }],
+    vo: { id: "vo_neel_yay", at: 260, pan: 0.5 }
   }
 };
 

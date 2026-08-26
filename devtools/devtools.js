@@ -166,11 +166,13 @@ function buildTrees() {
 
   // The walks are one moment each rather than a list, but they belong in the
   // menu: each is the act leading into a level. `dest` picks where it ends up.
+  // Read off the levels rather than listed by hand, so a new level brings its
+  // own walk into the menu the same way it brings its own beats.
   ui.gameTree.append(
-    group("The walks", "between the acts", [
-      { label: "walk  ·  to the clearing", act: "walk", index: 0, dest: "clearing" },
-      { label: "walk  ·  to the meadow", act: "walk", index: 0, dest: "meadow" }
-    ], false)
+    group("The walks", "between the acts",
+      levels.map((level) => (
+        { label: `walk  ·  to the ${level.walkTo}`, act: "walk", index: 0, dest: level.walkTo }
+      )), false)
   );
 
   // One group per level — the tutorial and every round after it.
