@@ -232,5 +232,53 @@ export const destinations = {
     // Fitted to the berry guide's height like the other two, so all four
     // guides travel the weave at the same apparent size.
     guide: { src: `${GAME}glowflower.webp`, w: 99, h: 105 }
+  },
+  // The walk home, after the last lamp: the journey dissolves into the first
+  // end screen's own painting — the pair mid-high-five in the lit town — so
+  // the ending opens on exactly the picture the walk arrived at. Its guide
+  // field is only the manifest's copy — the run itself flies the whole
+  // rescued flock, see HOME_GUIDES.
+  home: {
+    arrive: `${GAME}ep_street.webp`,
+    guide: { src: `${GAME}firefly.webp`, w: 78, h: 82 }
+  }
+};
+
+/* ---- the walk home ----
+
+   Played once, on the way out. Same layers, same journey — reversed: they
+   cross the frame right to left at a stroll (they are going home, not setting
+   out), walking close together, and ahead of them fly one of every
+   light-keeper from the chapter, each at its own height and its own point in
+   the weave, so the pair read as following the flock.
+
+   Sizes are the arts' own aspects at about 0.33 of their files; positions run
+   down-and-ahead of the pair, staggered so no two share a lane. `delay`
+   offsets each one's weave and flutter, or five fliers would bob as one. */
+export const HOME_GUIDES = [
+  // The firefly is the only directional art in the flock — drawn flying right,
+  // flipped to lead leftward. The others face front.
+  { key: "home-firefly", src: `${GAME}firefly.webp`, w: 78, h: 82, x: 640, y: 385, delay: 0, flip: true },
+  { key: "home-berry", src: `${GAME}glowberry.webp`, w: 74, h: 81, x: 505, y: 318, delay: -1.3 },
+  { key: "home-star", src: `${GAME}starlight.webp`, w: 82, h: 79, x: 365, y: 432, delay: -2.4 },
+  { key: "home-seed", src: `${GAME}magicseed.webp`, w: 64, h: 83, x: 235, y: 330, delay: -3.6 },
+  { key: "home-flower", src: `${GAME}glowflower.webp`, w: 76, h: 81, x: 105, y: 425, delay: -4.7 }
+];
+
+export const homeMode = {
+  reverse: true,
+  // The arrival painting has the pair drawn into it (mid-high-five), so the
+  // walking sprites dissolve out with everything else as it comes up —
+  // otherwise they would stand beside their painted selves.
+  fadeCast: true,
+  // A stroll: they have nowhere left to hurry to.
+  paceScale: 0.68,
+  walkMs: 5600,
+  guides: HOME_GUIDES,
+  // Close together and staying so — no spreading out, no growing toward the
+  // viewer: they cross the frame side by side at a fixed size, Agni leading.
+  cast: {
+    agni: { from: { cx: 1235, h: 470 }, to: { cx: 700, h: 470 } },
+    neel: { from: { cx: 1555, h: 500 }, to: { cx: 1020, h: 500 } }
   }
 };

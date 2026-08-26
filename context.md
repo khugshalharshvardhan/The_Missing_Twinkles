@@ -40,7 +40,8 @@ element change):
 | 2 | Starlight Valley (`bg_valley.webp`) | Starlights (`starlight.webp`) | 6 | ✅ built |
 | 3 | Magic Seed Forest (`bg_forest.webp`) | Magic seeds (`magicseed.webp`) | 9 | ✅ built |
 | 4 | Glowflower Meadow (`bg_flowermeadow.webp`) | Glow flowers (`glowflower.webp`) | 11 | ✅ built |
-| — | Post-game: town shining again, Neel drifts to the bakery, The End | | | ⬜ prompt 4 |
+| — | The walk home: after the last lamp, the walk replays in reverse (right to left, slower, the pair close together) with one of every rescued element flying ahead, and dissolves into the lit town (`homeMode` in js/data/walk.js; `goingHome` in js/main.js) | | | ✅ built |
+| — | The ending (owner's Figma "Mystry" 149-102, the SCREEN 7.x frames): four beats after the walk home — the high-five in the lit town (two lines), "Neel?", and Neel at the bakery with the smell — then the end card. Played by the game engine as `epilogue` (deliberately not in `levels`; `currentLevel() === -1` is how gameDone knows the chapter is over). Figma note: raw uploads keep alpha, node exports flatten onto white — the cutouts came from raws, seated by measuring the flattened exports. | | | ✅ built |
 
 Sheet order is starlight → flowers → seeds. Flowers (11) needed the multi-digit
 keypad first, so they were built last: starlight → seeds → (keypad + flowers).

@@ -47,6 +47,10 @@ const BLEND = 0.45;
 // could disagree with it.
 const TOTAL_SCROLL = (PACE * (WALK_MS - SETTLE_MS + SETTLE_MS / 2.7)) / 1000;
 
+// The run's own settings — pace, length, direction — so the walk out and the
+// walk home share one renderer. Filled in by startWalk().
+let run = { reverse: false, pace: PACE, ms: WALK_MS, scrollTotal: TOTAL_SCROLL };
+
 let scroll = 0;
 let raf = 0;
 let liveRaf = 0;
@@ -68,9 +72,16 @@ export function initWalk(handlers) {
 // `dest` picks where this walk ends up — see `destinations` in js/data/walk.js.
 // The journey is the same either way; the destination swaps the painting the
 // settle dissolves into and the guide leading the pair to it.
-export function startWalk(dest = destinations.clearing) {
+export function startWalk(dest = destinations.clearing, mode = null) {
   stopWalk();
   host.replaceChildren();
+
+  run = {
+    reverse: Boolean(mode?.reverse),
+    pace: PACE * (mode?.paceScale ?? 1),
+    ms: mode?.walkMs ?? WALK_MS
+  };
+  run.scrollTotal = (run.pace * (run.ms - SETTLE_MS + SETTLE_MS / 2.7)) / 1000;
   strips = [];
   walkers = [];
   fades = [];
@@ -92,11 +103,25 @@ export function startWalk(dest = destinations.clearing) {
   });
   // Shadows first, as a group, so neither walker's shadow lands on top of the
   // other one's feet.
-  cast.forEach((who) => host.append(shadow(who)));
-  cast.forEach((who) => host.append(walker(who)));
-  const led = flyer({ ...guide, ...dest.guide });
-  fades.push({ el: led, base: 1, to: 0 });
-  host.append(led);
+  const castRun = mode?.cast
+    ? cast.map((who) => ({ ...who, ...mode.cast[who.key] }))
+    : cast;
+  castRun.forEach((who) => host.append(shadow(who)));
+  castRun.forEach((who) => host.append(walker(who)));
+  // A run whose arrival painting holds the pair fades the walking sprites out
+  // over the settle. The boxes go through the same fade list as everything
+  // else; the shadows cannot (place() writes their opacity every frame for the
+  // step-beat), so the fade reaches them through run.castOpacity instead.
+  run.castOpacity = 1;
+  run.fading = Boolean(mode?.fadeCast);
+  if (mode?.fadeCast) {
+    for (const w of walkers) fades.push({ el: w.box, base: 1, to: 0 });
+  }
+  for (const spec of mode?.guides ?? [{ ...guide, ...dest.guide }]) {
+    const led = flyer(spec);
+    fades.push({ el: led, base: 1, to: 0 });
+    host.append(led);
+  }
   // And the nearest foliage, which passes in front of everything.
   foreground.forEach((layer) => host.append(strip(layer)));
 
@@ -142,13 +167,13 @@ function tick(now) {
 
   // Full pace, then ease to a standstill over the last stretch so they arrive
   // rather than stopping dead.
-  const left = WALK_MS - t;
+  const left = run.ms - t;
   const ease = left >= SETTLE_MS ? 1 : Math.max(0, left / SETTLE_MS) ** 1.7;
-  const step = (PACE * ease * dt) / 1000;
+  const step = (run.pace * ease * dt) / 1000;
   scroll += step;
 
   for (const { el, speed } of strips) {
-    el.style.backgroundPositionX = `${-scroll * speed}px`;
+    el.style.backgroundPositionX = `${(run.reverse ? scroll : -scroll) * speed}px`;
   }
 
   // The clearing opens over the same stretch the scroll is easing down. Both
@@ -158,6 +183,7 @@ function tick(now) {
   const settled = 1 - Math.min(1, Math.max(0, left / SETTLE_MS));
   if (Math.abs(settled - lastSettled) > 0.004) {
     lastSettled = settled;
+    if (run.fading) run.castOpacity = 1 - settled;
     for (const f of fades) {
       f.el.style.opacity = String(f.base + (f.to - f.base) * settled);
     }
@@ -175,7 +201,7 @@ function tick(now) {
 
   place(scroll, step);
 
-  if (t >= WALK_MS) {
+  if (t >= run.ms) {
     onArrive();
     return;
   }
@@ -188,7 +214,7 @@ function tick(now) {
 // the scroll can never disagree — when one stops the other does. `step` is the
 // ground covered since the last frame, which is what turns the stride over.
 function place(travelled, step) {
-  const progress = Math.min(1, travelled / TOTAL_SCROLL);
+  const progress = Math.min(1, travelled / run.scrollTotal);
 
   for (const w of walkers) {
     const { who } = w;
@@ -199,7 +225,9 @@ function place(travelled, step) {
     // the frame as Neel pulls ahead, so their own travel is the scroll plus
     // however far they have moved across it. Their stride follows that, not the
     // scroll, or the one falling behind would over-step.
-    const own = step + (dx - w.dx);
+    // Walking the other way flips which drift direction covers extra ground.
+    const drift = dx - w.dx;
+    const own = step + (run.reverse ? -drift : drift);
     w.dx = dx;
     // `per` is measured at full size, so it shortens as they do.
     w.cycles += own / (who.step.per * scale);
@@ -213,11 +241,14 @@ function place(travelled, step) {
     w.b.style.backgroundPositionX = `${-((cell + 1) % who.sheet.frames) * cellW}px`;
     w.b.style.opacity = frac <= 1 - BLEND ? "0" : String((frac - (1 - BLEND)) / BLEND);
 
-    w.box.style.transform = `translateX(${dx}px) scale(${scale})`;
+    // Homeward they face the other way: the sprite strips are drawn walking
+    // right, so the box is mirrored around its own centre.
+    const flip = run.reverse ? " scaleX(-1)" : "";
+    w.box.style.transform = `translateX(${dx}px) scale(${scale})${flip}`;
     // The shadow tightens on the down-beat, which is twice per cycle.
     const beat = 0.88 + 0.12 * Math.abs(Math.cos(Math.PI * w.cycles * 2));
     w.shadow.style.transform = `translateX(${dx}px) scale(${scale * beat})`;
-    w.shadow.style.opacity = String(0.72 + 0.28 * (beat - 0.88) / 0.12);
+    w.shadow.style.opacity = String((0.72 + 0.28 * (beat - 0.88) / 0.12) * (run.castOpacity ?? 1));
   }
 }
 
@@ -355,6 +386,8 @@ function spark(spec) {
   el.style.backgroundPositionX = `${-spec.cell * 100}%`;
   el.style.animationDuration = `${spec.drift}s`;
   el.style.animationDelay = `${spec.delay}s`;
+  // On the way home they fly the other way, like everything else.
+  if (run.reverse) el.classList.add("is-flipped");
 
   return el;
 }
@@ -364,6 +397,7 @@ function flyer(spec) {
 
   box.className = "pw__guide";
   box.dataset.key = spec.key;
+  if (spec.delay) box.style.animationDelay = `${spec.delay}s`;
   box.style.left = `${spec.x}px`;
   box.style.top = `${spec.y}px`;
   box.style.width = `${spec.w}px`;
@@ -373,6 +407,8 @@ function flyer(spec) {
   img.className = "pw__fill";
   img.src = spec.src;
   img.alt = "";
+  // The weave lives on the box, so the fill can mirror without fighting it.
+  if (spec.flip) img.style.transform = "scaleX(-1)";
 
   box.append(img);
   return box;
@@ -380,8 +416,8 @@ function flyer(spec) {
 
 /* ---- dev hook (devtools/, only reached with ?dev) ---- */
 
-export function devGoto() {
-  startWalk();
+export function devGoto(dest, mode) {
+  startWalk(dest, mode);
   return { id: "walk" };
 }
 

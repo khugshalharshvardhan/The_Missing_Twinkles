@@ -82,6 +82,19 @@ const LINES = [
   { id: "vo_neel_yay", who: "neel", screen: "5.2", mood: "celebrating, arms up",
     text: "Yaaay!", rate: 1.04, pitch: "+32%", volume: 100 },
 
+  // ---- e1..e4 — the ending ----
+  { id: "vo_ep_wedidit", who: "agni", screen: "e1", mood: "triumphant, high-fiving",
+    text: "We did it, Neel!", rate: 1.02, pitch: "+16%", volume: 100 },
+
+  { id: "vo_ep_shining", who: "agni", screen: "e2", mood: "taking the lit town in, glad",
+    text: "The town is shining again!", rate: 0.96, pitch: "+12%", volume: 98 },
+
+  { id: "vo_ep_neel", who: "agni", screen: "e3", mood: "turning around, puzzled",
+    text: "Neel?", rate: 0.92, pitch: "+10%", volume: 94 },
+
+  { id: "vo_ep_cake", who: "neel", screen: "e4", mood: "dreamy, drifting to the bakery",
+    text: "Caaaake!", rate: 0.6, pitch: "+18%", volume: 96 },
+
   // ---- 6.1, 6.2 — handing the game over ----
   { id: "vo_g_yourturn", who: "agni", screen: "6.1", mood: "warm, handing something over",
     text: "Now, it is your turn.", rate: 0.92, pitch: "+10%", volume: 96 },

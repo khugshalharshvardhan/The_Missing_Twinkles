@@ -1416,6 +1416,105 @@ export const levels = [
   }
 ];
 
+/* ---- The ending — the owner's Figma end screens (Mystry, 149-102) ----
+
+   Four beats after the walk home, all dialogue: the pair high-five in the lit
+   town (two lines over one painting), then Agni turns and Neel is gone — he is
+   at the bakery, eyes shut, the cake smell curling to his nose. The town
+   paintings ship with the characters' poses baked in where the design has
+   them; the 7.2 beats layer the pair and the smell over one clean street
+   plate (the design's PG3 and PG4 differ only by compression).
+
+   Boxes are the Figma frames' own coordinates scaled by 1882/1920 — the design
+   is drawn at the story's frame size, this act runs at the game's.
+
+   No anchors: these arts are not in POSE_BOX, and each is placed exactly once.
+   ep_street is also where the walk home arrives (destinations.home), so the
+   hand-over dissolves into the very painting the first beat stands on, and the
+   pair — faded out with the walk — reappear in it mid-high-five. */
+
+// One street plate serves all four beats — the design's PG1..PG4 are the same
+// painting re-exported (30dB+ PSNR apart). The high-five pair are their own
+// layer (the design's Subtract node, exported with alpha), drawn over it on
+// the first two beats; its box bottom lands exactly on the frame bottom, as
+// the design has it.
+const EP_STREET = { src: `${IMG}ep_street.webp`, x: 0, y: 0, w: FRAME_W, h: FRAME_H };
+// Every cutout below is the design's own source art (the raw uploads keep
+// their alpha; node exports flatten onto white), cropped to its opaque pixels
+// and seated by measuring where those pixels sit in the design's render.
+const EP_PAIR = { src: `${IMG}ep_pair.webp`, x: 455, y: 489, w: 812, h: 505 };
+
+export const epilogueScreens = [
+  // ---- E1 — "We did it, Neel!" (149:356) ----
+  {
+    id: "e1",
+    layers: [EP_STREET, EP_PAIR],
+    bubble: {
+      art: `${IMG}bub_51.webp`, who: "agni",
+      x: 683, y: 328, w: 322, h: 167,
+      text: "We did it, Neel!"
+    }
+  },
+
+  // ---- E2 — "The town is shining again!" (149:365, same painting) ----
+  {
+    id: "e2",
+    layers: [EP_STREET, EP_PAIR],
+    bubble: {
+      art: `${IMG}bub_51.webp`, who: "agni",
+      x: 660, y: 302, w: 400, h: 196,
+      text: "The town is shining again!"
+    }
+  },
+
+  // ---- E3 — "Neel?" — he has wandered off (149:375) ----
+  {
+    id: "e3",
+    layers: [
+      EP_STREET,
+      { src: `${IMG}ep_agni_wonder.webp`, x: 418, y: 520, w: 459, h: 454 },
+      { src: `${IMG}ep_neel_sniff.webp`, x: 1163, y: 489, w: 199, h: 384 }
+    ],
+    bubble: {
+      art: `${IMG}bub_51.webp`, who: "agni",
+      x: 661, y: 415, w: 280, h: 157,
+      text: "Neel?"
+    }
+  },
+
+  // ---- E4 — the bakery has him. "Caaakeee!" is voice only, as the design
+  // draws no bubble here — the smell says it. The wisps flicker gently. ----
+  {
+    id: "e4",
+    layers: [
+      EP_STREET,
+      { src: `${IMG}ep_agni_glad.webp`, x: 475, y: 523, w: 336, h: 454 },
+      // The same sniffing pose 7.2a walks away with — the design crops both
+      // beats' Neel from one sheet, two pixels apart.
+      { src: `${IMG}ep_neel_sniff.webp`, x: 1167, y: 512, w: 202, h: 387 },
+      // The whole golden wisp, curling off the bakery roof toward his nose —
+      // the design shows two crops of this one square; placed whole it reads
+      // the same and keeps its glow unclipped.
+      { src: `${IMG}ep_smell.webp`, x: 1328, y: 214, w: 441, h: 399, fx: "flicker" }
+    ],
+    // The closing shot holds a while: nothing else is coming.
+    dwell: 5600
+  }
+];
+
+// Shaped like a level so the one game machine can play it, but it is not in
+// `levels`: it has no walk of its own, nothing to count, and finishing it ends
+// the chapter (see gameDone in js/main.js).
+export const epilogue = {
+  name: "The ending",
+  word: "",
+  total: 0,
+  swarmSrc: FIREFLY_SRC,
+  layout: [],
+  swarmClass: "",
+  screens: epilogueScreens
+};
+
 /* The keypad, from the `keypad` group (108:12). Key boxes are 116 x 85 on a
    120px pitch, which is what the design's 4px gaps work out to.
 
@@ -1484,7 +1583,7 @@ export const counter = { src: `${IMG}counter.webp`, x: 1490, y: 57, w: 338, h: 1
 // stops to fetch mid-chapter.
 export const manifest = [
   ...new Set([
-    ...levels.flatMap((level) => [
+    ...[...levels, epilogue].flatMap((level) => [
       ...level.screens.flatMap((screen) => [
         ...screen.layers.map((layer) => layer.src),
         ...(screen.lamp ? [screen.lamp.src] : []),

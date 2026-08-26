@@ -10,7 +10,7 @@
 // player instead — the keypad for a guess, the swarm for every twinkle to
 // be tapped, the lamp for a tap — and advance once that is done.
 
-import { levels, keypad, counter, numberLine, FRAME_W } from "./data/screens.js";
+import { levels, epilogue, keypad, counter, numberLine, FRAME_W } from "./data/screens.js";
 import { gameCues } from "./data/audio.js";
 import { anchorOffset, bodyBox, castOf } from "./anchor.js";
 import { clearCues, playCues, playSfx, playVo, clipLength } from "./audio.js";
@@ -122,6 +122,40 @@ export function startGame(at = 0, levelIndex = 0) {
   go(start);
 }
 
+// The ending, played by the same machine: four dialogue beats after the walk
+// home. Not a level — currentLevel() reports -1 while it runs, which is how
+// gameDone knows the chapter is over rather than moving on.
+export function startEpilogue() {
+  clearTimeout(timer);
+  clearCues();
+  round = epilogue;
+  index = -1;
+  front = 0;
+  pending = null;
+  guess = null;
+  counted = 0;
+
+  panes.forEach((pane) => {
+    pane.classList.remove("is-active");
+    pane.replaceChildren();
+  });
+
+  hud.classList.add("is-active");
+  go(0);
+}
+
+// Dev hook for the ending's beats (the hamburger menu's "The ending" rows).
+export function devGotoEpilogue(at) {
+  clearTimeout(timer);
+  hold = false;
+  round = epilogue;
+  guess = null;
+  counted = 0;
+  const i = Math.min(Math.max(at, 0), round.screens.length - 1);
+  go(i);
+  return round.screens[i];
+}
+
 export function next() {
   clearTimeout(timer);
   if (index >= round.screens.length - 1) return finish();
@@ -130,6 +164,13 @@ export function next() {
 
 // Dev hooks (devtools/, only reached with ?dev). Jumping to a screen carries on
 // playing from it; only devPause() stops the clock.
+// Which round is playing, for the chapter loop in main.js: deriving it from
+// the game itself means a dev jump into any level continues correctly from
+// there — finishing level 4 walks home, whatever was played before it.
+export function currentLevel() {
+  return levels.indexOf(round);
+}
+
 export function devGoto(at, levelIndex) {
   clearTimeout(timer);
   hold = false;

@@ -191,6 +191,15 @@ export const cues = {
    ========================================================= */
 
 export const gameCues = {
+  /* ---- the ending — see epilogueScreens in js/data/screens.js ---- */
+  // Two lines over the high-five, hers, from mid-frame.
+  "e1": { vo: { id: "vo_ep_wedidit", at: 500, pan: -0.2 } },
+  "e2": { vo: { id: "vo_ep_shining", at: 500, pan: -0.2 } },
+  // She turns to where he was.
+  "e3": { vo: { id: "vo_ep_neel", at: 500, pan: -0.35 } },
+  // Voice only — the design draws no bubble here; the smell says the rest.
+  "e4": { vo: { id: "vo_ep_cake", at: 700, pan: 0.5 } },
+
   // Each beat: the bubble pops at 200ms and the line starts at 500, the same
   // 300ms gap the story uses between a bubble and the voice inside it.
   //

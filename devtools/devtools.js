@@ -16,10 +16,11 @@
 
 import { pages, timeline } from "../js/data/scenes.js";
 import { levels } from "../js/data/screens.js";
-import { destinations } from "../js/data/walk.js";
+import { destinations, homeMode } from "../js/data/walk.js";
+import { epilogue } from "../js/data/screens.js";
 import { devGoto as storyGoto, devPause as storyPause } from "../js/story.js";
-import { devGoto as gameGoto, devPause as gamePause } from "../js/game.js";
-import { devGoto as walkGoto, devPause as walkPause, startWalk } from "../js/walk.js";
+import { devGoto as gameGoto, devGotoEpilogue as epiGoto, devPause as gamePause } from "../js/game.js";
+import { devGoto as walkGoto, devPause as walkPause } from "../js/walk.js";
 import { initEdit, markTargets, deselect, nudge, edits, clearEdits, targets, pick } from "./edit.js";
 
 const root = document.documentElement;
@@ -170,9 +171,20 @@ function buildTrees() {
   // own walk into the menu the same way it brings its own beats.
   ui.gameTree.append(
     group("The walks", "between the acts",
-      levels.map((level) => (
-        { label: `walk  ·  to the ${level.walkTo}`, act: "walk", index: 0, dest: level.walkTo }
-      )), false)
+      [
+        ...levels.map((level) => (
+          { label: `walk  ·  to the ${level.walkTo}`, act: "walk", index: 0, dest: level.walkTo }
+        )),
+        // The one walk that is not on the way to a level.
+        { label: "walk  ·  home, all together", act: "walk", index: 0, dest: "home", home: true }
+      ], false)
+  );
+
+  // The ending, after the walk home.
+  ui.gameTree.append(
+    group(epilogue.name, `${epilogue.screens.length} screens`,
+      epilogue.screens.map((screen, i) =>
+        ({ label: `${screen.id}${parts(screen)}`, act: "game", index: i, epi: true })), false)
   );
 
   // One group per level — the tutorial and every round after it.
@@ -245,11 +257,19 @@ function jump(row) {
 
   if (act !== api.act()) api.setAct(act);
 
+  // Progression follows the jump: landing in a level means everything before
+  // it is done, and a walk leads into the level it walks to.
+  if (act === "game") api.setChapter?.(row.level ?? 0, false);
+  if (act === "walk") {
+    const li = row.home ? levels.length - 1 : levels.findIndex((l) => l.walkTo === row.dest);
+    api.setChapter?.(Math.max(0, li), Boolean(row.home));
+  }
+
   // The walk plays itself from the top rather than seeking, so entering it is
   // a restart — of the walk to wherever the row leads.
   const at =
-    act === "walk" ? (startWalk(destinations[row.dest ?? "clearing"]), walkGoto(index))
-    : act === "game" ? gameGoto(index, row.level ?? 0)
+    act === "walk" ? walkGoto(destinations[row.dest ?? "clearing"], row.home ? homeMode : null)
+    : act === "game" ? (row.epi ? epiGoto(index) : gameGoto(index, row.level ?? 0))
     : storyGoto(index);
   here = { ...row, label: at?.step?.id ?? at?.id ?? String(index) };
 

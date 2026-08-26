@@ -20,10 +20,11 @@ import { audioManifest, UI_ADVANCE } from "./data/audio.js";
 import { watchStage, setFrame } from "./stage.js";
 import { preload } from "./preload.js";
 import { initStory, startStory, nextPage, prevPage } from "./story.js";
-import { initGame, startGame, releaseHold, armHold } from "./game.js";
+import { initGame, startGame, startEpilogue, releaseHold, armHold, currentLevel } from "./game.js";
 import { initWalk, startWalk, endWalk } from "./walk.js";
 import { layers as walkLayers, foreground as walkFore, cast as walkCast,
-         guide as walkGuide, destinations, SPARK_SHEET, HAND_OVER_MS } from "./data/walk.js";
+         guide as walkGuide, destinations, homeMode,
+         SPARK_SHEET, HAND_OVER_MS } from "./data/walk.js";
 import {
   initAudio,
   loadAudio,
@@ -77,15 +78,29 @@ initGame({
   hold: !straightToGame
 });
 
-// A round is done: walk on to the next level's place, or — after the last —
-// the chapter is over.
+// A round is done: walk on to the next level's place — or, after the last
+// lamp, they walk home: the same road in reverse, the whole rescued flock
+// flying ahead of them, dissolving into the town with every light back on.
+let goingHome = false;
+
 function gameDone() {
+  // The ending just played out: the chapter is over.
+  if (currentLevel() === -1) {
+    endcard.classList.add("is-active");
+    return;
+  }
+  // The game itself knows which round just finished. Reading it here (rather
+  // than trusting the counter) makes a dev-menu jump into any level count as
+  // "everything before it is done": finish it and the chapter carries on from
+  // there.
+  chapter = Math.max(chapter, currentLevel());
   if (chapter + 1 < levels.length) {
     chapter += 1;
     enterWalk(destinations[levels[chapter].walkTo]);
     return;
   }
-  endcard.classList.add("is-active");
+  goingHome = true;
+  enterWalk(destinations.home, homeMode);
 }
 
 /* ---- loading ---- */
@@ -175,19 +190,32 @@ async function handOver() {
   enterWalk(destinations[levels[chapter].walkTo]);
 }
 
-function enterWalk(dest) {
+function enterWalk(dest, mode = null) {
   document.body.dataset.act = "walk";
   // The walk borrows the game's frame, so arriving is a cross-fade, not a cut.
   setFrame(GAME_W, GAME_H);
   hud.classList.remove("is-waiting");
   hud.classList.add("is-active");
-  startWalk(dest);
+  startWalk(dest, mode);
 }
 
 // They have arrived: bring the game up underneath and fade the path out over it.
 // Every arrival holds the first beat until the hand-over is done — the walk to
 // level 1 needs the same grace the story's did.
 function arrive() {
+  // Home: the walk dissolved into the celebration painting the first end
+  // screen stands on, so the ending begins exactly like any other arrival —
+  // built under the fade, held until it is done.
+  if (goingHome) {
+    armHold();
+    document.body.dataset.act = "game";
+    setFrame(GAME_W, GAME_H);
+    hud.classList.remove("is-waiting");
+    startEpilogue();
+    endWalk();
+    window.setTimeout(releaseHold, HAND_OVER_MS);
+    return;
+  }
   armHold();
   enterGame();
   endWalk();
@@ -274,6 +302,9 @@ const actions = {
     // Same as play: if they left full screen between chapters, go back in.
     goFullscreen();
     endcard.classList.remove("is-active");
+    // The walk home holds its final frame under the card; clear it.
+    goingHome = false;
+    endWalk();
 
     // From the top means from the first round.
     chapter = straightToGame ? jumpLevel : 0;
@@ -304,7 +335,13 @@ if (devMode) {
     .then(({ initDevTools }) =>
       initDevTools({
         act: () => document.body.dataset.act,
-        setAct: devSetAct
+        setAct: devSetAct,
+        // A dev jump says where the chapter now is, so walks arrive into the
+        // right level and the walk-home row ends on the card.
+        setChapter: (i, home = false) => {
+          chapter = Math.min(Math.max(i, 0), levels.length - 1);
+          goingHome = Boolean(home);
+        }
       }))
     .catch((err) => console.warn("dev tools failed to load", err));
 }

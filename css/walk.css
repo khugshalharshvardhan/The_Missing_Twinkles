@@ -132,6 +132,16 @@
   to   { transform: translate(30px, -22px) scale(1.04); }
 }
 
+/* The same drift, mirrored — the sheet's fireflies are drawn flying right,
+   and on the walk home everything travels left. A second set of keyframes
+   rather than an inline flip, because the drift owns transform. */
+.pw__spark.is-flipped { animation-name: pw-drift-flip; }
+
+@keyframes pw-drift-flip {
+  from { transform: translate(-26px, 18px) scale(0.92) scaleX(-1); }
+  to   { transform: translate(30px, -22px) scale(1.04) scaleX(-1); }
+}
+
 /* ---- the firefly they are following ---- */
 
 .pw__guide {
