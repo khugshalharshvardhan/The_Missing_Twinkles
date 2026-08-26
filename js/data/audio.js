@@ -386,6 +386,56 @@ export const gameCues = {
   "s5.2": {
     sfx: [{ id: "catch_pop", at: 120, gain: 0.8 }, { id: "twinkle", at: 500, gain: 0.45 }],
     vo: { id: "vo_neel_yay", at: 260, pan: 0.5 }
+  },
+
+  /* ---------- Level 3 — the magic seeds ----------
+     The same cue sheet a third time, on the forest's beats, offsets unchanged.
+     Only the three lines that name the element are new (vo_l3_*). */
+
+  // Look closely — the seeds materialise after the line (fireflies.at 2650 in
+  // screens.js) and vanish on their sparkle 5.9s later.
+  "m1": {
+    bed: "bed_main",
+    sfx: [{ id: "twinkle", at: 2750, gain: 0.4, pan: 0.2 },
+      { id: "sparkle", at: 8600, gain: 0.6 }],
+    vo: { id: "vo_g_guess", at: 500, pan: -0.5 }
+  },
+  // The keypad — the pad appears once the question is asked (keypadAt 2350).
+  "m2": {
+    sfx: [{ id: "page_air", at: 0, gain: 0.5 },
+      { id: "sparkle", at: 2350, gain: 0.55 }],
+    vo: { id: "vo_l3_howmany", at: 500, pan: -0.6 }
+  },
+
+  // ---- counting ----
+  "m3": {
+    vo: { id: "vo_g_count", at: 500, pan: -0.5 }
+  },
+  "m3.2": {
+    sfx: [{ id: "page_air", at: 0, gain: 0.5 }],
+    vo: { id: "vo_l3_tapcount", at: 500, pan: -0.5 }
+  },
+
+  // ---- the total, and how the guess did ----
+  "m4": {
+    sfx: [{ id: "sparkle", at: 420, gain: 0.5 }],
+    vo: { id: "vo_l3_total", at: 500, pan: -0.5 }
+  },
+  // Stem only: js/game.js says the number after it (role "guessline").
+  "m16": {
+    vo: { id: "vo_g_youguessed", at: 500, pan: -0.5 }
+  },
+  // The verdict line and its chime are chosen in js/game.js.
+  "m4.2": {},
+
+  // ---- the lamp ----
+  "m5.1": {
+    sfx: [{ id: "page_air", at: 0, gain: 0.5 }],
+    vo: { id: "vo_g_taplamp", at: 500, pan: -0.5 }
+  },
+  "m5.2": {
+    sfx: [{ id: "catch_pop", at: 120, gain: 0.8 }, { id: "twinkle", at: 500, gain: 0.45 }],
+    vo: { id: "vo_neel_yay", at: 260, pan: 0.5 }
   }
 };
 

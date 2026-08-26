@@ -113,7 +113,18 @@ const LINES = [
     text: "Tap each starlight to count.", rate: 0.94, pitch: "+8%", volume: 96 },
 
   { id: "vo_l2_total", who: "agni", screen: "s4", mood: "announcing it, pleased",
-    text: "There are six starlights.", rate: 0.98, pitch: "+12%", volume: 98 }
+    text: "There are six starlights.", rate: 0.98, pitch: "+12%", volume: 98 },
+
+  // ---- Level 3 — the magic seeds, in the forest. Third time for these three
+  // lines, same prosody again for the same reason.
+  { id: "vo_l3_howmany", who: "agni", screen: "m2", mood: "asking the player, open and unhurried",
+    text: "How many magic seeds were there?", rate: 0.92, pitch: "+10%", volume: 94 },
+
+  { id: "vo_l3_tapcount", who: "agni", screen: "m3.2", mood: "showing how, kind",
+    text: "Tap each magic seed to count.", rate: 0.94, pitch: "+8%", volume: 96 },
+
+  { id: "vo_l3_total", who: "agni", screen: "m4", mood: "announcing it, pleased",
+    text: "There are nine magic seeds.", rate: 0.98, pitch: "+12%", volume: 98 }
 ];
 
 // Counting out loud is the point of the game, so Agni says each number as the

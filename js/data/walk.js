@@ -219,5 +219,12 @@ export const destinations = {
     // so it is fitted to the same height as the berry guide rather than the
     // same width, which is what keeps the weave keyframes reading the same.
     guide: { src: `${GAME}starlight.webp`, w: 110, h: 105 }
+  },
+  forest: {
+    arrive: `${GAME}bg_forest.webp`,
+    // The seed art is 208x268 — the narrowest of the four — so like the star
+    // it is fitted to the berry guide's height, which is what keeps every
+    // guide travelling the weave at the same apparent size.
+    guide: { src: `${GAME}magicseed.webp`, w: 82, h: 105 }
   }
 };

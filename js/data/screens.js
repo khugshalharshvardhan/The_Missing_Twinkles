@@ -105,6 +105,39 @@ export const STARLIGHTS = [
 
 const BG_VALLEY = { src: `${IMG}bg_valley.webp`, x: 0, y: 0, w: FRAME_W, h: FRAME_H };
 
+/* ---- Level 3 — the magic seeds, in the forest ----
+
+   NINE, from the design sheet, in its formation for nine: a 3 x 3 grid on the
+   same 250px pitch across and down as level 2's two rows, so the three levels
+   read as one hand spacing them.
+
+   Nine at an equal 250 pitch is a taller block than level 1's nine (634px
+   against 423) because the berries had to squeeze their rows to 150 to fit.
+   It still clears everything: the grid spans x 696-1300, inside the gap
+   between Agni's box (ends 634) and Neel's (starts 1385), and y 40-674, well
+   above the number line at 866.
+
+   Boxes are 104x134 to match the seed art's own aspect. seed.png carries a
+   wide transparent margin (the drawing is 692x894 of its 1536x1024) and was
+   cropped to it before scaling, as the starlight was. 104x134 is 13,936 square
+   pixels against a berry's 13,776, so all three elements weigh the same. */
+export const SEED_TOTAL = 9;
+export const SEED_SRC = `${IMG}magicseed.webp`;
+
+export const MAGICSEEDS = [
+  { x: 0, y: 0, w: 104, h: 134 },
+  { x: 250, y: 0, w: 104, h: 134 },
+  { x: 500, y: 0, w: 104, h: 134 },
+  { x: 0, y: 250, w: 104, h: 134 },
+  { x: 250, y: 250, w: 104, h: 134 },
+  { x: 500, y: 250, w: 104, h: 134 },
+  { x: 0, y: 500, w: 104, h: 134 },
+  { x: 250, y: 500, w: 104, h: 134 },
+  { x: 500, y: 500, w: 104, h: 134 }
+];
+
+const BG_FOREST = { src: `${IMG}bg_forest.webp`, x: 0, y: 0, w: FRAME_W, h: FRAME_H };
+
 /* ---- crop transforms, named where a pose is reused ---- */
 
 const CROP = {
@@ -880,6 +913,196 @@ export const level2 = [
   }
 ];
 
+/* ---- Level 3 — the magic seeds, in the forest ----
+
+   The same nine beats a third time, in the Magic Seed Forest. As with level 2,
+   everything the round does not care about is held identical — THE_CLEARING
+   marks, the poses, the bubbles, and the keypad, counter, number line and lamp
+   coordinates — so only the place, the countable, its name and the ids move.
+
+   The 3 x 3 grid centres on (998, 357), the same point the berries and the
+   starlights centre on, so the countable is always in the same place on screen
+   whatever it happens to be that round. */
+export const level3 = [
+  // ---- M1 — look before you guess ----
+  {
+    id: "m1",
+    anchor: THE_CLEARING,
+    layers: [
+      BG_FOREST,
+      { src: `${IMG}agni_b.webp`, x: 25, y: 445, w: 553, h: 614, fill: CROP.agniB, fx: "breathe" },
+      { src: `${IMG}neel_think.webp`, x: 1327, y: 395, w: 372, h: 617, fill: CROP.neelThink, flipX: true, fx: "breathe-slow" }
+    ],
+    // Same clock as p1 and s1: her line ends (vo_g_guess runs 500 to 2581),
+    // the bubble goes, the seeds materialise, hold five seconds, vanish.
+    fireflies: { x: 696, y: 40, enter: "magic", at: 2650 },
+    dwell: 10000,
+    bubble: {
+      art: `${IMG}bub_15.webp`, who: "agni",
+      x: 224, y: 107, w: 514, h: 277,
+      text: "Look closely and make a guess!"
+    }
+  },
+
+  // ---- M2 — the keypad ----
+  {
+    id: "m2",
+    anchor: THE_CLEARING,
+    interact: "keypad",
+    counter: "guess",
+    layers: [
+      BG_FOREST,
+      { src: `${IMG}agni_talk.webp`, x: 10, y: 485, w: 576, h: 532, fill: CROP.agniTalk, flipX: true, fx: "breathe" },
+      { src: `${IMG}neel_think.webp`, x: 1369, y: 386, w: 372, h: 617, fill: CROP.neelThink, flipX: true, fx: "breathe-slow" }
+    ],
+    keypad: true,
+    // vo_l3_howmany runs 500 to 2250 — the same length as the other two.
+    keypadAt: 2350,
+    bubble: {
+      art: `${IMG}bub_15.webp`, who: "agni",
+      x: 0, y: 185, w: 514, h: 277,
+      text: "How many magic seeds were there?"
+    }
+  },
+
+  // ---- M3 — the seeds come back, dim, to be counted ----
+  {
+    id: "m3",
+    anchor: THE_CLEARING,
+    counter: "guess",
+    layers: [
+      BG_FOREST,
+      { src: `${IMG}agni_point.webp`, x: 64, y: 498, w: 525, h: 501, fill: CROP.agniPoint, fx: "breathe" },
+      { src: `${IMG}neel_d.webp`, x: 1344, y: 417, w: 449, h: 581, fill: CROP.neelD, flipX: true, fx: "breathe-slow" }
+    ],
+    fireflies: { x: 696, y: 40, dim: true },
+    bubble: {
+      art: `${IMG}bub_3.webp`, who: "agni",
+      x: 220, y: 216, w: 557, h: 282,
+      artInset: [18.09, 9.69, 0, 17.06],
+      text: "Let us count to check."
+    }
+  },
+
+  // ---- M3.2 — tap each one ----
+  {
+    id: "m3.2",
+    anchor: THE_CLEARING,
+    interact: "count",
+    layers: [
+      BG_FOREST,
+      { src: `${IMG}agni_g.webp`, x: 80, y: 490, w: 554, h: 512, fill: CROP.agniG, fx: "breathe" },
+      { src: `${IMG}neel_c.webp`, x: 1385, y: 484, w: 396, h: 557, fill: CROP.neelC, fx: "breathe-slow" }
+    ],
+    fireflies: { x: 696, y: 40 },
+    counter: "guess",
+    numberLine: true,
+    // The hand keeps level 1's offset from the first countable's own box
+    // origin (-34, -17), so it points at the first seed the same way.
+    hint: { src: `${SHARED}hand_nudge.svg`, x: 662, y: 23, w: 308.396, h: 308.396 },
+    bubble: {
+      art: `${IMG}bub_32.webp`, who: "agni",
+      x: 190, y: 248, w: 489, h: 256,
+      text: "Tap each magic seed to count."
+    }
+  },
+
+  // ---- M4 — the true count ----
+  {
+    id: "m4",
+    anchor: THE_CLEARING,
+    role: "totalline",
+    numberLine: true,
+    dwell: 3800,
+    layers: [
+      BG_FOREST,
+      { src: `${IMG}agni_f.webp`, x: 9, y: 481, w: 605, h: 553, fx: "breathe" },
+      { src: `${IMG}neel_f.webp`, x: 1372, y: 424, w: 465, h: 589, fx: "breathe-slow" }
+    ],
+    fireflies: { x: 696, y: 40 },
+    counter: "total",
+    bubble: {
+      art: `${IMG}bub_4.webp`, who: "agni",
+      x: 254, y: 251, w: 417, h: 201,
+      text: "There are {total} magic seeds"
+    }
+  },
+
+  // ---- M16 — the guess, next to the truth ----
+  {
+    id: "m16",
+    anchor: THE_CLEARING,
+    role: "guessline",
+    numberLine: true,
+    dwell: 4600,
+    layers: [
+      BG_FOREST,
+      { src: `${IMG}agni_f.webp`, x: 9, y: 481, w: 605, h: 553, fx: "breathe" },
+      { src: `${IMG}neel_f.webp`, x: 1372, y: 424, w: 465, h: 589, fx: "breathe-slow" }
+    ],
+    fireflies: { x: 696, y: 40 },
+    counter: "guess",
+    bubble: {
+      art: `${IMG}bub_4.webp`, who: "agni",
+      x: 254, y: 251, w: 417, h: 201,
+      text: "You guessed {guess}."
+    }
+  },
+
+  // ---- M4.2 — the verdict ----
+  {
+    id: "m4.2",
+    anchor: THE_CLEARING,
+    role: "verdict",
+    layers: [
+      BG_FOREST,
+      { src: `${IMG}agni_d.webp`, x: 84, y: 474, w: 342, h: 560, fill: CROP.agniD, fx: "breathe" },
+      { src: `${IMG}neel_f.webp`, x: 1355, y: 408, w: 465, h: 589, fx: "breathe-slow" }
+    ],
+    bubble: {
+      art: `${IMG}bub_42.webp`, who: "agni",
+      x: 276, y: 222, w: 376, h: 226,
+      text: "{verdict}"
+    }
+  },
+
+  // ---- M5.1 — tap the lamp ----
+  {
+    id: "m5.1",
+    anchor: THE_CLEARING,
+    interact: "lamp",
+    layers: [
+      BG_FOREST,
+      { src: `${IMG}agni_g.webp`, x: 70, y: 489, w: 554, h: 512, fill: CROP.agniG, fx: "breathe" },
+      { src: `${IMG}neel_f.webp`, x: 1294, y: 412, w: 465, h: 589, fx: "breathe-slow" }
+    ],
+    lamp: { src: `${IMG}lamp_off.webp`, x: 807, y: 74, w: 272, h: 927, fill: CROP.lampOff },
+    lampLit: { src: `${IMG}lamp_on.webp`, x: 799, y: 74, w: 287, h: 927, fill: CROP.lampOn },
+    lampGlass: { x: 902, y: 254 },
+    bubble: {
+      art: `${IMG}bub_51.webp`, who: "agni",
+      x: 314, y: 300, w: 383, h: 184,
+      text: "Tap the lamp!"
+    }
+  },
+
+  // ---- M5.2 — the lamp catches a seed, and Neel cheers ----
+  {
+    id: "m5.2",
+    anchor: THE_CLEARING,
+    layers: [
+      BG_FOREST,
+      { src: `${IMG}agni_g.webp`, x: 70, y: 489, w: 554, h: 512, fill: CROP.agniG, fx: "breathe" },
+      { src: `${IMG}neel_turn.webp`, x: 1125, y: 391, w: 735, h: 610, fill: CROP.neelTurn, flipX: true, fx: "breathe-slow" },
+      { src: `${IMG}lamp_on.webp`, x: 799, y: 74, w: 287, h: 927, fill: CROP.lampOn, fx: "lamp-glow" },
+      // The caught one, sized to the seed's aspect on the shared centre
+      // (845, 276) — the same spot all four levels hold their catch.
+      { src: SEED_SRC, x: 834, y: 261, w: 22, h: 29, fx: "flicker" }
+    ],
+    shout: { text: "YAY!", x: 1264, y: 258, tilt: -9 }
+  }
+];
+
 /* ---- the levels, in playing order ----
 
    Everything js/game.js needs to run a round with a different element in a
@@ -919,6 +1142,19 @@ export const levels = [
     swarmClass: "",
     walkTo: "valley",
     screens: level2
+  },
+  {
+    name: "Level 3 — the magic seeds",
+    word: "Magic seed",
+    total: SEED_TOTAL,
+    swarmSrc: SEED_SRC,
+    layout: MAGICSEEDS,
+    // The seed is a lit thing rather than a light source, like the berry, and
+    // it sits on the darkest background in the game — so it carries its own
+    // amber halo and a dim state the forest cannot swallow. See css/game.css.
+    swarmClass: "is-seeds",
+    walkTo: "forest",
+    screens: level3
   }
 ];
 
