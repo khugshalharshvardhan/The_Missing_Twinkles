@@ -926,7 +926,7 @@
   /* Deep bottom padding puts the button on the open ground in the gap between
      the two characters, rather than against the edge of the frame. */
   padding: 0 80px 176px;
-  background: #05060d url("../assets/images/cover2.webp") center / cover no-repeat;
+  background: #05060d url("../assets/images/newcover.webp") center / cover no-repeat;
 }
 
 /* Once the art is in, the loading furniture goes: the cover should be the cover,

@@ -30,6 +30,7 @@ import {
   loadAudio,
   unlockAudio,
   playUi,
+  stopAudio,
   toggleMuted,
   isMuted
 } from "./audio.js";
@@ -38,7 +39,6 @@ const loader = document.getElementById("loader");
 const loaderBar = document.getElementById("loader-bar");
 const loaderNote = document.getElementById("loader-note");
 const loaderCta = document.getElementById("loader-cta");
-const endcard = document.getElementById("endcard");
 const hud = document.getElementById("hud");
 const soundBtn = document.getElementById("sound");
 
@@ -84,9 +84,10 @@ initGame({
 let goingHome = false;
 
 function gameDone() {
-  // The ending just played out: the chapter is over.
+  // The ending just played out: the chapter closes back onto its own cover —
+  // "The End", then the title screen, ready to be played again.
   if (currentLevel() === -1) {
-    endcard.classList.add("is-active");
+    resetToTitle();
     return;
   }
   // The game itself knows which round just finished. Reading it here (rather
@@ -176,6 +177,20 @@ Promise.all([
     prefetchGame();
   }
 });
+
+// Back to the cover, everything wound down: the next press of Play runs the
+// whole chapter again from the top. The loader kept its is-ready state from
+// boot, so the button is already waiting on it.
+function resetToTitle() {
+  goingHome = false;
+  chapter = 0;
+  stopAudio();
+  endWalk();
+  hud.classList.remove("is-active", "is-waiting", "has-prev", "has-prev-off");
+  document.body.dataset.act = "story";
+  setFrame(STORY_W, STORY_H);
+  loader.classList.add("is-active");
+}
 
 /* ---- the hand-over ---- */
 
@@ -296,24 +311,6 @@ const actions = {
   },
   prev: () => {
     if (prevPage()) playUi(UI_ADVANCE, 0.5);
-  },
-  replay: () => {
-    unlockAudio();
-    // Same as play: if they left full screen between chapters, go back in.
-    goFullscreen();
-    endcard.classList.remove("is-active");
-    // The walk home holds its final frame under the card; clear it.
-    goingHome = false;
-    endWalk();
-
-    // From the top means from the first round.
-    chapter = straightToGame ? jumpLevel : 0;
-
-    if (straightToGame) {
-      enterGame(jumpTo === null ? 0 : Number(jumpTo));
-      return;
-    }
-    enterStory();
   },
   sound: () => {
     unlockAudio();
