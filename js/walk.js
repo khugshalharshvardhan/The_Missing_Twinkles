@@ -172,8 +172,12 @@ function tick(now) {
   const step = (run.pace * ease * dt) / 1000;
   scroll += step;
 
-  for (const { el, speed } of strips) {
-    el.style.backgroundPositionX = `${(run.reverse ? scroll : -scroll) * speed}px`;
+  for (const s of strips) {
+    // Wrap by whole tiles; until the tile width is known (one frame at most)
+    // the strip holds still rather than exposing an edge.
+    const raw = (run.reverse ? -scroll : scroll) * s.speed;
+    const off = s.tile ? ((raw % s.tile) + s.tile) % s.tile : 0;
+    s.el.style.transform = `translate3d(${-off}px, 0, 0)`;
   }
 
   // The clearing opens over the same stretch the scroll is easing down. Both
@@ -281,8 +285,30 @@ function strip(layer) {
     return el;
   }
 
-  el.style.backgroundImage = `url("${layer.src}")`;
-  strips.push({ el, speed: layer.speed });
+  // The art scrolls on an inner element moved by transform, not by
+  // background-position: a transform is composited on the GPU and moves in
+  // sub-pixels, where background-position repaints the whole strip on the CPU
+  // every frame and snaps to whole pixels — which is exactly the stutter the
+  // slow layers showed (the sky moves ~9px a second; pixel-snapped, it stepped
+  // visibly). The inner is one tile wider than the frame and wraps by whole
+  // tiles, so there is never an exposed edge. Everything frame-aligned — the
+  // settle masks, the bottom fade, the dim, the opacity — stays on the
+  // stationary outer box.
+  const inner = document.createElement("i");
+  inner.className = "pw__scroll";
+  inner.style.backgroundImage = `url("${layer.src}")`;
+  el.append(inner);
+
+  const entry = { el: inner, speed: layer.speed, tile: 0 };
+  strips.push(entry);
+  // The wrap period is the tile's on-screen width: the art's own aspect at
+  // this band's height. Cached by the preloader, so this fires immediately.
+  const probe = new Image();
+  probe.onload = () => {
+    entry.tile = probe.naturalWidth * ((layer.h ?? FRAME_H) / probe.naturalHeight);
+    inner.style.width = `${Math.ceil(FRAME_W + entry.tile)}px`;
+  };
+  probe.src = layer.src;
   if (layer.settle != null) fades.push({ el, base, to: layer.settle });
   if (layer.settleMask != null) masks.push({ el, edge: layer.settleMask });
   // Static, so it goes on once: art with a hard lower edge dissolved into what

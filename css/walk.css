@@ -37,13 +37,27 @@
   left: 0;
   right: 0;
   display: block;
+  overflow: hidden;
   background-repeat: repeat-x;
   background-size: auto 100%;
   background-position: 0 0;
   /* The layers are painted at 724px tall and drawn at 1059, so let the browser
      scale them smoothly rather than sharpening the upscale. */
   image-rendering: auto;
-  will-change: background-position;
+}
+
+/* The moving part of a strip: the tile, one tile wider than the frame, slid by
+   transform so the browser composites it on the GPU in sub-pixel steps — see
+   strip() in js/walk.js for why background-position could not do this job. */
+.pw__scroll {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-repeat: repeat-x;
+  background-size: auto 100%;
+  will-change: transform;
 }
 
 /* Solid earth under the two ground planes, which are semi-transparent texture
