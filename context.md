@@ -202,6 +202,14 @@ the tutorial's `lamp_off.webp`/`lamp_on.webp` at their existing coordinates**
   unprompted (`ffmpeg -i in.png -vf scale=1882:1059:flags=lanczos out.webp` for
   backgrounds; keep alpha for elements). **Leave the source PNGs on disk** for
   the owner to delete.
+- Story music follows its scenes: `bed_main` (page 1, the walks, the game) →
+  `bed_uneasy` (the mist, step 2.1) → `bed_dark` (lights-out and the black
+  page, 2.2) → `bed_hope` (page 3, from the 3.4 transition) — `playBed()`
+  cross-fades between them. The lamp dies magically (`magic_gutter` /
+  `magic_out` — this world has no electricity, nothing may buzz) and the
+  game's swarms vanish on `magic_vanish` (a falling shimmer), never a reward
+  chime. All recipes live in tools/gen-sfx.js; `lamp_flicker`, `lantern_pop`
+  and `lamp_out` are unreferenced but kept on disk.
 - **Never delete audio files** when removing them from code — just remove the
   references.
 - **Update the devtools hamburger menu with every screen/feature change**,

@@ -246,5 +246,39 @@ publish("cheer_swell", mix("cheer_raw", [
   { file: bell("cs_bell", 1047, 1.4), at: 1300, gain: 0.5 }
 ]), "shot", { stereo: true });
 
+/* ======================= the magical lamp, and vanishing ======================= */
+
+// The lamp's stutter: a glassy chime-flutter with breath — this town has no
+// electricity, so its lamp must not buzz. Two detuned high partials trembling
+// over a warm low flame tone.
+publish("magic_gutter", mix("magic_gutter_raw", [
+  { file: src("mg_hi", `aevalsrc=sin(2*PI*1244*t)*exp(-5*t):d=0.72:s=${SR}`, "tremolo=f=13:d=0.85"), gain: 0.8 },
+  { file: src("mg_hi2", `aevalsrc=sin(2*PI*1866*t)*exp(-7*t):d=0.6:s=${SR}`, "tremolo=f=17:d=0.9"), gain: 0.4 },
+  { file: src("mg_flame", `aevalsrc=sin(2*PI*311*t)*exp(-4*t):d=0.72:s=${SR}`, "tremolo=f=11:d=0.7"), gain: 0.45 },
+  { file: src("mg_air", `anoisesrc=d=0.55:c=white:r=${SR}:a=0.8`,
+    "bandpass=f=3400:width_type=h:width=2200,tremolo=f=13:d=0.8,afade=t=out:st=0.2:d=0.34"), gain: 0.22 }
+]), "shot");
+
+// The light drawn away: two falling glissandi an octave apart dissolving into
+// a hush, a last high wisp at the end.
+publish("magic_out", mix("magic_out_raw", [
+  { file: src("mo_fall", `aevalsrc=sin(2*PI*(1100*t-420*t*t))*exp(-2.6*t):d=1.2:s=${SR}`), gain: 1 },
+  { file: src("mo_fall2", `aevalsrc=sin(2*PI*(1650*t-630*t*t))*exp(-3.4*t):d=1.15:s=${SR}`), gain: 0.42 },
+  { file: src("mo_hush", `anoisesrc=d=1.1:c=pink:r=${SR}:a=0.8`,
+    "bandpass=f=1100:width_type=h:width=1200,afade=t=in:st=0:d=0.12,afade=t=out:st=0.25:d=0.8"), gain: 0.3 },
+  { file: src("mo_wisp", `aevalsrc=sin(2*PI*2637*t)*exp(-18*t):d=0.3:s=${SR}`), at: 850, gain: 0.16 }
+]), "shot");
+
+// A thing disappearing: three glints falling in sequence over a soft puff of
+// air — away, not reward. The game's swarms vanish on this.
+publish("magic_vanish", mix("magic_vanish_raw", [
+  { file: src("mv_g1", `aevalsrc=sin(2*PI*(1568*t-520*t*t))*exp(-5*t):d=0.8:s=${SR}`), at: 0, gain: 0.9 },
+  { file: src("mv_g2", `aevalsrc=sin(2*PI*(1318*t-470*t*t))*exp(-5.4*t):d=0.75:s=${SR}`), at: 90, gain: 0.7 },
+  { file: src("mv_g3", `aevalsrc=sin(2*PI*(1046*t-400*t*t))*exp(-5.8*t):d=0.72:s=${SR}`), at: 190, gain: 0.55 },
+  { file: src("mv_puff", `anoisesrc=d=0.4:c=white:r=${SR}:a=0.9`,
+    "bandpass=f=1700:width_type=h:width=1500,afade=t=in:st=0:d=0.03,afade=t=out:st=0.08:d=0.3"), at: 0, gain: 0.3 },
+  { file: src("mv_low", `aevalsrc=sin(2*PI*(240*t-90*t*t))*exp(-6*t):d=0.6:s=${SR}`), at: 60, gain: 0.3 }
+]), "shot");
+
 console.log("generated:");
 for (const f of fs.readdirSync(OUT).sort()) console.log("  " + f);

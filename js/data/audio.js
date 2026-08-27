@@ -13,11 +13,13 @@
 // the layer's x position as (x / 1920) * 2 - 1, and sweep pans across the clip.
 // `fade: { at, over }` takes a clip out instead of cutting it.
 //
-// One piece of music, bed_main, runs unbroken from the first page to the end
-// card — it is never swapped, because playBed() ignores a request for the bed
-// already playing. What used to be four mood beds cross-fading is now `music`
-// on the beats where the mood turns: the track falls away for the lights-out and
-// comes back with the fireflies. `music.to` is a fraction of the bus level.
+// The story's music follows its scenes: bed_main (the cheerful stroll) for
+// page one, bed_uneasy under the mist, bed_dark for the lights-out and the
+// black page, bed_hope as the empty street resolves into a plan — and
+// bed_main again from the walk on, for the game. playBed() cross-fades on a
+// change and ignores a request for the bed already playing. `music` still
+// rides on top for the dips that let a line land; `music.to` is a fraction
+// of the bus level.
 
 const SFX_DIR = "assets/audios/sfx/";
 const VO_DIR = "assets/audios/vo/";
@@ -73,8 +75,9 @@ export const cues = {
 
   // Mist at their feet. The bed turns uneasy and a heartbeat starts.
   "2.1": {
-    // The first turn: the music pulls back as the mist arrives.
-    music: { to: 0.7, at: 0, over: 1.6 },
+    // The first turn: the cheer cross-fades into the mist's uneasy grind.
+    bed: "bed_uneasy",
+    music: { to: 0.85, at: 0, over: 1.6 },
     sfx: [{ id: "mist_rise", at: 0, gain: 0.85 },
       // The heartbeats carry the rise; he only speaks once it has covered the
       // ground, so the bubble and the line wait for it. Matches `say.at` on
@@ -82,15 +85,15 @@ export const cues = {
       { id: "heartbeat", at: 900, gain: 0.5 },
       { id: "heartbeat", at: 1700, gain: 0.55 },
       { id: "heartbeat", at: 2500, gain: 0.6 },
-      // The lamp answers his line: two stutters, the pop, its sparks, and its
-      // light going out — all panned hard left, where it stands. Times match
-      // LAMP_GUTTER / LAMPS_FLARE / LAMP_SPARKS in scenes.js and the keyframes
-      // in story.css.
-      { id: "lamp_flicker", at: 4000, gain: 0.72, pan: -0.69 },
-      { id: "lamp_flicker", at: 4400, gain: 0.78, pan: -0.69 },
-      { id: "lantern_pop", at: 4950, gain: 1, rate: 0.92, pan: -0.69 },
+      // The lamp answers his line: two magical stutters (a glassy flutter,
+      // not a buzz — nothing in this town is electric), its sparks, and the
+      // light drawn away in a falling shimmer. All panned hard left, where it
+      // stands. Times match LAMP_GUTTER / LAMPS_FLARE / LAMP_SPARKS in
+      // scenes.js and the keyframes in story.css.
+      { id: "magic_gutter", at: 4000, gain: 0.8, pan: -0.69 },
+      { id: "magic_gutter", at: 4400, gain: 0.88, rate: 0.94, pan: -0.69 },
       { id: "sparkle", at: 4990, gain: 0.75, pan: -0.6 },
-      { id: "lamp_out", at: 5150, gain: 0.8, pan: -0.69 }
+      { id: "magic_out", at: 5050, gain: 0.9, pan: -0.69 }
     ],
     vo: { id: "vo_neel_what", at: 3160 }
   },
@@ -99,9 +102,11 @@ export const cues = {
   // with every light off, the last warmth settles off the pair, and the dark
   // drains into the black the eyes open out of.
   "2.2": {
+    // The uneasy grind gives way to the dark's near-nothing drone.
+    bed: "bed_dark",
     // Down to almost nothing under blackout_hit — the lights going out wants
     // air behind it, not a cheerful loop.
-    music: { to: 0.18, at: 0, over: 1.4 },
+    music: { to: 0.55, at: 0, over: 1.4 },
     sfx: [{ id: "mist_rush", at: 0, gain: 0.9 },
       { id: "blackout_hit", at: 2750, gain: 1 }
     ]
@@ -140,6 +145,8 @@ export const cues = {
 
   // Firefly transition — bells, and the music comes back up with them.
   "3.4": {
+    // The fireflies out of the dark: warmth comes back with them.
+    bed: "bed_hope",
     music: { to: 1, at: 300, over: 1.8 },
     sfx: [{ id: "sparkle", at: 100, gain: 0.9 }]
   },
@@ -227,8 +234,8 @@ export const gameCues = {
   "1.1": {
     bed: "bed_main",
     sfx: [{ id: "twinkle", at: 700, gain: 0.4 },
-      // The swarm vanishing on its magic, 5.9s after it set out.
-      { id: "sparkle", at: 5950, gain: 0.6 }],
+      // The swarm vanishing on its magic — a falling shimmer, not a reward.
+      { id: "magic_vanish", at: 5950, gain: 0.7 }],
     vo: { id: "vo_g_look", at: 500, pan: -0.55 }
   },
   "1.2": {
@@ -247,7 +254,7 @@ export const gameCues = {
   // as they arrive, the sparkle as they vanish 5.9s later.
   "1.5": {
     sfx: [{ id: "twinkle", at: 2750, gain: 0.4, pan: 0.2 },
-      { id: "sparkle", at: 8600, gain: 0.6 }],
+      { id: "magic_vanish", at: 8600, gain: 0.7 }],
     vo: { id: "vo_g_guess", at: 500, pan: -0.5 }
   },
 
@@ -316,11 +323,11 @@ export const gameCues = {
      the berries wait for the line, the pad arrives on its sparkle. */
 
   // Look closely — the berries materialise after the line (fireflies.at 2650
-  // in screens.js) and vanish on their sparkle 5.9s later.
+  // in screens.js) and vanish on their own falling shimmer 5.9s later.
   "p1": {
     bed: "bed_main",
     sfx: [{ id: "twinkle", at: 2750, gain: 0.4, pan: 0.2 },
-      { id: "sparkle", at: 8600, gain: 0.6 }],
+      { id: "magic_vanish", at: 8600, gain: 0.7 }],
     vo: { id: "vo_g_guess", at: 500, pan: -0.5 }
   },
   // The keypad — the pad appears once the question is asked (keypadAt 2350).
@@ -368,11 +375,11 @@ export const gameCues = {
      meadow use, which is what keeps one narrator across three places. */
 
   // Look closely — the stars materialise after the line (fireflies.at 2650 in
-  // screens.js) and vanish on their sparkle 5.9s later.
+  // screens.js) and vanish on their own falling shimmer 5.9s later.
   "s1": {
     bed: "bed_main",
     sfx: [{ id: "twinkle", at: 2750, gain: 0.4, pan: 0.2 },
-      { id: "sparkle", at: 8600, gain: 0.6 }],
+      { id: "magic_vanish", at: 8600, gain: 0.7 }],
     vo: { id: "vo_g_guess", at: 500, pan: -0.5 }
   },
   // The keypad — the pad appears once the question is asked (keypadAt 2350).
@@ -418,11 +425,11 @@ export const gameCues = {
      Only the three lines that name the element are new (vo_l3_*). */
 
   // Look closely — the seeds materialise after the line (fireflies.at 2650 in
-  // screens.js) and vanish on their sparkle 5.9s later.
+  // screens.js) and vanish on their own falling shimmer 5.9s later.
   "m1": {
     bed: "bed_main",
     sfx: [{ id: "twinkle", at: 2750, gain: 0.4, pan: 0.2 },
-      { id: "sparkle", at: 8600, gain: 0.6 }],
+      { id: "magic_vanish", at: 8600, gain: 0.7 }],
     vo: { id: "vo_g_guess", at: 500, pan: -0.5 }
   },
   // The keypad — the pad appears once the question is asked (keypadAt 2350).
@@ -468,11 +475,11 @@ export const gameCues = {
      lines that name the element are new (vo_l4_*). */
 
   // Look closely — the flowers open after the line (fireflies.at 2650 in
-  // screens.js) and vanish on their sparkle 5.9s later.
+  // screens.js) and vanish on their own falling shimmer 5.9s later.
   "f1": {
     bed: "bed_main",
     sfx: [{ id: "twinkle", at: 2750, gain: 0.4, pan: 0.2 },
-      { id: "sparkle", at: 8600, gain: 0.6 }],
+      { id: "magic_vanish", at: 8600, gain: 0.7 }],
     vo: { id: "vo_g_guess", at: 500, pan: -0.5 }
   },
   // The keypad — the pad appears once the question is asked (keypadAt 2350).
