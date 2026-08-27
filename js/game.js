@@ -229,7 +229,7 @@ function go(target) {
   // and is-counted-out left behind hides every count number on the NEXT count
   // beat that lands on this pane — which is why the numbers showed on some
   // levels and not others: it depended on pane parity.
-  back.classList.remove("is-begun", "is-cleared", "is-line", "is-counted-out");
+  back.classList.remove("is-begun", "is-cleared", "is-line", "is-counted-out", "is-flying");
   // The lamp beat is staged as a small camera move — the scene eases a step
   // right while the lamp comes in from the left edge (see game.css). Only the
   // tap beat pans; the lit beat after it holds the frame it settled on.
@@ -307,6 +307,20 @@ function scheduleReveals(screen, pane) {
     revealTimers.push(window.setTimeout(() => {
       pane.classList.add("is-cleared");
     }, screen.fireflies.at - 150));
+  }
+
+  // The float: feet leave the ground — the standing pose fades under the
+  // flyer (see .is-flying), with a burst where he stood.
+  if (screen.flight) {
+    revealTimers.push(window.setTimeout(() => {
+      pane.classList.add("is-flying");
+      sparkleBurst(pane, {
+        x: screen.flight.x + screen.flight.w / 2,
+        y: screen.flight.y + screen.flight.h / 2,
+        spread: 160,
+        count: 12
+      });
+    }, screen.flight.at));
   }
 
   // 2: the pad appears once the question has been asked, on a burst of sparkle.
@@ -475,6 +489,8 @@ function render(screen) {
   if (screen.hint) frag.append(imageLayer(screen.hint, "layer hint"));
   if (screen.bubble) frag.append(bubble(screen.bubble, screen));
   if (screen.shout) frag.append(shout(screen.shout));
+  if (screen.flight) frag.append(flight(screen.flight));
+  if (screen.video) frag.append(videoLayer(screen.video));
 
   return frag;
 }
@@ -679,15 +695,75 @@ function shout(spec) {
   wrap.style.top = `${spec.y}px`;
   wrap.style.setProperty("--tilt", `${spec.tilt ?? 0}deg`);
 
+  if (spec.size) wrap.style.setProperty("--shout-size", `${spec.size}px`);
+
+  // `at` holds the whole word back — The End waits for the iris to close.
+  const from = spec.at ?? 0;
+
   [...spec.text].forEach((ch, i) => {
     const b = document.createElement("b");
     b.textContent = ch;
-    b.style.animationDelay = `${180 + i * 90}ms`;
+    // A space is a seat with nothing in it — no stroke, just width.
+    if (ch === " ") b.classList.add("shout__sp");
+    b.style.animationDelay = `${from + 180 + i * 90}ms`;
     b.style.setProperty("--ch-tilt", `${((i * 47) % 15) - 7}deg`);
     wrap.append(b);
   });
 
   return wrap;
+}
+
+// A beat that is a film: the clip fills the frame (same 16:9 as the stage) and
+// starts as soon as the pane is built, so its first frames play under the
+// cross-fade the way every other beat's opening does. Muted and track-stripped —
+// the cue table carries the sound.
+function videoLayer(spec) {
+  const box = document.createElement("div");
+  box.className = "video-layer";
+
+  const vid = document.createElement("video");
+  vid.src = spec.src;
+  vid.muted = true;
+  vid.autoplay = true;
+  vid.playsInline = true;
+  vid.preload = "auto";
+  // The stage-show close: the moment the clip's last frame lands, the picture
+  // shrinks to a circle and winks out — on the frame itself, not after a cut.
+  vid.addEventListener("ended", () => box.classList.add("is-iris"));
+  box.append(vid);
+
+  return box;
+}
+
+// A character carried off by a smell: a box that drifts along the wavy climb
+// css/game.css draws (g-neel-drift), holding two poses that take turns —
+// alternating drawings is what makes a cartoon float read as floating rather
+// than sliding. The whole thing waits out spec.at before the first frame.
+function flight(spec) {
+  const box = document.createElement("div");
+  box.className = "neel-flight";
+  place(box, spec);
+  // One value serves both of the box's animations (travel and fade).
+  box.style.animationDelay = `${spec.at}ms`;
+  box.style.animationDuration = `${spec.ms}ms`;
+
+  // The bob rides between the travel and the drawings, so the rock and the
+  // rise-fall never disturb the straight line the box itself flies.
+  const bob = document.createElement("div");
+  bob.className = "neel-flight__bob";
+  box.append(bob);
+
+  spec.srcs.forEach((src, i) => {
+    const img = document.createElement("img");
+    img.className = "neel-flight__pose";
+    img.src = src;
+    img.alt = "";
+    // The second drawing breathes in and out on its own clock.
+    if (i === 1) img.classList.add("neel-flight__pose--b");
+    bob.append(img);
+  });
+
+  return box;
 }
 
 /* ---- the lamp ---- */

@@ -214,6 +214,8 @@ function parts(screen) {
   if (screen.keypadAt) bits.add(`pad @${screen.keypadAt}ms`);
   if (screen.lamp) bits.add(screen.lampLit ? "lamp ⇢ lit" : "lamp");
   if (screen.shout) bits.add(`shout "${screen.shout.text}"`);
+  if (screen.flight) bits.add(`flight @${screen.flight.at}ms`);
+  if (screen.video) bits.add("video");
   if (screen.hint) bits.add("hint");
   if (screen.bubble) bits.add("bubble");
   return bits.size ? `  ·  ${[...bits].join("  ·  ")}` : "";

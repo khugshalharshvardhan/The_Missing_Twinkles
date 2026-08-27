@@ -1442,16 +1442,20 @@ const EP_STREET = { src: `${IMG}ep_street.webp`, x: 0, y: 0, w: FRAME_W, h: FRAM
 // Every cutout below is the design's own source art (the raw uploads keep
 // their alpha; node exports flatten onto white), cropped to its opaque pixels
 // and seated by measuring where those pixels sit in the design's render.
-const EP_PAIR = { src: `${IMG}ep_pair.webp`, x: 455, y: 489, w: 812, h: 505 };
+const EP_PAIR = { src: `${IMG}ep_pair.webp`, x: 414, y: 434, w: 895, h: 560, flipX: true };
 
 export const epilogueScreens = [
   // ---- E1 — "We did it, Neel!" (149:356) ----
   {
     id: "e1",
-    layers: [EP_STREET, EP_PAIR],
+    layers: [
+      EP_STREET,
+      EP_PAIR,
+      { src: `${SHARED}smell.webp`, x: 1180, y: 150, w: 620, h: 378, fx: "aroma-1" }
+    ],
     bubble: {
       art: `${IMG}bub_51.webp`, who: "agni",
-      x: 683, y: 328, w: 322, h: 167,
+      x: 679, y: 268, w: 322, h: 167,
       text: "We did it, Neel!"
     }
   },
@@ -1459,10 +1463,14 @@ export const epilogueScreens = [
   // ---- E2 — "The town is shining again!" (149:365, same painting) ----
   {
     id: "e2",
-    layers: [EP_STREET, EP_PAIR],
+    layers: [
+      EP_STREET,
+      EP_PAIR,
+      { src: `${SHARED}smell.webp`, x: 1180, y: 150, w: 620, h: 378, fx: "aroma-2" }
+    ],
     bubble: {
       art: `${IMG}bub_51.webp`, who: "agni",
-      x: 660, y: 302, w: 400, h: 196,
+      x: 657, y: 238, w: 400, h: 196,
       text: "The town is shining again!"
     }
   },
@@ -1473,32 +1481,39 @@ export const epilogueScreens = [
     layers: [
       EP_STREET,
       { src: `${IMG}ep_agni_wonder.webp`, x: 418, y: 520, w: 459, h: 454 },
-      { src: `${IMG}ep_neel_sniff.webp`, x: 1163, y: 489, w: 199, h: 384 }
+      { src: `${IMG}ep_neel_sniff.webp`, x: 1163, y: 489, w: 199, h: 384 },
+      { src: `${SHARED}smell.webp`, x: 1180, y: 150, w: 620, h: 378, fx: "aroma-3" }
     ],
     bubble: {
       art: `${IMG}bub_51.webp`, who: "agni",
-      x: 661, y: 415, w: 280, h: 157,
+      x: 668, y: 385, w: 280, h: 157,
       text: "Neel?"
     }
   },
 
-  // ---- E4 — the bakery has him. "Caaakeee!" is voice only, as the design
-  // draws no bubble here — the smell says it. The wisps flicker gently. ----
+  // ---- EV — the owner's animated telling of the gag: the smell reaches
+  // him and off he floats to the bakery. The clip's own soundtrack is
+  // stripped at conversion (assets/videos/neel_floating.webm, from the .mp4
+  // beside it); the cue table plays ours over it, including his dreamy
+  // "Caaaake!". Runs 5.9s; the dwell gives it air either side.
   {
-    id: "e4",
-    layers: [
-      EP_STREET,
-      { src: `${IMG}ep_agni_glad.webp`, x: 475, y: 523, w: 336, h: 454 },
-      // The same sniffing pose 7.2a walks away with — the design crops both
-      // beats' Neel from one sheet, two pixels apart.
-      { src: `${IMG}ep_neel_sniff.webp`, x: 1167, y: 512, w: 202, h: 387 },
-      // The whole golden wisp, curling off the bakery roof toward his nose —
-      // the design shows two crops of this one square; placed whole it reads
-      // the same and keeps its glow unclipped.
-      { src: `${IMG}ep_smell.webp`, x: 1328, y: 214, w: 441, h: 399, fx: "flicker" }
-    ],
-    // The closing shot holds a while: nothing else is coming.
-    dwell: 5600
+    id: "ev",
+    layers: [],
+    video: { src: "assets/videos/neel_floating.webm" },
+    // The clip runs 5.9s; the iris (2s, fired by the video's ended event)
+    // closes over its last frame, and the beat turns once it is dark.
+    dwell: 8400
+  },
+
+  // ---- EEND — the words the chapter closes on ----
+  {
+    id: "eend",
+    // Nothing but the dark the iris closed down to — the pane is empty and
+    // the letterbox shows through, so the cross-fade from the clipped-black
+    // video is invisible. Then the words.
+    layers: [],
+    shout: { text: "The End", x: 585, y: 380, tilt: -3, size: 150, at: 450 },
+    dwell: 5000
   }
 ];
 

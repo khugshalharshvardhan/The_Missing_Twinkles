@@ -677,7 +677,7 @@
 }
 
 #game .shout b {
-  font-size: 96px;
+  font-size: var(--shout-size, 96px);
   line-height: 1;
   color: #ffd94e;
   -webkit-text-stroke: 10px #4a2c14;
@@ -685,6 +685,12 @@
   text-shadow: 0 6px 0 rgba(0, 0, 0, 0.28), 0 0 26px rgba(255, 196, 80, 0.65);
   transform: scale(0) rotate(var(--ch-tilt, 0deg));
   animation: shout-pop 460ms cubic-bezier(0.2, 1.6, 0.4, 1) both;
+}
+
+#game .shout b.shout__sp {
+  width: 0.42em;
+  -webkit-text-stroke: 0;
+  text-shadow: none;
 }
 
 @keyframes shout-pop {
@@ -968,6 +974,19 @@
   animation: none;
 }
 
+/* A beat that is a film: the clip covers the frame edge to edge. */
+#game .video-layer {
+  position: absolute;
+  inset: 0;
+}
+
+#game .video-layer video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+
 /* The lamp beat's camera move. The whole pane eases a step to the right while
    the lamp slides in from the left edge and settles — so the lamp reads as
    walked up to, not as materialising mid-frame. The pan lives on the PANE, not
@@ -990,6 +1009,139 @@
   from { transform: translateX(-380px); opacity: 0; }
   55%  { opacity: 1; }
   to   { transform: translateX(0); opacity: 1; }
+}
+
+/* The story's aroma treatment, staged across the ending's three talking
+   beats: the same mask wipe as .fx-smell in css/story.css, but each beat only
+   advances the reveal part of the way — a wisp off the chimney while they
+   high-five, halfway down the roof on the second line, and the full curl
+   reaching his nose exactly on "Neel?". The layer's box is identical on all
+   three beats, so the pane cross-fades meet on the same pixels and the smell
+   reads as one slow, continuous arrival. */
+#game .fx-aroma-1,
+#game .fx-aroma-2,
+#game .fx-aroma-3 {
+  -webkit-mask-image: linear-gradient(237deg, #000 0%, #000 42%, rgba(0, 0, 0, 0) 62%);
+  mask-image: linear-gradient(237deg, #000 0%, #000 42%, rgba(0, 0, 0, 0) 62%);
+  -webkit-mask-size: 300% 300%;
+  mask-size: 300% 300%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
+
+#game .fx-aroma-1 { animation: g-aroma-1 3200ms ease-out both; }
+#game .fx-aroma-2 { animation: g-aroma-2 3600ms linear both; }
+#game .fx-aroma-3 {
+  animation: g-aroma-3 2600ms ease-out both,
+             g-smell-sway 9s ease-in-out 2.6s infinite alternate;
+}
+
+@keyframes g-aroma-1 {
+  from { -webkit-mask-position: 0% 100%; mask-position: 0% 100%; }
+  to   { -webkit-mask-position: 35% 65%; mask-position: 35% 65%; }
+}
+
+@keyframes g-aroma-2 {
+  from { -webkit-mask-position: 35% 65%; mask-position: 35% 65%; }
+  to   { -webkit-mask-position: 65% 35%; mask-position: 65% 35%; }
+}
+
+@keyframes g-aroma-3 {
+  from { -webkit-mask-position: 65% 35%; mask-position: 65% 35%; }
+  to   { -webkit-mask-position: 100% 0%; mask-position: 100% 0%; }
+}
+
+/* The stage-show close: the video's last frame shrinks to a circle centred
+   where Neel went and winks out, leaving the dark for the words. The class
+   lands on the video's own ended event, so the circle closes on the final
+   frame itself. The pane sits on the letterbox (#05060d), which is what the
+   circle closes down to. */
+#game .video-layer.is-iris {
+  animation: g-iris 2000ms cubic-bezier(0.4, 0, 0.6, 1) 150ms both;
+}
+
+@keyframes g-iris {
+  from { clip-path: circle(130% at 62% 52%); }
+  to   { clip-path: circle(0% at 62% 52%); }
+}
+
+@keyframes g-smell-sway {
+  from { transform: translate(0, 0) scale(1); }
+  to   { transform: translate(-10px, -8px) scale(1.02); }
+}
+
+/* The stander's feet leave the ground: he fades under the flyer. */
+#game .scene .layer.fx-stander {
+  transition: opacity 600ms var(--ease);
+}
+
+#game .scene.is-flying .layer.fx-stander {
+  opacity: 0;
+}
+
+/* Carried off by the smell. The box drifts up the wavy climb to the bakery
+   roof and out past its top corner; inside it two drawings of him take turns,
+   which is what makes the float bob like a cartoon instead of sliding like a
+   cursor. Starts opacity 0 and waits out its delay (set inline from the
+   screen's flight.at). */
+#game .neel-flight {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 4;
+  /* Travel and fade are SEPARATE animations so the travel is one unbroken
+     segment: CSS re-eases between every keyframe pair, and an earlier
+     multi-waypoint path braked and re-accelerated at each waypoint — a lurch.
+     The waviness lives on the child's bob instead, where a sine can be a
+     sine. */
+  animation-name: g-drift-travel, g-drift-fade;
+  animation-timing-function: cubic-bezier(0.42, 0, 0.58, 1), linear;
+  animation-fill-mode: both, both;
+}
+
+@keyframes g-drift-travel {
+  from { transform: translate(0, 0) scale(0.94); }
+  to   { transform: translate(580px, -470px) scale(0.8); }
+}
+
+@keyframes g-drift-fade {
+  0%   { opacity: 0; }
+  7%   { opacity: 1; }
+  88%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* The float itself: a gentle continuous rock and rise-fall riding on top of
+   the travel. Alternate + ease-in-out is a clean sine — no waypoints. */
+#game .neel-flight__bob {
+  position: absolute;
+  inset: 0;
+  animation: g-float-bob 2100ms ease-in-out infinite alternate;
+}
+
+@keyframes g-float-bob {
+  from { transform: translateY(-13px) rotate(-4deg); }
+  to   { transform: translateY(13px) rotate(4deg); }
+}
+
+#game .neel-flight__pose {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  transform: translate(-50%, -50%);
+}
+
+/* The two drawings breathe into each other rather than hard-cutting — with
+   only two poses, a cross-fade reads as a wiggle; a swap read as a flicker. */
+#game .neel-flight__pose--b {
+  opacity: 0;
+  animation: g-pose-fade 1700ms ease-in-out infinite alternate;
+}
+
+@keyframes g-pose-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
 #game .fx-flicker { animation: g-flicker 2.4s ease-in-out infinite; }
@@ -1026,6 +1178,22 @@
    ========================================================= */
 
 @media (prefers-reduced-motion: reduce) {
+  #game .neel-flight {
+    animation: none !important;
+    opacity: 0;
+  }
+
+  #game .scene.is-flying .layer.fx-stander { opacity: 1; }
+  #game .fx-aroma-1,
+  #game .fx-aroma-2,
+  #game .fx-aroma-3 {
+    animation: none;
+    mask-image: none;
+    -webkit-mask-image: none;
+  }
+
+  #game .video-layer.is-iris { animation: none; }
+
   #game .scene.is-lampstage,
   #game .scene.is-lampstage .lamp,
   #game .fx-breathe,

@@ -192,13 +192,29 @@ export const cues = {
 
 export const gameCues = {
   /* ---- the ending — see epilogueScreens in js/data/screens.js ---- */
-  // Two lines over the high-five, hers, from mid-frame.
-  "e1": { vo: { id: "vo_ep_wedidit", at: 500, pan: -0.2 } },
+  // The high-five lands with the beat: a clap, then her line.
+  "e1": {
+    sfx: [{ id: "hand_clap", at: 350, gain: 0.9 }],
+    vo: { id: "vo_ep_wedidit", at: 700, pan: -0.2 }
+  },
   "e2": { vo: { id: "vo_ep_shining", at: 500, pan: -0.2 } },
   // She turns to where he was.
   "e3": { vo: { id: "vo_ep_neel", at: 500, pan: -0.35 } },
-  // Voice only — the design draws no bubble here; the smell says the rest.
-  "e4": { vo: { id: "vo_ep_cake", at: 700, pan: 0.5 } },
+  // Over the film, whose own soundtrack is stripped: the smell's twinkle, his
+  // dreamy line as it reaches him, and a sparkle as his feet leave the ground.
+  "ev": {
+    sfx: [
+      { id: "twinkle", at: 500, gain: 0.45 },
+      { id: "sparkle", at: 4400, gain: 0.6 },
+      // The iris closing over the last frame.
+      { id: "mist_rush", at: 6050, gain: 0.35 }
+    ],
+    vo: { id: "vo_ep_cake", at: 2600, pan: 0.4 }
+  },
+  // The words land on the dark the iris left behind.
+  "eend": {
+    sfx: [{ id: "sparkle", at: 550, gain: 0.55 }]
+  },
 
   // Each beat: the bubble pops at 200ms and the line starts at 500, the same
   // 300ms gap the story uses between a bubble and the voice inside it.
