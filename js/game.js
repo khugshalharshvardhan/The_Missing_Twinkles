@@ -1106,8 +1106,15 @@ function numberLineStrip(screen) {
   // not fly in a second time — only the beat's own number arrives. Keyed by
   // role, not the tutorial's id ("16"), so the guess lands NEXT TO the answer
   // on every level's readback of it, not just the tutorial's.
-  if (screen && screen.role === "guessline" && counted) {
-    level(mark(wrap, "total", counted), true);
+  if (screen && (screen.role === "guessline" || screen.role === "verdict")) {
+    // The count when it happened, the level's own total on a dev jump past
+    // the counting — same fallback the spoken line uses.
+    level(mark(wrap, "total", counted || round.total), true);
+  }
+  // The verdict keeps the whole comparison in view: both numbers sit on the
+  // line under "Spot on!" / "That was close!", already placed.
+  if (screen && screen.role === "verdict") {
+    level(mark(wrap, "guess", guess), true);
   }
 
   return wrap;

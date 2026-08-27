@@ -1001,12 +1001,12 @@
 }
 
 @keyframes g-stage-pan {
-  from { transform: translateX(-46px); }
+  from { transform: translateX(46px); }
   to   { transform: translateX(0); }
 }
 
 @keyframes g-lamp-arrive {
-  from { transform: translateX(-380px); opacity: 0; }
+  from { transform: translateX(380px); opacity: 0; }
   55%  { opacity: 1; }
   to   { transform: translateX(0); opacity: 1; }
 }

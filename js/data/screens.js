@@ -39,13 +39,13 @@ export const TOTAL = 8;
 // 250 down, like every other level's rows.
 export const FIREFLIES = [
   { x: 0, y: 0, w: 116, h: 122 },
-  { x: 210, y: 0, w: 117, h: 123 },
-  { x: 420, y: 0, w: 116, h: 122 },
-  { x: 630, y: 0, w: 117, h: 123 },
-  { x: 0, y: 250, w: 116, h: 122 },
-  { x: 210, y: 250, w: 116, h: 122 },
-  { x: 420, y: 250, w: 116, h: 122 },
-  { x: 630, y: 250, w: 116, h: 122 }
+  { x: 170, y: 0, w: 117, h: 123 },
+  { x: 340, y: 0, w: 116, h: 122 },
+  { x: 510, y: 0, w: 117, h: 123 },
+  { x: 0, y: 210, w: 116, h: 122 },
+  { x: 170, y: 210, w: 116, h: 122 },
+  { x: 340, y: 210, w: 116, h: 122 },
+  { x: 510, y: 210, w: 116, h: 122 }
 ];
 
 export const FIREFLY_SRC = `${IMG}firefly.webp`;
@@ -241,8 +241,8 @@ const THE_CLEARING = {
    of them stand together on the right, watching it light. Mirrors TOGETHER's
    trick — a deliberate move between beats reads as staging, not sliding. */
 const LAMP_STAGE = {
-  agni: { cx: 1059, feet: 978 },
-  neel: { cx: 1618, feet: 984 }
+  agni: { cx: 823, feet: 978 },
+  neel: { cx: 264, feet: 984 }
 };
 
 const TOGETHER = {
@@ -278,7 +278,7 @@ export const screens = [
     //
     // Timing lives in @keyframes ff-swarm in css/game.css: 0.9s in, 5s held,
     // 0.7s to vanish where they stand. Change one, change the other.
-    fireflies: { x: 611, y: 172, enter: "left" },
+    fireflies: { x: 671, y: 192, enter: "left" },
     dwell: 7100,
     bubble: {
       art: `${IMG}bub_11.webp`, who: "agni",
@@ -352,7 +352,7 @@ export const screens = [
     // runs 500 to 2581), holds its five seconds, and vanishes the same way.
     // The player is asked to guess at something they have just watched appear
     // and disappear by magic.
-    fireflies: { x: 625, y: 172, enter: "magic", at: 2650 },
+    fireflies: { x: 685, y: 192, enter: "magic", at: 2650 },
     dwell: 10000,
     bubble: {
       art: `${IMG}bub_15.webp`, who: "agni",
@@ -416,7 +416,7 @@ export const screens = [
       { src: `${IMG}agni_point.webp`, x: 64, y: 498, w: 525, h: 501, fill: CROP.agniPoint, fx: "breathe" },
       { src: `${IMG}neel_d.webp`, x: 1344, y: 417, w: 449, h: 581, fill: CROP.neelD, flipX: true, fx: "breathe-slow" }
     ],
-    fireflies: { x: 631, y: 177, dim: true },
+    fireflies: { x: 691, y: 197, dim: true },
     bubble: {
       art: `${IMG}bub_3.webp`, who: "agni",
       x: 127, y: 229, w: 557, h: 282,
@@ -435,10 +435,10 @@ export const screens = [
       { src: `${IMG}agni_g.webp`, x: 80, y: 490, w: 554, h: 512, fill: CROP.agniG, fx: "breathe" },
       { src: `${IMG}neel_c.webp`, x: 1385, y: 484, w: 396, h: 557, fill: CROP.neelC, fx: "breathe-slow" }
     ],
-    fireflies: { x: 689, y: 177 },
+    fireflies: { x: 749, y: 197 },
     counter: "guess",
     numberLine: true,
-    hint: { src: `${SHARED}hand_nudge.svg`, x: 593, y: 160, w: 308.396, h: 308.396 },
+    hint: { src: `${SHARED}hand_nudge.svg`, x: 653, y: 180, w: 308.396, h: 308.396 },
     bubble: {
       art: `${IMG}bub_32.webp`, who: "agni",
       x: 172, y: 252, w: 489, h: 256,
@@ -461,7 +461,7 @@ export const screens = [
       { src: `${IMG}agni_f.webp`, x: 9, y: 481, w: 605, h: 553, fx: "breathe" },
       { src: `${IMG}neel_f.webp`, x: 1372, y: 424, w: 465, h: 589, fx: "breathe-slow" }
     ],
-    fireflies: { x: 601, y: 187 },
+    fireflies: { x: 661, y: 207 },
     counter: "total",
     bubble: {
       art: `${IMG}bub_4.webp`, who: "agni",
@@ -485,7 +485,7 @@ export const screens = [
       { src: `${IMG}agni_f.webp`, x: 9, y: 481, w: 605, h: 553, fx: "breathe" },
       { src: `${IMG}neel_f.webp`, x: 1372, y: 424, w: 465, h: 589, fx: "breathe-slow" }
     ],
-    fireflies: { x: 601, y: 187 },
+    fireflies: { x: 661, y: 207 },
     counter: "guess",
     bubble: {
       art: `${IMG}bub_4.webp`, who: "agni",
@@ -499,6 +499,7 @@ export const screens = [
     id: "4.2",
     anchor: THE_CLEARING,
     role: "verdict",
+    numberLine: true,
     layers: [
       BG,
       { src: `${IMG}agni_d.webp`, x: 84, y: 474, w: 342, h: 560, fill: CROP.agniD, fx: "breathe" },
@@ -518,20 +519,20 @@ export const screens = [
     interact: "lamp",
     layers: [
       BG,
-      { src: `${IMG}agni_g.webp`, x: 70, y: 489, w: 554, h: 512, fill: CROP.agniG, flipX: true, fx: "breathe" },
-      { src: `${IMG}neel_f.webp`, x: 1294, y: 412, w: 465, h: 589, fx: "breathe-slow" }
+      { src: `${IMG}agni_g.webp`, x: 70, y: 489, w: 554, h: 512, fill: CROP.agniG, fx: "breathe" },
+      { src: `${IMG}neel_f.webp`, x: 1294, y: 412, w: 465, h: 589, flipX: true, fx: "breathe-slow" }
     ],
-    lamp: { src: `${IMG}lamp_off.webp`, x: 195, y: 74, w: 272, h: 927, fill: CROP.lampOff },
+    lamp: { src: `${IMG}lamp_off.webp`, x: 1415, y: 74, w: 272, h: 927, fill: CROP.lampOff },
     // What the tap turns it into — the exact art screen 5.2 stands on, so the
     // cut after it changes nothing about the lamp. It fades up as the flock
     // arrives; see strike() in js/game.js.
-    lampLit: { src: `${IMG}lamp_on.webp`, x: 187, y: 74, w: 287, h: 927, fill: CROP.lampOn },
+    lampLit: { src: `${IMG}lamp_on.webp`, x: 1408, y: 74, w: 287, h: 927, fill: CROP.lampOn },
     // Where the glass is, in frame coordinates — the point the flock pours
     // into. Matches the element 5.2 draws inside it.
-    lampGlass: { x: 290, y: 254 },
+    lampGlass: { x: 1592, y: 254 },
     bubble: {
       art: `${IMG}bub_51.webp`, who: "agni",
-      x: 806, y: 210, w: 383, h: 184,
+      x: 693, y: 210, w: 383, h: 184,
       text: "Tap the lamp!"
     }
   },
@@ -542,14 +543,14 @@ export const screens = [
     anchor: LAMP_STAGE,
     layers: [
       BG,
-      { src: `${IMG}agni_g.webp`, x: 70, y: 489, w: 554, h: 512, fill: CROP.agniG, flipX: true, fx: "breathe" },
-      { src: `${IMG}neel_turn.webp`, x: 1125, y: 391, w: 735, h: 610, fill: CROP.neelTurn, flipX: true, fx: "breathe-slow" },
-      { src: `${IMG}lamp_on.webp`, x: 187, y: 74, w: 287, h: 927, fill: CROP.lampOn, fx: "lamp-glow" },
-      { src: FIREFLY_SRC, x: 220, y: 263, w: 25, h: 26, fx: "flicker" }
+      { src: `${IMG}agni_g.webp`, x: 70, y: 489, w: 554, h: 512, fill: CROP.agniG, fx: "breathe" },
+      { src: `${IMG}neel_turn.webp`, x: 1125, y: 391, w: 735, h: 610, fill: CROP.neelTurn, fx: "breathe-slow" },
+      { src: `${IMG}lamp_on.webp`, x: 1408, y: 74, w: 287, h: 927, fill: CROP.lampOn, fx: "lamp-glow" },
+      { src: FIREFLY_SRC, x: 1637, y: 263, w: 25, h: 26, fx: "flicker" }
     ],
     // Neel's cheer, drawn as well as heard: comic-burst lettering over his
     // head as he spins to the lit lamp. Matches vo_neel_yay in the cue table.
-    shout: { text: "YAY!", x: 1420, y: 236, tilt: -9 }
+    shout: { text: "YAY!", x: 150, y: 236, tilt: 9 }
   },
 
   // ---- SCREEN 6.1 — handing over (99:587) ----
@@ -726,6 +727,7 @@ export const level1 = [
     id: "p4.2",
     anchor: THE_CLEARING,
     role: "verdict",
+    numberLine: true,
     layers: [
       BG_MEADOW,
       { src: `${IMG}agni_d.webp`, x: 84, y: 474, w: 342, h: 560, fill: CROP.agniD, fx: "breathe" },
@@ -745,15 +747,15 @@ export const level1 = [
     interact: "lamp",
     layers: [
       BG_MEADOW,
-      { src: `${IMG}agni_g.webp`, x: 70, y: 489, w: 554, h: 512, fill: CROP.agniG, flipX: true, fx: "breathe" },
-      { src: `${IMG}neel_f.webp`, x: 1294, y: 412, w: 465, h: 589, fx: "breathe-slow" }
+      { src: `${IMG}agni_g.webp`, x: 70, y: 489, w: 554, h: 512, fill: CROP.agniG, fx: "breathe" },
+      { src: `${IMG}neel_f.webp`, x: 1294, y: 412, w: 465, h: 589, flipX: true, fx: "breathe-slow" }
     ],
-    lamp: { src: `${IMG}lamp_off.webp`, x: 205, y: 74, w: 272, h: 927, fill: CROP.lampOff },
-    lampLit: { src: `${IMG}lamp_on.webp`, x: 197, y: 74, w: 287, h: 927, fill: CROP.lampOn },
-    lampGlass: { x: 300, y: 254 },
+    lamp: { src: `${IMG}lamp_off.webp`, x: 1405, y: 74, w: 272, h: 927, fill: CROP.lampOff },
+    lampLit: { src: `${IMG}lamp_on.webp`, x: 1398, y: 74, w: 287, h: 927, fill: CROP.lampOn },
+    lampGlass: { x: 1582, y: 254 },
     bubble: {
       art: `${IMG}bub_51.webp`, who: "agni",
-      x: 806, y: 210, w: 383, h: 184,
+      x: 693, y: 210, w: 383, h: 184,
       text: "Tap the lamp!"
     }
   },
@@ -764,14 +766,14 @@ export const level1 = [
     anchor: LAMP_STAGE,
     layers: [
       BG_MEADOW,
-      { src: `${IMG}agni_g.webp`, x: 70, y: 489, w: 554, h: 512, fill: CROP.agniG, flipX: true, fx: "breathe" },
-      { src: `${IMG}neel_turn.webp`, x: 1125, y: 391, w: 735, h: 610, fill: CROP.neelTurn, flipX: true, fx: "breathe-slow" },
-      { src: `${IMG}lamp_on.webp`, x: 197, y: 74, w: 287, h: 927, fill: CROP.lampOn, fx: "lamp-glow" },
+      { src: `${IMG}agni_g.webp`, x: 70, y: 489, w: 554, h: 512, fill: CROP.agniG, fx: "breathe" },
+      { src: `${IMG}neel_turn.webp`, x: 1125, y: 391, w: 735, h: 610, fill: CROP.neelTurn, fx: "breathe-slow" },
+      { src: `${IMG}lamp_on.webp`, x: 1398, y: 74, w: 287, h: 927, fill: CROP.lampOn, fx: "lamp-glow" },
       // The caught one, glowing in the glass where the tutorial kept its
       // firefly.
-      { src: BERRY_SRC, x: 231, y: 262, w: 24, h: 27, fx: "flicker" }
+      { src: BERRY_SRC, x: 1627, y: 262, w: 24, h: 27, fx: "flicker" }
     ],
-    shout: { text: "YAY!", x: 1420, y: 236, tilt: -9 }
+    shout: { text: "YAY!", x: 150, y: 236, tilt: 9 }
   }
 ];
 
@@ -919,6 +921,7 @@ export const level2 = [
     id: "s4.2",
     anchor: THE_CLEARING,
     role: "verdict",
+    numberLine: true,
     layers: [
       BG_VALLEY,
       { src: `${IMG}agni_d.webp`, x: 84, y: 474, w: 342, h: 560, fill: CROP.agniD, fx: "breathe" },
@@ -938,15 +941,15 @@ export const level2 = [
     interact: "lamp",
     layers: [
       BG_VALLEY,
-      { src: `${IMG}agni_g.webp`, x: 70, y: 489, w: 554, h: 512, fill: CROP.agniG, flipX: true, fx: "breathe" },
-      { src: `${IMG}neel_f.webp`, x: 1294, y: 412, w: 465, h: 589, fx: "breathe-slow" }
+      { src: `${IMG}agni_g.webp`, x: 70, y: 489, w: 554, h: 512, fill: CROP.agniG, fx: "breathe" },
+      { src: `${IMG}neel_f.webp`, x: 1294, y: 412, w: 465, h: 589, flipX: true, fx: "breathe-slow" }
     ],
-    lamp: { src: `${IMG}lamp_off.webp`, x: 205, y: 74, w: 272, h: 927, fill: CROP.lampOff },
-    lampLit: { src: `${IMG}lamp_on.webp`, x: 197, y: 74, w: 287, h: 927, fill: CROP.lampOn },
-    lampGlass: { x: 300, y: 254 },
+    lamp: { src: `${IMG}lamp_off.webp`, x: 1405, y: 74, w: 272, h: 927, fill: CROP.lampOff },
+    lampLit: { src: `${IMG}lamp_on.webp`, x: 1398, y: 74, w: 287, h: 927, fill: CROP.lampOn },
+    lampGlass: { x: 1582, y: 254 },
     bubble: {
       art: `${IMG}bub_51.webp`, who: "agni",
-      x: 806, y: 210, w: 383, h: 184,
+      x: 693, y: 210, w: 383, h: 184,
       text: "Tap the lamp!"
     }
   },
@@ -957,15 +960,15 @@ export const level2 = [
     anchor: LAMP_STAGE,
     layers: [
       BG_VALLEY,
-      { src: `${IMG}agni_g.webp`, x: 70, y: 489, w: 554, h: 512, fill: CROP.agniG, flipX: true, fx: "breathe" },
-      { src: `${IMG}neel_turn.webp`, x: 1125, y: 391, w: 735, h: 610, fill: CROP.neelTurn, flipX: true, fx: "breathe-slow" },
-      { src: `${IMG}lamp_on.webp`, x: 197, y: 74, w: 287, h: 927, fill: CROP.lampOn, fx: "lamp-glow" },
+      { src: `${IMG}agni_g.webp`, x: 70, y: 489, w: 554, h: 512, fill: CROP.agniG, fx: "breathe" },
+      { src: `${IMG}neel_turn.webp`, x: 1125, y: 391, w: 735, h: 610, fill: CROP.neelTurn, fx: "breathe-slow" },
+      { src: `${IMG}lamp_on.webp`, x: 1398, y: 74, w: 287, h: 927, fill: CROP.lampOn, fx: "lamp-glow" },
       // The caught one, in the glass where level 1 keeps its berry. Sized to
       // the star's aspect on the same centre (845, 276), so all three levels
       // hold their catch in exactly the same spot.
-      { src: STARLIGHT_SRC, x: 230, y: 263, w: 26, h: 25, fx: "flicker" }
+      { src: STARLIGHT_SRC, x: 1626, y: 263, w: 26, h: 25, fx: "flicker" }
     ],
-    shout: { text: "YAY!", x: 1420, y: 236, tilt: -9 }
+    shout: { text: "YAY!", x: 150, y: 236, tilt: 9 }
   }
 ];
 
@@ -1110,6 +1113,7 @@ export const level3 = [
     id: "m4.2",
     anchor: THE_CLEARING,
     role: "verdict",
+    numberLine: true,
     layers: [
       BG_FOREST,
       { src: `${IMG}agni_d.webp`, x: 84, y: 474, w: 342, h: 560, fill: CROP.agniD, fx: "breathe" },
@@ -1129,15 +1133,15 @@ export const level3 = [
     interact: "lamp",
     layers: [
       BG_FOREST,
-      { src: `${IMG}agni_g.webp`, x: 70, y: 489, w: 554, h: 512, fill: CROP.agniG, flipX: true, fx: "breathe" },
-      { src: `${IMG}neel_f.webp`, x: 1294, y: 412, w: 465, h: 589, fx: "breathe-slow" }
+      { src: `${IMG}agni_g.webp`, x: 70, y: 489, w: 554, h: 512, fill: CROP.agniG, fx: "breathe" },
+      { src: `${IMG}neel_f.webp`, x: 1294, y: 412, w: 465, h: 589, flipX: true, fx: "breathe-slow" }
     ],
-    lamp: { src: `${IMG}lamp_off.webp`, x: 150, y: 74, w: 272, h: 927, fill: CROP.lampOff },
-    lampLit: { src: `${IMG}lamp_on.webp`, x: 142, y: 74, w: 287, h: 927, fill: CROP.lampOn },
-    lampGlass: { x: 245, y: 254 },
+    lamp: { src: `${IMG}lamp_off.webp`, x: 1460, y: 74, w: 272, h: 927, fill: CROP.lampOff },
+    lampLit: { src: `${IMG}lamp_on.webp`, x: 1453, y: 74, w: 287, h: 927, fill: CROP.lampOn },
+    lampGlass: { x: 1637, y: 254 },
     bubble: {
       art: `${IMG}bub_51.webp`, who: "agni",
-      x: 806, y: 210, w: 383, h: 184,
+      x: 693, y: 210, w: 383, h: 184,
       text: "Tap the lamp!"
     }
   },
@@ -1148,14 +1152,14 @@ export const level3 = [
     anchor: LAMP_STAGE,
     layers: [
       BG_FOREST,
-      { src: `${IMG}agni_g.webp`, x: 70, y: 489, w: 554, h: 512, fill: CROP.agniG, flipX: true, fx: "breathe" },
-      { src: `${IMG}neel_turn.webp`, x: 1125, y: 391, w: 735, h: 610, fill: CROP.neelTurn, flipX: true, fx: "breathe-slow" },
-      { src: `${IMG}lamp_on.webp`, x: 142, y: 74, w: 287, h: 927, fill: CROP.lampOn, fx: "lamp-glow" },
+      { src: `${IMG}agni_g.webp`, x: 70, y: 489, w: 554, h: 512, fill: CROP.agniG, fx: "breathe" },
+      { src: `${IMG}neel_turn.webp`, x: 1125, y: 391, w: 735, h: 610, fill: CROP.neelTurn, fx: "breathe-slow" },
+      { src: `${IMG}lamp_on.webp`, x: 1453, y: 74, w: 287, h: 927, fill: CROP.lampOn, fx: "lamp-glow" },
       // The caught one, sized to the seed's aspect on the shared centre
       // (845, 276) — the same spot all four levels hold their catch.
-      { src: SEED_SRC, x: 177, y: 261, w: 22, h: 29, fx: "flicker" }
+      { src: SEED_SRC, x: 1683, y: 261, w: 22, h: 29, fx: "flicker" }
     ],
-    shout: { text: "YAY!", x: 1420, y: 236, tilt: -9 }
+    shout: { text: "YAY!", x: 150, y: 236, tilt: 9 }
   }
 ];
 
@@ -1300,6 +1304,7 @@ export const level4 = [
     id: "f4.2",
     anchor: THE_CLEARING,
     role: "verdict",
+    numberLine: true,
     layers: [
       BG_FLOWERMEADOW,
       { src: `${IMG}agni_d.webp`, x: 84, y: 474, w: 342, h: 560, fill: CROP.agniD, fx: "breathe" },
@@ -1319,15 +1324,15 @@ export const level4 = [
     interact: "lamp",
     layers: [
       BG_FLOWERMEADOW,
-      { src: `${IMG}agni_g.webp`, x: 70, y: 489, w: 554, h: 512, fill: CROP.agniG, flipX: true, fx: "breathe" },
-      { src: `${IMG}neel_f.webp`, x: 1294, y: 412, w: 465, h: 589, fx: "breathe-slow" }
+      { src: `${IMG}agni_g.webp`, x: 70, y: 489, w: 554, h: 512, fill: CROP.agniG, fx: "breathe" },
+      { src: `${IMG}neel_f.webp`, x: 1294, y: 412, w: 465, h: 589, flipX: true, fx: "breathe-slow" }
     ],
-    lamp: { src: `${IMG}lamp_off.webp`, x: 150, y: 74, w: 272, h: 927, fill: CROP.lampOff },
-    lampLit: { src: `${IMG}lamp_on.webp`, x: 142, y: 74, w: 287, h: 927, fill: CROP.lampOn },
-    lampGlass: { x: 245, y: 254 },
+    lamp: { src: `${IMG}lamp_off.webp`, x: 1460, y: 74, w: 272, h: 927, fill: CROP.lampOff },
+    lampLit: { src: `${IMG}lamp_on.webp`, x: 1453, y: 74, w: 287, h: 927, fill: CROP.lampOn },
+    lampGlass: { x: 1637, y: 254 },
     bubble: {
       art: `${IMG}bub_51.webp`, who: "agni",
-      x: 806, y: 210, w: 383, h: 184,
+      x: 693, y: 210, w: 383, h: 184,
       text: "Tap the lamp!"
     }
   },
@@ -1338,14 +1343,14 @@ export const level4 = [
     anchor: LAMP_STAGE,
     layers: [
       BG_FLOWERMEADOW,
-      { src: `${IMG}agni_g.webp`, x: 70, y: 489, w: 554, h: 512, fill: CROP.agniG, flipX: true, fx: "breathe" },
-      { src: `${IMG}neel_turn.webp`, x: 1125, y: 391, w: 735, h: 610, fill: CROP.neelTurn, flipX: true, fx: "breathe-slow" },
-      { src: `${IMG}lamp_on.webp`, x: 142, y: 74, w: 287, h: 927, fill: CROP.lampOn, fx: "lamp-glow" },
+      { src: `${IMG}agni_g.webp`, x: 70, y: 489, w: 554, h: 512, fill: CROP.agniG, fx: "breathe" },
+      { src: `${IMG}neel_turn.webp`, x: 1125, y: 391, w: 735, h: 610, fill: CROP.neelTurn, fx: "breathe-slow" },
+      { src: `${IMG}lamp_on.webp`, x: 1453, y: 74, w: 287, h: 927, fill: CROP.lampOn, fx: "lamp-glow" },
       // The caught one, sized to the flower's aspect on the shared centre
       // (845, 276) — the same spot all four levels hold their catch.
-      { src: FLOWER_SRC, x: 175, y: 262, w: 25, h: 27, fx: "flicker" }
+      { src: FLOWER_SRC, x: 1682, y: 262, w: 25, h: 27, fx: "flicker" }
     ],
-    shout: { text: "YAY!", x: 1420, y: 236, tilt: -9 }
+    shout: { text: "YAY!", x: 150, y: 236, tilt: 9 }
   }
 ];
 
