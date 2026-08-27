@@ -616,6 +616,44 @@
   100% { opacity: 0; transform: translate(2260px, 60px) scale(0.75); }
 }
 
+/* The tease: the same climb as fly-across's first half, but she dissolves at
+   the midpoint — shrinking to a point the way everything magical here goes —
+   instead of making it across. */
+.firefly--tease {
+  animation-name: fly-tease;
+}
+
+@keyframes fly-tease {
+  0%   { opacity: 0; transform: translate(0, 0) scale(0.7); }
+  14%  { opacity: 1; }
+  80%  { opacity: 1; transform: translate(1035px, -99px) scale(1); }
+  100% { opacity: 0; transform: translate(1150px, -110px) scale(0.08); }
+}
+
+/* Mr. Giggles' hehes, popping out of the dark one after another. The laugh
+   lettering's palette at a fraction of its size — teasing, not billboarding. */
+.sfx-hehe {
+  position: absolute;
+  font-family: "Creepster", cursive;
+  letter-spacing: 0.04em;
+  color: #b6ff5c;
+  -webkit-text-stroke: 6px #35134f;
+  paint-order: stroke;
+  text-shadow: 0 0 22px rgba(150, 255, 92, 0.5);
+  opacity: 0;
+  transform: rotate(var(--tilt, 0deg)) scale(0.4);
+  animation: hehe-pop 1150ms var(--ease) both;
+  pointer-events: none;
+}
+
+@keyframes hehe-pop {
+  0%   { opacity: 0; transform: rotate(var(--tilt, 0deg)) scale(0.4); }
+  18%  { opacity: 1; transform: rotate(var(--tilt, 0deg)) scale(1.12); }
+  26%  { transform: rotate(var(--tilt, 0deg)) scale(1); }
+  72%  { opacity: 1; }
+  100% { opacity: 0; transform: rotate(var(--tilt, 0deg)) scale(0.85) translateY(-14px); }
+}
+
 /* =========================================================
    Onomatopoeia
    ========================================================= */

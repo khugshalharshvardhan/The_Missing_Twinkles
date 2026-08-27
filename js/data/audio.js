@@ -119,10 +119,16 @@ export const cues = {
   // The eyes open, and he crosses overhead. The pan sweeps with the text.
   // The dip from 2.2 carries: nothing here puts the music back.
   "3.1": {
-    sfx: [{ id: "blink", at: 900, gain: 0.55, pan: -0.42 },
-      { id: "blink", at: 2100, gain: 0.55, pan: 0.55 }
-    ],
-    vo: { id: "vo_giggles_2", at: 500, gain: 0.95, sweep: [-0.9, 0.9] }
+    // One blink, then a giggle PER hehe: each starts exactly as its text pops
+    // (scenes.js: 1250 / 2250 / 3250) and comes from where the text is —
+    // left, the middle gap, high right. The rates keep three plays of two
+    // clips from sounding like copies.
+    sfx: [
+      { id: "blink", at: 900, gain: 0.55, pan: -0.42 },
+      { id: "vo_giggles_1", at: 1250, gain: 0.95, pan: -0.6 },
+      { id: "vo_giggles_2", at: 2250, gain: 0.9, pan: 0.05, rate: 1.06 },
+      { id: "vo_giggles_1", at: 3250, gain: 0.95, pan: 0.55, rate: 0.94 }
+    ]
   },
 
   // She calls a beat sooner than she used to. The whole exchange was carrying a
@@ -134,11 +140,12 @@ export const cues = {
     vo: { id: "vo_agni_neil", at: 340, pan: -0.42 }
   },
 
-  // His answer, and one twinkle going past while he gives it — the first light
-  // in the frame since the lamp, and the one the next page follows.
+  // His answer lands first; only then the twinkle enters — and dissolves
+  // midway on its own falling shimmer. Times match LONE_TWINKLE in scenes.js.
   "3.3": {
     sfx: [{ id: "blink", at: 820, gain: 0.55, pan: 0.55 },
-      { id: "twinkle", at: 520, gain: 0.42, sweep: [-0.75, 0.75] }
+      { id: "twinkle", at: 2700, gain: 0.42, sweep: [-0.75, 0.1] },
+      { id: "magic_vanish", at: 4350, gain: 0.5, pan: 0.05 }
     ],
     vo: { id: "vo_neel_here", at: 300, pan: 0.5 }
   },

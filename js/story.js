@@ -414,7 +414,7 @@ function overlays(step) {
     frag.append(el);
   });
   (step.sfx ?? []).forEach((cue) =>
-    frag.append(cue.kind === "laugh" ? laugh(cue) : shout(cue))
+    frag.append(cue.kind === "laugh" ? laugh(cue) : cue.kind === "hehes" ? hehes(cue) : shout(cue))
   );
 
   return frag;
@@ -513,6 +513,43 @@ function shout(cue) {
 // rather than being spoken by anyone on screen. Each letter is placed on that
 // arc as its own element, which is what lets them wave in sequence — a single
 // <textPath> could travel but never ripple.
+// Mr. Giggles teasing from the dark: little "hehe"s popping up at scattered
+// spots, one after another, each gone again in about a second. Positions come
+// off the noise hash, so the scatter is the same on every read — and they keep
+// away from the middle band, where the eyes are.
+function hehes(cue) {
+  const wrap = document.createElement("div");
+  wrap.className = "sfx-hehes";
+
+  // Three zones the eyes can never be under: left of Agni's pair, the gap
+  // between the two pairs, and high above Neel's. The eyes sit at roughly
+  // x 400-710 and 1110-1540, y 360-680 (frame px), and every zone keeps a
+  // text-width of clearance from both.
+  const ZONES = [
+    { x: 60, y: 340, w: 120, h: 240 },
+    { x: 780, y: 280, w: 120, h: 260 },
+    { x: 1180, y: 90, w: 300, h: 110 }
+  ];
+
+  const count = cue.count ?? 3;
+  for (let i = 0; i < count; i++) {
+    const b = document.createElement("b");
+    b.className = "sfx-hehe";
+    b.textContent = "hehe";
+    const z = ZONES[i % ZONES.length];
+    const x = z.x + noise(i, 21) * z.w;
+    const y = z.y + noise(i, 22) * z.h;
+    b.style.left = `${Math.round(x)}px`;
+    b.style.top = `${Math.round(y)}px`;
+    b.style.fontSize = `${Math.round(58 + noise(i, 23) * 26)}px`;
+    b.style.setProperty("--tilt", `${Math.round(noise(i, 24) * 28 - 14)}deg`);
+    b.style.animationDelay = `${(cue.delay ?? 0) + i * (cue.gap ?? 850)}ms`;
+    wrap.append(b);
+  }
+
+  return wrap;
+}
+
 function laugh(cue) {
   const wrap = document.createElement("div");
   const W = 1000;
@@ -739,9 +776,12 @@ function effect(layer) {
       const scale = layer.scale ?? 1;
       const delay = layer.delay ?? 0;
       const MOTES = layer.motes ?? 340;
+      // A vanishing flight only travels this fraction of the crossing, so the
+      // dust is laid only that far and each mote still lights as she passes.
+      const span = layer.vanish ?? 1;
 
       for (let i = 0; i < MOTES; i++) {
-        const t = i / (MOTES - 1);
+        const t = (i / (MOTES - 1)) * span;
 
         // Where she is at t. The same curve as fly-across, and deliberately
         // unscaled: her own flight is a fixed keyframe, so scaling the dust's
@@ -774,13 +814,13 @@ function effect(layer) {
         if (glint) bit.style.setProperty("--turn", `${Math.round(noise(i, 6) * 90)}deg`);
         // She lights each one as she passes it; the jitter keeps the leading
         // edge of the cloud ragged rather than a clean advancing rule.
-        bit.style.animationDelay = `${delay + Math.round(t * ms + noise(i, 7) * 200)}ms`;
+        bit.style.animationDelay = `${delay + Math.round((t / span) * ms + noise(i, 7) * 200)}ms`;
         bit.style.animationDuration = `${1400 + Math.round(noise(i, 8) * 1500)}ms`;
         el.append(bit);
       }
 
       const fly = document.createElement("img");
-      fly.className = "firefly";
+      fly.className = layer.vanish ? "firefly firefly--tease" : "firefly";
       fly.src = "assets/images/firefly.webp";
       fly.alt = "";
       fly.style.top = `${top}px`;

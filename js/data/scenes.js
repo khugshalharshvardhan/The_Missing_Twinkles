@@ -121,7 +121,10 @@ const EYES = {
 // beat later it is plainly more of the same thing.
 const LONE_TWINKLE = {
   key: "lone-twinkle", kind: "firefly-trail",
-  top: 250, scale: 0.78, ms: 2800, motes: 320, delay: 380
+  // `vanish` ends the flight at that fraction of the crossing: she dissolves
+  // mid-frame instead of making it out the other side. The delay waits out
+  // Neel's line (voice at 300 + 2.04s + a breath).
+  top: 250, scale: 0.78, ms: 2200, motes: 190, delay: 2550, vanish: 0.5
 };
 
 /* ---- page 2: shared marks, so nothing re-dissolves between its steps ---- */
@@ -396,9 +399,12 @@ export const pages = [
       // later.
       {
         id: "3.1",
-        hold: 3400, // he crosses at 500ms and takes 2.6s to pass
+        // One blink (900ms, see the cue), then the hehes: three of them
+        // popping at scattered spots while the giggle roams the dark. The last
+        // fades out around 4.1s.
+        hold: 4600,
         layers: [{ key: "night", kind: "night" }, EYES],
-        sfx: [{ kind: "laugh", y: 70, text: "Hee-hee-hee-hee!", delay: 500 }]
+        sfx: [{ kind: "hehes", count: 3, delay: 1250, gap: 1000 }]
       },
 
       {
@@ -409,11 +415,12 @@ export const pages = [
       },
 
       {
-        // Last step of the page: chevron in once his answer has landed. One
-        // twinkle crosses while he speaks — the first of them anyone has seen
-        // since the lane, and the thread the next page picks up.
+        // Last step of the page: chevron in once the twinkle has gone. His
+        // line lands first ("I am here… I think." runs 2.04s from 300); only
+        // THEN one twinkle enters — the first light since the lamp — and
+        // dissolves halfway across, a tease the next page chases.
         id: "3.3",
-        reveal: 2900, // "I am here… I think." runs 2.04s from 300
+        reveal: 5200,
         layers: [
           { key: "night", kind: "night" },
           EYES,
