@@ -30,6 +30,11 @@ const READ_PER_CHAR = 70;
 const READ_MIN = 3000;
 const READ_MAX = 6200;
 
+// The idle bob's periods, one per twinkle in turn, so a swarm never bobs in
+// unison. Set inline rather than in CSS because each one's phase is computed
+// against a running clock — see swarm().
+const BOB_SECS = [3.4, 4.1, 3.8, 4.6];
+
 const AFTER_COUNT = 950; // let the last twinkle land before moving on
 // The lamp's whole answer to the tap: the flock takes FLOCK_MS to stream in
 // and pour into the glass, the light comes up under the last of them, and the
@@ -570,6 +575,18 @@ function swarm(screen) {
 
     el.className = countable ? "firefly is-countable" : "firefly";
     place(el, spot);
+
+    // Carry the idle bob's phase across the beat change. The panes are rebuilt
+    // every beat, so a CSS animation restarts from zero each time — and g-bob
+    // swings 14px and 4 degrees, so on two beats that are otherwise the same
+    // picture ("Let us count to check." into "Tap each twinkle to count.") the
+    // swarm visibly reset. Phasing each one off a clock that never restarts
+    // makes the bob continuous, so the cut changes nothing that moves.
+    if (!enter) {
+      const secs = BOB_SECS[i % BOB_SECS.length];
+      el.style.animationDuration = `${secs}s`;
+      el.style.animationDelay = `-${((performance.now() / 1000 + i * 0.37) % secs).toFixed(3)}s`;
+    }
 
     const img = document.createElement("img");
     img.className = "fill";

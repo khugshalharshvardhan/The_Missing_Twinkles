@@ -278,7 +278,7 @@ export const screens = [
     //
     // Timing lives in @keyframes ff-swarm in css/game.css: 0.9s in, 5s held,
     // 0.7s to vanish where they stand. Change one, change the other.
-    fireflies: { x: 671, y: 192, enter: "left" },
+    fireflies: { x: 749, y: 197, enter: "left" },
     dwell: 7100,
     bubble: {
       art: `${IMG}bub_11.webp`, who: "agni",
@@ -352,7 +352,7 @@ export const screens = [
     // runs 500 to 2581), holds its five seconds, and vanishes the same way.
     // The player is asked to guess at something they have just watched appear
     // and disappear by magic.
-    fireflies: { x: 685, y: 192, enter: "magic", at: 2650 },
+    fireflies: { x: 749, y: 197, enter: "magic", at: 2650 },
     dwell: 10000,
     bubble: {
       art: `${IMG}bub_15.webp`, who: "agni",
@@ -416,7 +416,7 @@ export const screens = [
       { src: `${IMG}agni_g.webp`, x: 80, y: 490, w: 554, h: 512, fill: CROP.agniG, fx: "breathe" },
       { src: `${IMG}neel_c.webp`, x: 1382, y: 428, w: 434, h: 611, fill: CROP.neelC, fx: "breathe-slow" }
     ],
-    fireflies: { x: 691, y: 197, dim: true },
+    fireflies: { x: 749, y: 197, dim: true },
     bubble: {
       art: `${IMG}bub_3.webp`, who: "agni",
       x: 127, y: 229, w: 557, h: 282,
@@ -461,7 +461,7 @@ export const screens = [
       { src: `${IMG}agni_f.webp`, x: 9, y: 481, w: 605, h: 553, fx: "breathe" },
       { src: `${IMG}neel_f.webp`, x: 1372, y: 424, w: 465, h: 589, fx: "breathe-slow" }
     ],
-    fireflies: { x: 661, y: 207 },
+    fireflies: { x: 749, y: 197 },
     counter: "total",
     bubble: {
       art: `${IMG}bub_4.webp`, who: "agni",
@@ -485,7 +485,7 @@ export const screens = [
       { src: `${IMG}agni_f.webp`, x: 9, y: 481, w: 605, h: 553, fx: "breathe" },
       { src: `${IMG}neel_f.webp`, x: 1372, y: 424, w: 465, h: 589, fx: "breathe-slow" }
     ],
-    fireflies: { x: 661, y: 207 },
+    fireflies: { x: 749, y: 197 },
     counter: "guess",
     bubble: {
       art: `${IMG}bub_4.webp`, who: "agni",

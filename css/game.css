@@ -312,22 +312,26 @@
   border-radius: 50%;
 }
 
-/* Waiting to be counted: turned right down, so the screen starts dark and fills
-   with light as the player works. This is the other way round from before, when
-   counting one dimmed it — which made the reward for counting look like loss.
+/* Waiting to be counted: unlit, but SOLID. The screen still starts dark and
+   fills with light as the player works — that is the point, and counting one
+   must never look like loss — but the "not yet" state is carried by brightness
+   alone, never by opacity. At 0.42 the night sky showed straight through the
+   art and the twinkles read as ghosts rather than as things sitting in the
+   scene. Fully opaque and a little cooler reads as "waiting", which is what it
+   is; the glow a counted one gains is what marks the difference.
    The .is-dim variant is "Let us count to check." wearing the same level, so
    the cut onto the counting screen changes nothing about the twinkles. */
 #game .swarm.is-dim .firefly .fill,
 #game .firefly.is-countable .fill {
-  opacity: 0.42;
-  filter: saturate(0.5) brightness(0.72);
+  opacity: 1;
+  filter: saturate(0.78) brightness(0.86);
   transition: opacity var(--speed) var(--ease), filter var(--speed) var(--ease);
 }
 
 #game .firefly.is-countable:hover .fill,
 #game .firefly.is-countable:focus-visible .fill {
-  opacity: 0.72;
-  filter: saturate(0.8) brightness(0.95) drop-shadow(0 0 14px var(--glow));
+  opacity: 1;
+  filter: saturate(0.95) brightness(1.02) drop-shadow(0 0 14px var(--glow));
 }
 
 #game .firefly.is-countable:focus-visible {
@@ -390,14 +394,14 @@
 
 #game .swarm.is-seeds.is-dim .firefly .fill,
 #game .swarm.is-seeds .firefly.is-countable .fill {
-  opacity: 0.58;
-  filter: saturate(0.62) brightness(0.8)
+  opacity: 1;
+  filter: saturate(0.7) brightness(0.84)
     drop-shadow(0 0 10px rgba(255, 170, 70, 0.3));
 }
 
 #game .swarm.is-seeds .firefly.is-countable:hover .fill,
 #game .swarm.is-seeds .firefly.is-countable:focus-visible .fill {
-  opacity: 0.86;
+  opacity: 1;
   filter: saturate(0.95) brightness(1)
     drop-shadow(0 0 16px rgba(255, 186, 84, 0.9));
 }
