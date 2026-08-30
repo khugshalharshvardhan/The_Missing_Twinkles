@@ -779,6 +779,19 @@ function effect(layer) {
       // A vanishing flight only travels this fraction of the crossing, so the
       // dust is laid only that far and each mote still lights as she passes.
       const span = layer.vanish ?? 1;
+      // The phased flight's clock: how long each stretch takes. Must track the
+      // fly-pause keyframes in story.css.
+      const IN_MS = 1400;
+      const HOLD_MS = 1200;
+      const AHEAD_MS = 1000;
+      // When she passes the point at t — linear for a plain flight, and for
+      // the phased one: the run-in, then nothing moves through the hold, then
+      // the short hop covers the rest.
+      const passAt = (t) => !layer.pause
+        ? (t / span) * ms
+        : t <= 0.5
+          ? (t / 0.5) * IN_MS
+          : IN_MS + HOLD_MS + ((t - 0.5) / (span - 0.5)) * AHEAD_MS;
 
       for (let i = 0; i < MOTES; i++) {
         const t = (i / (MOTES - 1)) * span;
@@ -814,13 +827,18 @@ function effect(layer) {
         if (glint) bit.style.setProperty("--turn", `${Math.round(noise(i, 6) * 90)}deg`);
         // She lights each one as she passes it; the jitter keeps the leading
         // edge of the cloud ragged rather than a clean advancing rule.
-        bit.style.animationDelay = `${delay + Math.round((t / span) * ms + noise(i, 7) * 200)}ms`;
-        bit.style.animationDuration = `${1400 + Math.round(noise(i, 8) * 1500)}ms`;
+        bit.style.animationDelay = `${delay + Math.round(passAt(t) + noise(i, 7) * 200)}ms`;
+        // A pausing flight leaves a trail that outlives her — the point of the
+        // tease is the dust still hanging where she was.
+        bit.style.animationDuration = layer.pause
+          ? `${2400 + Math.round(noise(i, 8) * 2200)}ms`
+          : `${1400 + Math.round(noise(i, 8) * 1500)}ms`;
         el.append(bit);
       }
 
       const fly = document.createElement("img");
-      fly.className = layer.vanish ? "firefly firefly--tease" : "firefly";
+      fly.className = layer.pause ? "firefly firefly--pause"
+        : layer.vanish ? "firefly firefly--tease" : "firefly";
       fly.src = "assets/images/firefly.webp";
       fly.alt = "";
       fly.style.top = `${top}px`;

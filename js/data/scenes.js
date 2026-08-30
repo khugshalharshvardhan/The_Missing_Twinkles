@@ -121,10 +121,14 @@ const EYES = {
 // beat later it is plainly more of the same thing.
 const LONE_TWINKLE = {
   key: "lone-twinkle", kind: "firefly-trail",
-  // `vanish` ends the flight at that fraction of the crossing: she dissolves
-  // mid-frame instead of making it out the other side. The delay waits out
-  // Neel's line (voice at 300 + 2.04s + a breath).
-  top: 250, scale: 0.78, ms: 2200, motes: 190, delay: 2550, vanish: 0.5
+  // The tease, in phases: in to the centre (1.4s), a full stop where she
+  // notices the reader (1.2s), a short hop onward (1s), and a dissolve — 4.3s
+  // all told, with her dust staying lit after her. `pause` picks the phased
+  // flight (fly-pause in story.css and the piecewise trail in js/story.js —
+  // the three must agree); `vanish` is how far across she gets. The delay
+  // waits out Neel's line (voice at 300 + 2.04s + a breath).
+  top: 250, scale: 0.78, ms: 4300, motes: 210, delay: 2550,
+  vanish: 0.58, pause: true
 };
 
 /* ---- page 2: shared marks, so nothing re-dissolves between its steps ---- */
@@ -208,34 +212,20 @@ const TOWN_WIDE_OUT = { key: "bg-wide-out", src: `${IMG}bg_town_moonlight_wide.w
 // them has gone dark.
 const STREET_DUSK = { key: "street-dusk", kind: "dusk" };
 
-// The three little lights on the last page. Each one glows — see .glow--* in
-// css/story.css — because on that page they are the only light there is.
-const NIGHT_PROPS = [
-  // Off the right edge now, and mirrored so the pair face into the street.
-  {
-    key: "ghost", src: `${IMG}ghost.webp`, x: 1618, y: 430, w: 271, h: 181,
-    flipX: true, glow: "ghost", fx: "float"
-  },
-  {
-    // Figma has this at x 1874, which put most of it and nearly all of its
-    // glow past the right edge. Pulled in so the light it gives off is on
-    // screen, since on this page it is one of only three sources.
-    key: "berry", src: `${IMG}berry.webp`, x: 1800, y: 742, w: 62, h: 55,
-    fill: { left: "-22.76%", top: "-3.04%", width: "143.72%", height: "108.51%" },
-    glow: "berry", fx: "float"
-  }
-];
-
-// The firefly sits in Agni's hand, on the spark already painted into the art,
-// so it moves with her between the two poses.
+// The one twinkle they have, and the little story it tells across the page:
+// cupped in Agni's hand while she works out what happened, and gone from it by
+// the time she says let us go — up and off to the right, where it hangs in the
+// dark as the thing they are about to chase. It keeps its key across both
+// steps, so the player's layer diffing GLIDES it out of her hand rather than
+// re-drawing it somewhere else (see .layer's transition in css/story.css).
 //
-// Both marks come from measuring the swirl in the source art — (255,336) in
-// scene_shock, (240,343) in scene_cheer, both 1024px wide — then scaling by the
-// layer box's own width over 1024 and adding the box origin. Skipping that
-// scale is what first put the firefly up by her wing instead of in her hand.
+// The shock mark is measured, not guessed: the gold swirl painted into the new
+// art sits at (0.4318, 0.5111) of the picture, so the sprite is centred there
+// through the layer box below. The cheer mark is where the ghost used to
+// hover, which is the far side of the street from her hand.
 const FIREFLY_IN_HAND = {
-  shock: { key: "firefly", src: `${IMG}firefly.webp`, x: 498, y: 570, w: 118, h: 79, glow: "spark" },
-  cheer: { key: "firefly", src: `${IMG}firefly.webp`, x: 509, y: 622, w: 118, h: 79, glow: "spark" }
+  shock: { key: "firefly", src: `${IMG}firefly.webp`, x: 731, y: 587, w: 118, h: 79, glow: "spark" },
+  cheer: { key: "firefly", src: `${IMG}firefly.webp`, x: 1695, y: 481, w: 118, h: 79, glow: "spark" }
 };
 
 // "Very faint lights blink in distant hiding places" — clear of the characters
@@ -420,7 +410,7 @@ export const pages = [
         // THEN one twinkle enters — the first light since the lamp — and
         // dissolves halfway across, a tease the next page chases.
         id: "3.3",
-        reveal: 5200,
+        reveal: 7300,
         layers: [
           { key: "night", kind: "night" },
           EYES,
@@ -449,11 +439,10 @@ export const pages = [
         id: "4.1",
         hold: 5200, // "…the little twinkles!" ends at 3.83s (VO at 560 + 3.27s)
         layers: [
-          { key: "cast", anchor: CLEARING, src: `${IMG}scene_shock.webp`, x: 239, y: 191, w: 1276, h: 851 },
+          { key: "cast", anchor: CLEARING, src: `${IMG}scene_shock1.webp`, x: 263, y: 219, w: 1221, h: 798 },
           DIM,
           ...GLIMMERS,
-          FIREFLY_IN_HAND.shock,
-          ...NIGHT_PROPS
+          FIREFLY_IN_HAND.shock
         ],
         say: {
           bubble: { src: `${IMG}bubble_agni.webp`, x: 118, y: 96, w: 586, h: 294, flipX: true },
@@ -468,11 +457,10 @@ export const pages = [
         id: "4.2",
         reveal: 3100,
         layers: [
-          { key: "cast", anchor: CLEARING, src: `${IMG}scene_cheer.webp`, x: 273, y: 241, w: 1258, h: 839 },
+          { key: "cast", anchor: CLEARING, src: `${IMG}scene_cheer1.webp`, x: 258, y: 217, w: 1298, h: 804 },
           DIM,
           ...GLIMMERS,
-          FIREFLY_IN_HAND.cheer,
-          ...NIGHT_PROPS
+          FIREFLY_IN_HAND.cheer
         ],
         say: {
           bubble: { src: `${IMG}bubble_agni.webp`, x: 54, y: 78, w: 606, h: 326, flipX: true },

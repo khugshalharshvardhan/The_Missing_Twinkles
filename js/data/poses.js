@@ -17,6 +17,8 @@ export const POSE_BOX = {
   "images/neel_smelling.webp": [0.0667, 0.9375, 0.0208, 0.9708],
   "images/neel_walking.webp": [0.0625, 0.9375, 0.0167, 0.9875],
   "images/scene_cheer.webp": [0.0375, 0.9833, 0.0167, 0.9333],
+  "images/scene_cheer1.webp": [0.0219, 0.9484, 0.0076, 0.9646],
+  "images/scene_shock1.webp": [0.0437, 0.9797, 0.0048, 0.9689],
   "images/scene_shock.webp": [0.0542, 0.9625, 0.0375, 0.9417],
   "game/agni_a.webp": [0.3167, 0.6875, 0.1667, 0.8083],
   "game/agni_b.webp": [0.3333, 0.65, 0.1792, 0.8083],

@@ -623,6 +623,27 @@
   animation-name: fly-tease;
 }
 
+/* The phased tease: in to the centre, a full stop where she notices the
+   reader — leaning toward the camera with two little tilts — then a short hop
+   onward and a dissolve. Percentages are of a 4300ms flight: 1.4s in, 1.2s
+   hold, 1s hop, 0.7s out. Must track LONE_TWINKLE in scenes.js and the
+   piecewise trail in js/story.js. */
+.firefly--pause {
+  animation-name: fly-pause;
+}
+
+@keyframes fly-pause {
+  0%     { opacity: 0; transform: translate(0, 0) scale(0.7) rotate(0deg); }
+  8%     { opacity: 1; }
+  32.5%  { transform: translate(1130px, -110px) scale(1) rotate(0deg); }
+  38%    { transform: translate(1130px, -110px) scale(1.1) rotate(-6deg); }
+  46%    { transform: translate(1130px, -110px) scale(1.14) rotate(7deg); }
+  53%    { transform: translate(1130px, -110px) scale(1.08) rotate(-5deg); }
+  60.5%  { transform: translate(1130px, -110px) scale(1.05) rotate(0deg); }
+  83.7%  { opacity: 1; transform: translate(1311px, -83px) scale(1) rotate(0deg); }
+  100%   { opacity: 0; transform: translate(1378px, -76px) scale(0.1) rotate(4deg); }
+}
+
 @keyframes fly-tease {
   0%   { opacity: 0; transform: translate(0, 0) scale(0.7); }
   14%  { opacity: 1; }

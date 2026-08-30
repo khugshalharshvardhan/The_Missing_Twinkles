@@ -144,26 +144,31 @@ export const cues = {
   // midway on its own falling shimmer. Times match LONE_TWINKLE in scenes.js.
   "3.3": {
     sfx: [{ id: "blink", at: 820, gain: 0.55, pan: 0.55 },
-      { id: "twinkle", at: 2700, gain: 0.42, sweep: [-0.75, 0.1] },
-      { id: "magic_vanish", at: 4350, gain: 0.5, pan: 0.05 }
+      // Her entrance, a little hello as she stops to look, and the dissolve
+      // at the end of her hop. Times ride LONE_TWINKLE's phases.
+      { id: "twinkle", at: 2700, gain: 0.42, sweep: [-0.75, 0.05] },
+      { id: "twinkle", at: 3950, gain: 0.3, rate: 1.25, pan: 0.05 },
+      { id: "magic_vanish", at: 6100, gain: 0.5, pan: 0.12 }
     ],
     vo: { id: "vo_neel_here", at: 300, pan: 0.5 }
   },
 
   // Firefly transition — bells, and the music comes back up with them.
+  // The fireflies out of the dark: warmth comes back with them, and nothing
+  // else. The page used to arrive on a sparkle here and a spark_ignite on the
+  // beat under it, which landed as a fanfare over a quiet, dark page — both
+  // gone (the clips stay on disk, simply unreferenced).
   "3.4": {
-    // The fireflies out of the dark: warmth comes back with them.
     bed: "bed_hope",
-    music: { to: 1, at: 300, over: 1.8 },
-    sfx: [{ id: "sparkle", at: 100, gain: 0.9 }]
+    music: { to: 1, at: 300, over: 1.8 }
   },
 
   /* ---------- Screen 4 ---------- */
 
-  // Agni's spark catches. Twinkles sit on two of the distant glimmers.
+  // Twinkles sit on two of the distant glimmers — the only sound under her
+  // line, so the page opens on her voice rather than on an effect.
   "4.1": {
-    sfx: [{ id: "spark_ignite", at: 150, gain: 0.85, pan: -0.2 },
-      { id: "twinkle", at: 900, gain: 0.35, pan: 0.77 },
+    sfx: [{ id: "twinkle", at: 900, gain: 0.35, pan: 0.77 },
       { id: "twinkle", at: 2600, gain: 0.3, pan: -0.78 }
     ],
     vo: { id: "vo_agni_giggles", at: 560 }
@@ -542,7 +547,6 @@ export const audioManifest = [
     // or chosen from what the player did.
     "twinkle",
     "sparkle",
-    "spark_ignite",
     "cheer_swell",
     "key_press",
     "key_clear",
