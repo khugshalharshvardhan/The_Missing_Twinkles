@@ -309,8 +309,8 @@ export const screens = [
     anchor: THE_CLEARING,
     layers: [
       BG,
-      { src: `${IMG}agni_a.webp`, x: 25, y: 415, w: 590, h: 612, fill: CROP.agniA, fx: "breathe" },
-      { src: `${IMG}neel_b.webp`, x: 1347, y: 400, w: 376, h: 611, fill: CROP.neelB, flipX: true, fx: "breathe-slow" }
+      { src: `${IMG}agni_talk.webp`, x: 10, y: 485, w: 576, h: 532, fill: CROP.agniTalk, flipX: true, fx: "breathe" },
+      { src: `${IMG}neel_a.webp`, x: 1327, y: 434, w: 377, h: 573, fill: CROP.neelA, flipX: true, fx: "breathe-slow" }
     ],
     bubble: {
       art: `${IMG}bub_13.webp`, who: "agni",
@@ -326,8 +326,8 @@ export const screens = [
     anchor: THE_CLEARING,
     layers: [
       BG,
-      { src: `${IMG}agni_f.webp`, x: 34, y: 461, w: 605, h: 553, fx: "breathe" },
-      { src: `${IMG}neel_e.webp`, x: 1146, y: 344, w: 567, h: 667, fill: CROP.neelE, fx: "breathe-slow" }
+      { src: `${IMG}agni_talk.webp`, x: 10, y: 485, w: 576, h: 532, fill: CROP.agniTalk, flipX: true, fx: "breathe" },
+      { src: `${IMG}neel_c.webp`, x: 1382, y: 428, w: 434, h: 611, fill: CROP.neelC, fx: "breathe-slow" }
     ],
     bubble: {
       art: `${IMG}bub_neel.webp`, who: "neel",
@@ -342,8 +342,8 @@ export const screens = [
     anchor: THE_CLEARING,
     layers: [
       BG,
-      { src: `${IMG}agni_b.webp`, x: 25, y: 445, w: 553, h: 614, fill: CROP.agniB, fx: "breathe" },
-      { src: `${IMG}neel_think.webp`, x: 1327, y: 395, w: 372, h: 617, fill: CROP.neelThink, flipX: true, fx: "breathe-slow" }
+      { src: `${IMG}agni_talk.webp`, x: 10, y: 485, w: 576, h: 532, fill: CROP.agniTalk, flipX: true, fx: "breathe" },
+      { src: `${IMG}neel_c.webp`, x: 1382, y: 428, w: 434, h: 611, fill: CROP.neelC, fx: "breathe-slow" }
     ],
     // The last look before the keypad. Nothing is on screen while Agni speaks;
     // the moment her line ends the bubble goes and the swarm materialises where
@@ -396,8 +396,8 @@ export const screens = [
     counter: "guess",
     layers: [
       BG,
-      { src: `${IMG}agni_c.webp`, x: 23, y: 396, w: 473, h: 651, fill: CROP.agniC, fx: "breathe" },
-      { src: `${IMG}neel_c.webp`, x: 1382, y: 428, w: 434, h: 611, fill: CROP.neelC, fx: "breathe-slow" }
+      { src: `${IMG}agni_talk.webp`, x: 10, y: 485, w: 576, h: 532, fill: CROP.agniTalk, flipX: true, fx: "breathe" },
+      { src: `${IMG}neel_think.webp`, x: 1327, y: 395, w: 372, h: 617, fill: CROP.neelThink, flipX: true, fx: "breathe-slow" }
     ],
     bubble: {
       art: `${IMG}bub_neel.webp`, who: "neel",
@@ -413,8 +413,8 @@ export const screens = [
     counter: "guess",
     layers: [
       BG,
-      { src: `${IMG}agni_point.webp`, x: 64, y: 498, w: 525, h: 501, fill: CROP.agniPoint, fx: "breathe" },
-      { src: `${IMG}neel_d.webp`, x: 1344, y: 417, w: 449, h: 581, fill: CROP.neelD, flipX: true, fx: "breathe-slow" }
+      { src: `${IMG}agni_g.webp`, x: 80, y: 490, w: 554, h: 512, fill: CROP.agniG, fx: "breathe" },
+      { src: `${IMG}neel_c.webp`, x: 1382, y: 428, w: 434, h: 611, fill: CROP.neelC, fx: "breathe-slow" }
     ],
     fireflies: { x: 691, y: 197, dim: true },
     bubble: {
@@ -433,7 +433,7 @@ export const screens = [
     layers: [
       BG,
       { src: `${IMG}agni_g.webp`, x: 80, y: 490, w: 554, h: 512, fill: CROP.agniG, fx: "breathe" },
-      { src: `${IMG}neel_c.webp`, x: 1385, y: 484, w: 396, h: 557, fill: CROP.neelC, fx: "breathe-slow" }
+      { src: `${IMG}neel_c.webp`, x: 1382, y: 428, w: 434, h: 611, fill: CROP.neelC, fx: "breathe-slow" }
     ],
     fireflies: { x: 749, y: 197 },
     counter: "guess",
@@ -502,7 +502,7 @@ export const screens = [
     numberLine: true,
     layers: [
       BG,
-      { src: `${IMG}agni_d.webp`, x: 84, y: 474, w: 342, h: 560, fill: CROP.agniD, fx: "breathe" },
+      { src: `${IMG}agni_f.webp`, x: 9, y: 481, w: 605, h: 553, fx: "breathe" },
       { src: `${IMG}neel_f.webp`, x: 1355, y: 408, w: 465, h: 589, fx: "breathe-slow" }
     ],
     bubble: {
@@ -543,7 +543,7 @@ export const screens = [
     anchor: LAMP_STAGE,
     layers: [
       BG,
-      { src: `${IMG}agni_g.webp`, x: 70, y: 489, w: 554, h: 512, fill: CROP.agniG, fx: "breathe" },
+      { src: `${IMG}agni_celebrating.webp`, x: 579, y: 465, w: 549, h: 528, fx: "breathe" },
       { src: `${IMG}neel_turn.webp`, x: 1125, y: 391, w: 735, h: 610, fill: CROP.neelTurn, fx: "breathe-slow" },
       { src: `${IMG}lamp_on.webp`, x: 1408, y: 74, w: 287, h: 927, fill: CROP.lampOn, fx: "lamp-glow" },
       { src: FIREFLY_SRC, x: 1637, y: 263, w: 25, h: 26, fx: "flicker" }
@@ -559,8 +559,8 @@ export const screens = [
     anchor: TOGETHER,
     layers: [
       BG,
-      { src: `${IMG}agni_b.webp`, x: 398, y: 460, w: 495, h: 549, fill: CROP.agniB, fx: "breathe" },
-      { src: `${IMG}neel_e.webp`, x: 945, y: 310, w: 567, h: 667, fill: CROP.neelE, fx: "breathe-slow" }
+      { src: `${IMG}agni_e.webp`, x: 441, y: 389, w: 450, h: 623, fill: CROP.agniE, fx: "breathe" },
+      { src: `${IMG}neel_g.webp`, x: 1039, y: 366, w: 462, h: 646, fill: CROP.neelG, fx: "breathe-slow" }
     ],
     bubble: {
       art: `${IMG}bub_61.webp`, who: "agni",
@@ -605,7 +605,7 @@ export const level1 = [
     anchor: THE_CLEARING,
     layers: [
       BG_MEADOW,
-      { src: `${IMG}agni_b.webp`, x: 25, y: 445, w: 553, h: 614, fill: CROP.agniB, fx: "breathe" },
+      { src: `${IMG}agni_talk.webp`, x: 10, y: 485, w: 576, h: 532, fill: CROP.agniTalk, flipX: true, fx: "breathe" },
       { src: `${IMG}neel_think.webp`, x: 1327, y: 395, w: 372, h: 617, fill: CROP.neelThink, flipX: true, fx: "breathe-slow" }
     ],
     // Same clock as tutorial 1.5: her line ends (vo_g_guess runs 500 to 2581),
@@ -647,8 +647,8 @@ export const level1 = [
     counter: "guess",
     layers: [
       BG_MEADOW,
-      { src: `${IMG}agni_point.webp`, x: 64, y: 498, w: 525, h: 501, fill: CROP.agniPoint, fx: "breathe" },
-      { src: `${IMG}neel_d.webp`, x: 1344, y: 417, w: 449, h: 581, fill: CROP.neelD, flipX: true, fx: "breathe-slow" }
+      { src: `${IMG}agni_g.webp`, x: 80, y: 490, w: 554, h: 512, fill: CROP.agniG, fx: "breathe" },
+      { src: `${IMG}neel_c.webp`, x: 1382, y: 428, w: 434, h: 611, fill: CROP.neelC, fx: "breathe-slow" }
     ],
     fireflies: { x: 773, y: 140, dim: true },
     bubble: {
@@ -667,7 +667,7 @@ export const level1 = [
     layers: [
       BG_MEADOW,
       { src: `${IMG}agni_g.webp`, x: 80, y: 490, w: 554, h: 512, fill: CROP.agniG, fx: "breathe" },
-      { src: `${IMG}neel_c.webp`, x: 1385, y: 484, w: 396, h: 557, fill: CROP.neelC, fx: "breathe-slow" }
+      { src: `${IMG}neel_c.webp`, x: 1382, y: 428, w: 434, h: 611, fill: CROP.neelC, fx: "breathe-slow" }
     ],
     fireflies: { x: 773, y: 140 },
     counter: "guess",
@@ -730,7 +730,7 @@ export const level1 = [
     numberLine: true,
     layers: [
       BG_MEADOW,
-      { src: `${IMG}agni_d.webp`, x: 84, y: 474, w: 342, h: 560, fill: CROP.agniD, fx: "breathe" },
+      { src: `${IMG}agni_f.webp`, x: 9, y: 481, w: 605, h: 553, fx: "breathe" },
       { src: `${IMG}neel_f.webp`, x: 1355, y: 408, w: 465, h: 589, fx: "breathe-slow" }
     ],
     bubble: {
@@ -766,7 +766,7 @@ export const level1 = [
     anchor: LAMP_STAGE,
     layers: [
       BG_MEADOW,
-      { src: `${IMG}agni_g.webp`, x: 70, y: 489, w: 554, h: 512, fill: CROP.agniG, fx: "breathe" },
+      { src: `${IMG}agni_celebrating.webp`, x: 579, y: 465, w: 549, h: 528, fx: "breathe" },
       { src: `${IMG}neel_turn.webp`, x: 1125, y: 391, w: 735, h: 610, fill: CROP.neelTurn, fx: "breathe-slow" },
       { src: `${IMG}lamp_on.webp`, x: 1398, y: 74, w: 287, h: 927, fill: CROP.lampOn, fx: "lamp-glow" },
       // The caught one, glowing in the glass where the tutorial kept its
@@ -796,7 +796,7 @@ export const level2 = [
     anchor: THE_CLEARING,
     layers: [
       BG_VALLEY,
-      { src: `${IMG}agni_b.webp`, x: 25, y: 445, w: 553, h: 614, fill: CROP.agniB, fx: "breathe" },
+      { src: `${IMG}agni_talk.webp`, x: 10, y: 485, w: 576, h: 532, fill: CROP.agniTalk, flipX: true, fx: "breathe" },
       { src: `${IMG}neel_think.webp`, x: 1327, y: 395, w: 372, h: 617, fill: CROP.neelThink, flipX: true, fx: "breathe-slow" }
     ],
     // Same clock as level 1's p1: her line ends (vo_g_guess runs 500 to 2581),
@@ -838,8 +838,8 @@ export const level2 = [
     counter: "guess",
     layers: [
       BG_VALLEY,
-      { src: `${IMG}agni_point.webp`, x: 64, y: 498, w: 525, h: 501, fill: CROP.agniPoint, fx: "breathe" },
-      { src: `${IMG}neel_d.webp`, x: 1344, y: 417, w: 449, h: 581, fill: CROP.neelD, flipX: true, fx: "breathe-slow" }
+      { src: `${IMG}agni_g.webp`, x: 80, y: 490, w: 554, h: 512, fill: CROP.agniG, fx: "breathe" },
+      { src: `${IMG}neel_c.webp`, x: 1382, y: 428, w: 434, h: 611, fill: CROP.neelC, fx: "breathe-slow" }
     ],
     fireflies: { x: 688, y: 174, dim: true },
     bubble: {
@@ -858,7 +858,7 @@ export const level2 = [
     layers: [
       BG_VALLEY,
       { src: `${IMG}agni_g.webp`, x: 80, y: 490, w: 554, h: 512, fill: CROP.agniG, fx: "breathe" },
-      { src: `${IMG}neel_c.webp`, x: 1385, y: 484, w: 396, h: 557, fill: CROP.neelC, fx: "breathe-slow" }
+      { src: `${IMG}neel_c.webp`, x: 1382, y: 428, w: 434, h: 611, fill: CROP.neelC, fx: "breathe-slow" }
     ],
     fireflies: { x: 688, y: 174 },
     counter: "guess",
@@ -924,7 +924,7 @@ export const level2 = [
     numberLine: true,
     layers: [
       BG_VALLEY,
-      { src: `${IMG}agni_d.webp`, x: 84, y: 474, w: 342, h: 560, fill: CROP.agniD, fx: "breathe" },
+      { src: `${IMG}agni_f.webp`, x: 9, y: 481, w: 605, h: 553, fx: "breathe" },
       { src: `${IMG}neel_f.webp`, x: 1355, y: 408, w: 465, h: 589, fx: "breathe-slow" }
     ],
     bubble: {
@@ -960,7 +960,7 @@ export const level2 = [
     anchor: LAMP_STAGE,
     layers: [
       BG_VALLEY,
-      { src: `${IMG}agni_g.webp`, x: 70, y: 489, w: 554, h: 512, fill: CROP.agniG, fx: "breathe" },
+      { src: `${IMG}agni_celebrating.webp`, x: 579, y: 465, w: 549, h: 528, fx: "breathe" },
       { src: `${IMG}neel_turn.webp`, x: 1125, y: 391, w: 735, h: 610, fill: CROP.neelTurn, fx: "breathe-slow" },
       { src: `${IMG}lamp_on.webp`, x: 1398, y: 74, w: 287, h: 927, fill: CROP.lampOn, fx: "lamp-glow" },
       // The caught one, in the glass where level 1 keeps its berry. Sized to
@@ -989,7 +989,7 @@ export const level3 = [
     anchor: THE_CLEARING,
     layers: [
       BG_FOREST,
-      { src: `${IMG}agni_b.webp`, x: 25, y: 445, w: 553, h: 614, fill: CROP.agniB, fx: "breathe" },
+      { src: `${IMG}agni_talk.webp`, x: 10, y: 485, w: 576, h: 532, fill: CROP.agniTalk, flipX: true, fx: "breathe" },
       { src: `${IMG}neel_think.webp`, x: 1327, y: 395, w: 372, h: 617, fill: CROP.neelThink, flipX: true, fx: "breathe-slow" }
     ],
     // Same clock as p1 and s1: her line ends (vo_g_guess runs 500 to 2581),
@@ -1031,8 +1031,8 @@ export const level3 = [
     counter: "guess",
     layers: [
       BG_FOREST,
-      { src: `${IMG}agni_point.webp`, x: 64, y: 498, w: 525, h: 501, fill: CROP.agniPoint, fx: "breathe" },
-      { src: `${IMG}neel_d.webp`, x: 1344, y: 417, w: 449, h: 581, fill: CROP.neelD, flipX: true, fx: "breathe-slow" }
+      { src: `${IMG}agni_g.webp`, x: 80, y: 490, w: 554, h: 512, fill: CROP.agniG, fx: "breathe" },
+      { src: `${IMG}neel_c.webp`, x: 1382, y: 428, w: 434, h: 611, fill: CROP.neelC, fx: "breathe-slow" }
     ],
     fireflies: { x: 696, y: 85, dim: true },
     bubble: {
@@ -1051,7 +1051,7 @@ export const level3 = [
     layers: [
       BG_FOREST,
       { src: `${IMG}agni_g.webp`, x: 80, y: 490, w: 554, h: 512, fill: CROP.agniG, fx: "breathe" },
-      { src: `${IMG}neel_c.webp`, x: 1385, y: 484, w: 396, h: 557, fill: CROP.neelC, fx: "breathe-slow" }
+      { src: `${IMG}neel_c.webp`, x: 1382, y: 428, w: 434, h: 611, fill: CROP.neelC, fx: "breathe-slow" }
     ],
     fireflies: { x: 696, y: 85 },
     counter: "guess",
@@ -1116,7 +1116,7 @@ export const level3 = [
     numberLine: true,
     layers: [
       BG_FOREST,
-      { src: `${IMG}agni_d.webp`, x: 84, y: 474, w: 342, h: 560, fill: CROP.agniD, fx: "breathe" },
+      { src: `${IMG}agni_f.webp`, x: 9, y: 481, w: 605, h: 553, fx: "breathe" },
       { src: `${IMG}neel_f.webp`, x: 1355, y: 408, w: 465, h: 589, fx: "breathe-slow" }
     ],
     bubble: {
@@ -1152,7 +1152,7 @@ export const level3 = [
     anchor: LAMP_STAGE,
     layers: [
       BG_FOREST,
-      { src: `${IMG}agni_g.webp`, x: 70, y: 489, w: 554, h: 512, fill: CROP.agniG, fx: "breathe" },
+      { src: `${IMG}agni_celebrating.webp`, x: 579, y: 465, w: 549, h: 528, fx: "breathe" },
       { src: `${IMG}neel_turn.webp`, x: 1125, y: 391, w: 735, h: 610, fill: CROP.neelTurn, fx: "breathe-slow" },
       { src: `${IMG}lamp_on.webp`, x: 1453, y: 74, w: 287, h: 927, fill: CROP.lampOn, fx: "lamp-glow" },
       // The caught one, sized to the seed's aspect on the shared centre
@@ -1180,7 +1180,7 @@ export const level4 = [
     anchor: THE_CLEARING,
     layers: [
       BG_FLOWERMEADOW,
-      { src: `${IMG}agni_b.webp`, x: 25, y: 445, w: 553, h: 614, fill: CROP.agniB, fx: "breathe" },
+      { src: `${IMG}agni_talk.webp`, x: 10, y: 485, w: 576, h: 532, fill: CROP.agniTalk, flipX: true, fx: "breathe" },
       { src: `${IMG}neel_think.webp`, x: 1327, y: 395, w: 372, h: 617, fill: CROP.neelThink, flipX: true, fx: "breathe-slow" }
     ],
     // Same clock as every other look beat: her line ends (vo_g_guess runs 500
@@ -1222,8 +1222,8 @@ export const level4 = [
     counter: "guess",
     layers: [
       BG_FLOWERMEADOW,
-      { src: `${IMG}agni_point.webp`, x: 64, y: 498, w: 525, h: 501, fill: CROP.agniPoint, fx: "breathe" },
-      { src: `${IMG}neel_d.webp`, x: 1344, y: 417, w: 449, h: 581, fill: CROP.neelD, flipX: true, fx: "breathe-slow" }
+      { src: `${IMG}agni_g.webp`, x: 80, y: 490, w: 554, h: 512, fill: CROP.agniG, fx: "breathe" },
+      { src: `${IMG}neel_c.webp`, x: 1382, y: 428, w: 434, h: 611, fill: CROP.neelC, fx: "breathe-slow" }
     ],
     fireflies: { x: 623, y: 138, dim: true },
     bubble: {
@@ -1242,7 +1242,7 @@ export const level4 = [
     layers: [
       BG_FLOWERMEADOW,
       { src: `${IMG}agni_g.webp`, x: 80, y: 490, w: 554, h: 512, fill: CROP.agniG, fx: "breathe" },
-      { src: `${IMG}neel_c.webp`, x: 1385, y: 484, w: 396, h: 557, fill: CROP.neelC, fx: "breathe-slow" }
+      { src: `${IMG}neel_c.webp`, x: 1382, y: 428, w: 434, h: 611, fill: CROP.neelC, fx: "breathe-slow" }
     ],
     fireflies: { x: 623, y: 138 },
     counter: "guess",
@@ -1307,7 +1307,7 @@ export const level4 = [
     numberLine: true,
     layers: [
       BG_FLOWERMEADOW,
-      { src: `${IMG}agni_d.webp`, x: 84, y: 474, w: 342, h: 560, fill: CROP.agniD, fx: "breathe" },
+      { src: `${IMG}agni_f.webp`, x: 9, y: 481, w: 605, h: 553, fx: "breathe" },
       { src: `${IMG}neel_f.webp`, x: 1355, y: 408, w: 465, h: 589, fx: "breathe-slow" }
     ],
     bubble: {
@@ -1343,7 +1343,7 @@ export const level4 = [
     anchor: LAMP_STAGE,
     layers: [
       BG_FLOWERMEADOW,
-      { src: `${IMG}agni_g.webp`, x: 70, y: 489, w: 554, h: 512, fill: CROP.agniG, fx: "breathe" },
+      { src: `${IMG}agni_celebrating.webp`, x: 579, y: 465, w: 549, h: 528, fx: "breathe" },
       { src: `${IMG}neel_turn.webp`, x: 1125, y: 391, w: 735, h: 610, fill: CROP.neelTurn, fx: "breathe-slow" },
       { src: `${IMG}lamp_on.webp`, x: 1453, y: 74, w: 287, h: 927, fill: CROP.lampOn, fx: "lamp-glow" },
       // The caught one, sized to the flower's aspect on the shared centre

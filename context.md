@@ -223,6 +223,15 @@ the tutorial's `lamp_off.webp`/`lamp_on.webp` at their existing coordinates**
   when the user pastes `devEdits` from edit mode, apply those numbers verbatim.
 - Verify with screenshots before saying done. Report failures plainly.
 - Comment style in data files: explain *why a number is what it is*.
+- **A pose lasts a phase, not a line.** Playtest feedback was that the
+  characters changed pose on almost every dialogue (measured: Agni on 13 of the
+  tutorial's 15 beat transitions). Each character now holds one pose per phase
+  of a round — look/ask, count, compare, lamp — the listener never changes
+  while the other speaks, and the only beat where both change is the payoff
+  (the lamp lights: Neel spins, Agni cheers on `agni_celebrating`). Now Agni
+  6/15 and Neel 7/15 in the tutorial, 4/8 and 3/8 in a level. When adding beats,
+  reuse the pose the phase is already holding rather than picking a new one, and
+  copy that pose's canonical box+crop so it does not change size mid-phase.
 
 ---
 
