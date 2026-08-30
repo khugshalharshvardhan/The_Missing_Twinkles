@@ -1546,15 +1546,22 @@ export const epilogue = {
 export const keypad = {
   // The panel behind the keys, back where Figma has it. Without it the digits
   // floated on the background with nothing holding them together.
-  frame: { src: `${IMG}keypad.webp`, x: 665, y: 184, w: 553, h: 691 },
+  // Scaled up by 1.3 from the Figma size, about a new origin at (582, 92):
+  // measured, the keys already filled the panel's cream interior edge to edge,
+  // so the only way to give a child bigger buttons was to grow the whole pad.
+  // Everything below is that one transform — panel, readout, key pitch, key
+  // size and the tick inside the confirm key — so the pad is still exactly the
+  // design, just larger. It stays clear of both characters (Agni's art ends
+  // near x 503, Neel's box starts at 1369) and of the counter card.
+  frame: { src: `${IMG}keypad.webp`, x: 582, y: 92, w: 719, h: 898 },
   // The readout, back in the place Figma drew it (the `num` layer, 108:51).
   // A guess can now be two digits, so there has to be somewhere to see it
   // being built — and with the readout back, the key rows return to their own
   // designed y rather than the 60px lift they were given while the top of the
   // panel was empty.
-  display: { src: `${IMG}num_display.webp`, x: 766, y: 289, w: 356, h: 121, fill: CROP.numDisplay },
-  keyW: 116,
-  keyH: 85,
+  display: { src: `${IMG}num_display.webp`, x: 713, y: 228, w: 463, h: 157, fill: CROP.numDisplay },
+  keyW: 150,
+  keyH: 110,
   keyArt: `${IMG}key.webp`,
   keyFill: CROP.key,
   // Both action keys are back too, in the bottom row Figma gives them: clear
@@ -1565,24 +1572,24 @@ export const keypad = {
   clearArt: `${IMG}key_x.webp`,
   confirmArt: `${IMG}key_ok.webp`,
   // The tick sits inset inside its key, at the size Figma gives it (146:12).
-  tick: { src: `${IMG}tick.svg`, x: 30, y: 14, w: 56, h: 56 },
+  tick: { src: `${IMG}tick.svg`, x: 39, y: 18, w: 73, h: 73 },
   // A guess is capped at two digits and at 19 — the largest number Neel can
   // read back (vo_nn_0..19), and comfortably past every total in the game.
   maxDigits: 2,
   maxValue: 19,
   keys: [
-    { label: "1", x: 766, y: 421 },
-    { label: "2", x: 886, y: 421 },
-    { label: "3", x: 1006, y: 421 },
-    { label: "4", x: 766, y: 508 },
-    { label: "5", x: 886, y: 508 },
-    { label: "6", x: 1006, y: 508 },
-    { label: "7", x: 766, y: 595 },
-    { label: "8", x: 886, y: 595 },
-    { label: "9", x: 1006, y: 595 },
-    { label: "X", x: 766, y: 682, clear: true },
-    { label: "0", x: 886, y: 682 },
-    { label: "OK", x: 1006, y: 682, confirm: true }
+    { label: "1", x: 713, y: 400 },
+    { label: "2", x: 869, y: 400 },
+    { label: "3", x: 1025, y: 400 },
+    { label: "4", x: 713, y: 513 },
+    { label: "5", x: 869, y: 513 },
+    { label: "6", x: 1025, y: 513 },
+    { label: "7", x: 713, y: 626 },
+    { label: "8", x: 869, y: 626 },
+    { label: "9", x: 1025, y: 626 },
+    { label: "X", x: 713, y: 739, clear: true },
+    { label: "0", x: 869, y: 739 },
+    { label: "OK", x: 1025, y: 739, confirm: true }
   ]
 };
 

@@ -330,7 +330,7 @@ function scheduleReveals(screen, pane) {
       if (!panel) return;
       panel.classList.remove("is-waiting");
       // The burst is scattered over the panel's face, not its corner.
-      sparkleBurst(pane, { x: 941, y: 530, spread: 300, count: 18 });
+      sparkleBurst(pane, { x: 941, y: 541, spread: 380, count: 18 });
     }, screen.keypadAt));
   }
 }
