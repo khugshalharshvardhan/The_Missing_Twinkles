@@ -1413,8 +1413,10 @@ export const levels = [
     total: FLOWER_TOTAL,
     swarmSrc: FLOWER_SRC,
     layout: GLOWFLOWERS,
-    // Violet petals round a gold face: the glow the swarm styling was built for
-    // is already drawn into the art, so it needs no restyling of its own.
+    // Warm orange petals round a gold face. The art was violet once and was
+    // very hard to find against this meadow's violet sky — the new one carries
+    // its own glow in exactly the colour the swarm styling was built for, so it
+    // still needs no restyling of its own.
     swarmClass: "",
     walkTo: "flowermeadow",
     screens: level4
