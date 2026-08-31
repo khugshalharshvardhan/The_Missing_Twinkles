@@ -13,13 +13,21 @@
 // the layer's x position as (x / 1920) * 2 - 1, and sweep pans across the clip.
 // `fade: { at, over }` takes a clip out instead of cutting it.
 //
-// The story's music follows its scenes: bed_main (the cheerful stroll) for
+// The music follows the scenes. The story: bed_main (the cheerful stroll) for
 // page one, bed_uneasy under the mist, bed_dark for the lights-out and the
-// black page, bed_hope as the empty street resolves into a plan — and
-// bed_main again from the walk on, for the game. playBed() cross-fades on a
-// change and ignores a request for the bed already playing. `music` still
-// rides on top for the dips that let a line land; `music.to` is a fraction
-// of the bus level.
+// black page, bed_hope as the empty street resolves into a plan. The game has
+// its own: bed_game, on the first beat of every round.
+//
+// The two acts deliberately do NOT share a track. bed_main is a song with a
+// vocal in it — right for a storybook page that reads itself once, wrong under
+// a round the player sits inside, where a voice in the music argues with the
+// voice giving the instructions. bed_game is the instrumental.
+//
+// Every bed is written at about -17 LUFS because that is what the music bus in
+// js/audio.js was tuned against; the quiet moments come from `music.to` here,
+// never from a quieter file. playBed() cross-fades on a change and ignores a
+// request for the bed already playing. `music.to` is a fraction of the bus
+// level, and rides on top for the dips that let a line land.
 
 const SFX_DIR = "assets/audios/sfx/";
 const VO_DIR = "assets/audios/vo/";
@@ -244,14 +252,14 @@ export const gameCues = {
 
   // ---- they notice the twinkles, and the problem is stated ----
   "1.1": {
-    bed: "bed_main",
+    bed: "bed_game",
     sfx: [{ id: "twinkle", at: 700, gain: 0.4 },
       // The swarm vanishing on its magic — a falling shimmer, not a reward.
       { id: "magic_vanish", at: 5950, gain: 0.7 }],
     vo: { id: "vo_g_look", at: 500, pan: -0.55 }
   },
   "1.2": {
-    bed: "bed_main",
+    bed: "bed_game",
         vo: { id: "vo_g_gone", at: 500, pan: -0.55 }
   },
   "1.3": {
@@ -337,7 +345,7 @@ export const gameCues = {
   // Look closely — the berries materialise after the line (fireflies.at 2650
   // in screens.js) and vanish on their own falling shimmer 5.9s later.
   "p1": {
-    bed: "bed_main",
+    bed: "bed_game",
     sfx: [{ id: "twinkle", at: 2750, gain: 0.4, pan: 0.2 },
       { id: "magic_vanish", at: 8600, gain: 0.7 }],
     vo: { id: "vo_g_guess", at: 500, pan: -0.5 }
@@ -389,7 +397,7 @@ export const gameCues = {
   // Look closely — the stars materialise after the line (fireflies.at 2650 in
   // screens.js) and vanish on their own falling shimmer 5.9s later.
   "s1": {
-    bed: "bed_main",
+    bed: "bed_game",
     sfx: [{ id: "twinkle", at: 2750, gain: 0.4, pan: 0.2 },
       { id: "magic_vanish", at: 8600, gain: 0.7 }],
     vo: { id: "vo_g_guess", at: 500, pan: -0.5 }
@@ -439,7 +447,7 @@ export const gameCues = {
   // Look closely — the seeds materialise after the line (fireflies.at 2650 in
   // screens.js) and vanish on their own falling shimmer 5.9s later.
   "m1": {
-    bed: "bed_main",
+    bed: "bed_game",
     sfx: [{ id: "twinkle", at: 2750, gain: 0.4, pan: 0.2 },
       { id: "magic_vanish", at: 8600, gain: 0.7 }],
     vo: { id: "vo_g_guess", at: 500, pan: -0.5 }
@@ -489,7 +497,7 @@ export const gameCues = {
   // Look closely — the flowers open after the line (fireflies.at 2650 in
   // screens.js) and vanish on their own falling shimmer 5.9s later.
   "f1": {
-    bed: "bed_main",
+    bed: "bed_game",
     sfx: [{ id: "twinkle", at: 2750, gain: 0.4, pan: 0.2 },
       { id: "magic_vanish", at: 8600, gain: 0.7 }],
     vo: { id: "vo_g_guess", at: 500, pan: -0.5 }
