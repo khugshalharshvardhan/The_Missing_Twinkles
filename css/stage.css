@@ -70,11 +70,16 @@ body {
   will-change: transform;
 }
 
-/* Nothing on the stage should ever be text-selected or drag-ghosted. */
+/* Art should never be drag-ghosted or text-selected by a stray swipe.
+   It is deliberately NOT pointer-events:none: that made every drawing on the
+   stage — characters, balloons, the lamp — invisible to the browser's element
+   inspector, which picks whatever the mouse can hit. Images inside a button
+   need no such rule anyway, because a click on one bubbles to the button. The
+   few pieces of art that genuinely sit ON TOP of something tappable turn
+   pointer events off themselves; see .hint in css/game.css. */
 #stage img {
   user-select: none;
   -webkit-user-drag: none;
-  pointer-events: none;
 }
 
 /* =========================================================

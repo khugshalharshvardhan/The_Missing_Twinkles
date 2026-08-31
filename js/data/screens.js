@@ -1252,7 +1252,7 @@ export const level4 = [
     hint: { src: `${SHARED}hand_nudge.svg`, x: 589, y: 121, w: 308.396, h: 308.396 },
     bubble: {
       art: `${IMG}bub_32.webp`, who: "agni",
-      x: 172, y: 252, w: 489, h: 256,
+      x: 108, y: 252, w: 489, h: 256,
       text: "Tap each glow flower to count."
     }
   },

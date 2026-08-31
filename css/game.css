@@ -712,18 +712,34 @@
    Keypad
    ========================================================= */
 
+/* The panel is a full-frame container holding the pad, so like .overlays in
+   the story it must not take the mouse itself — it would sit in front of the
+   whole scene and be the only thing the element picker could ever find. Its
+   contents (the panel art, the readout, the keys) take events instead. */
 #game .keypad {
   position: absolute;
   inset: 0;
+  pointer-events: none;
   transition: opacity 550ms var(--ease), transform 550ms var(--ease);
+}
+
+#game .keypad > * {
+  pointer-events: auto;
 }
 
 /* Held while the question is still being asked — see keypadAt on screen 2 in
    js/data/screens.js. Removing the class is the reveal. */
+/* Held back until the question has been asked. The keys are listed too: a
+   child with pointer-events:auto still takes clicks through a parent that has
+   them off, so without this the pad would be tappable while invisible. */
+#game .keypad.is-waiting,
+#game .keypad.is-waiting > * {
+  pointer-events: none;
+}
+
 #game .keypad.is-waiting {
   opacity: 0;
   transform: scale(0.94);
-  pointer-events: none;
 }
 
 /* The guess being built, centred in the readout plate. Sits inside the
@@ -945,7 +961,13 @@
   opacity: 0;
 }
 
-#game .hint {
+/* The pointing hand lies directly over the first twinkle, so it — and the
+   image inside it — must stay untappable or it would swallow the very tap it
+   is asking for. The child rule matters now that stage art is no longer
+   pointer-events:none as a blanket: a child can receive events even when its
+   parent cannot. */
+#game .hint,
+#game .hint img {
   pointer-events: none;
   transition: opacity var(--speed-slow) var(--ease);
   animation: hand-tap 2.2s var(--ease) infinite;

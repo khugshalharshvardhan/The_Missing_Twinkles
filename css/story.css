@@ -4,12 +4,25 @@
    so they scale with #stage rather than with the viewport.
    ========================================================= */
 
+/* Containers transparent, contents inspectable.
+   These three are full-frame boxes that hold things rather than being things,
+   so they stay out of the way of the mouse — otherwise .overlays, which covers
+   the whole stage, sits in front of every character and the element picker can
+   only ever land on it. Their contents get pointer events back, so the art and
+   the captions are selectable in the inspector the way a normal page is.
+   Nothing in here is clickable and nothing underneath needs the clicks: the
+   page-turn buttons live in the HUD, above this at a higher z-index. */
 .scene,
 .layers,
 .overlays {
   position: absolute;
   inset: 0;
   pointer-events: none;
+}
+
+.layers > *,
+.overlays > * {
+  pointer-events: auto;
 }
 
 /* isolate keeps .overlays' z-index inside the scene, so the transition cover
