@@ -1,12 +1,22 @@
 /* ---- font ----
 
-   Baloo 2 SemiBold, self-hosted in two subsets so the browser only fetches the
-   script a reader actually needs. Baloo 2 is the DEVANAGARI member of the Baloo
-   superfamily: Baloo Bhai 2 is the Gujarati one and ships no Devanagari at all,
-   so it cannot set this game's Hindi — the Latin design is the same across the
-   family, so this is the same look with the script that works.
+   Two faces, and the stack decides between them by script rather than by rule:
 
-   FredokaOne is kept on disk and stays last in the stack as a fallback. */
+     Fredoka One  the digits 0-9, and nothing else — the counter, the number
+                  line, the keypad, the tap counts, and any number inside a
+                  line of dialogue
+     Baloo 2      everything else: the Hindi, the punctuation it is written
+                  with, and any Latin
+
+   Fredoka One is first in the stack but its @font-face is declared for the
+   digits alone, so the browser only reaches for it on a 0-9 and everything
+   else — including the ? and ! that sit inside a Hindi line — falls through to
+   Baloo 2. No element has to be told which of the two it is.
+
+   Baloo 2 SemiBold is self-hosted in two subsets so the browser only fetches
+   the script a reader actually needs. It is the DEVANAGARI member of the Baloo
+   superfamily: Baloo Bhai 2 is the Gujarati one and ships no Devanagari at all,
+   so it cannot set this game's Hindi. */
 @font-face {
   font-family: "Baloo 2";
   src: url("../assets/fonts/Baloo2-SemiBold-devanagari.woff2") format("woff2");
@@ -31,9 +41,16 @@
 @font-face {
   font-family: "Fredoka One";
   src: url("../assets/fonts/FredokaOne-Regular.woff2") format("woff2");
-  font-weight: 400;
+  /* One weight, declared as covering the range the page asks for: at the body's
+     600 the browser then draws it as it is, instead of smearing a synthetic
+     bold over it. The numbers have to look exactly as they always did. */
+  font-weight: 100 900;
   font-style: normal;
   font-display: swap;
+  /* The digits, and only the digits. Punctuation is part of the sentence it
+     is written in, so a Hindi line's ? and ! belong to Baloo 2 with the rest
+     of the words — this stops Fredoka One from claiming them. */
+  unicode-range: U+0030-0039;
 }
 
 /* Mr Giggles' laugh, and nothing else. */
@@ -57,7 +74,7 @@
   --ember:     #ef5a24;
   --dusk:      #1b2036;
 
-  --font-display: "Baloo 2", "Fredoka One", "Trebuchet MS", system-ui, sans-serif;
+  --font-display: "Fredoka One", "Baloo 2", "Trebuchet MS", system-ui, sans-serif;
   --font-creepy: "Creepster", "Trebuchet MS", system-ui, sans-serif;
 
   --speed:      480ms;

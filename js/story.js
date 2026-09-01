@@ -19,7 +19,8 @@ import { pages, timeline } from "./data/scenes.js";
 import { cues } from "./data/audio.js";
 import { clearCues, playCues, stopAudio } from "./audio.js";
 import { anchorOffset } from "./anchor.js";
-import { faceOf } from "./data/bubbles.js";
+import { roomOf, tailXOf } from "./data/bubbles.js";
+import { fitToText, centreInk, textRoom } from "./fit.js";
 
 const layerHost = document.getElementById("layers");
 const overlayHost = document.getElementById("overlays");
@@ -211,6 +212,10 @@ function paint(entry, { silent = false } = {}) {
 
   diffLayers([...page.layers, ...step.layers]);
   overlayHost.replaceChildren(overlays(step));
+  // Now that the line is on the page it can be measured, and the balloon
+  // around it sized to fit. The overlay is still faded out at this point, so
+  // the reader never sees it settle.
+  overlayHost.querySelectorAll(".say__bubble").forEach(fitSay);
 
   beatLine.textContent = step.beat ?? "";
   reached = Math.max(reached, entry.p);
@@ -394,6 +399,11 @@ function overlays(step) {
     const text = line(step.say);
     text.dataset.role = "say.text";
 
+    // The balloon is sized to its own line rather than to the box it was drawn
+    // at — see fitSay(). It can only be measured once it is on the page, so
+    // the fitting itself happens back in paint().
+    bubble._say = { spec: step.say.bubble, text };
+
     // A step can hold its line back until the scene has settled — page 2 lets
     // the mist cover the ground before Neel says anything. This adds to the
     // pop and settle delays the stylesheet already gives them.
@@ -467,25 +477,24 @@ function fillImage(layer) {
   return img;
 }
 
-// The line, centred on the balloon's BODY rather than sat at a hand-placed
-// mark. Each balloon is a body plus a tail, so the middle of its layer box is
-// not the middle of the shape — js/data/bubbles.js carries the face, measured
-// off the art and mirrored when the art is. `text` still decides nothing but
-// the width when a balloon has no measurement to fall back on.
+// The line, laid inside the space the balloon's outline encloses rather than
+// sat at a hand-placed mark — js/data/bubbles.js carries that space, measured
+// off the art and mirrored when the art is. This is only where the words start:
+// fitSay() below sizes the balloon to them and lays them out again. `text`
+// decides nothing but the width, and only for a balloon nobody has measured.
 function line({ bubble, text, lines }) {
   const el = document.createElement("p");
 
   el.className = "say__text";
   el.textContent = lines.join("\n");
 
-  const face = bubble && faceOf(bubble.src, Boolean(bubble.flipX));
-  if (face) {
-    const [fx0, fx1, fy0, fy1] = face;
-    const padX = 0.08 * (fx1 - fx0) * bubble.w;
-    el.style.left = `${bubble.x + fx0 * bubble.w + padX}px`;
-    el.style.top = `${bubble.y + fy0 * bubble.h}px`;
-    el.style.width = `${(fx1 - fx0) * bubble.w - padX * 2}px`;
-    el.style.height = `${(fy1 - fy0) * bubble.h}px`;
+  const room = bubble && roomOf(bubble.src, Boolean(bubble.flipX));
+  if (room) {
+    const [rx0, rx1, ry0, ry1] = textRoom(room);
+    el.style.left = `${bubble.x + rx0 * bubble.w}px`;
+    el.style.top = `${bubble.y + ry0 * bubble.h}px`;
+    el.style.width = `${(rx1 - rx0) * bubble.w}px`;
+    el.style.height = `${(ry1 - ry0) * bubble.h}px`;
   } else {
     el.style.left = `${text.x}px`;
     el.style.top = `${text.y}px`;
@@ -493,6 +502,68 @@ function line({ bubble, text, lines }) {
   }
 
   return el;
+}
+
+// A balloon should be the size of what it is saying.
+//
+// Each one was drawn at a fixed size, chosen against the English line it used
+// to hold. The Hindi lines are different lengths, so a two-word balloon was as
+// big as a two-line one. This shrinks each balloon to its own line: the art
+// scales uniformly, so the outline keeps its shape and nothing is stretched,
+// and the scale is anchored at the TAIL, so a smaller balloon still points at
+// the same mouth. It never grows past the drawn size — those were placed
+// against the characters, and a balloon that grew could cover them.
+const SAY_MIN = 0.5;
+
+// Lay a balloon and its line out at any size, tail held still.
+function placeSay(box, spec, scale) {
+  const { text, room, tailX } = box._say;
+  const w = spec.w * scale;
+  const h = spec.h * scale;
+  const x = spec.x + tailX * spec.w - tailX * w;
+  const y = spec.y + spec.h - h;
+
+  box.style.left = `${x}px`;
+  box.style.top = `${y}px`;
+  box.style.width = `${w}px`;
+  box.style.height = `${h}px`;
+  // What the balloon was drawn at, and where the fitting has just put it, so
+  // devtools/edit.js can report an edit in the numbers the scene data holds.
+  box._design = { x: spec.x, y: spec.y, w: spec.w, h: spec.h };
+  box._fitAt = { x, y, w, h };
+
+  const [rx0, rx1, ry0, ry1] = room;
+  text.style.left = `${x + rx0 * w}px`;
+  text.style.top = `${y + ry0 * h}px`;
+  text.style.width = `${(rx1 - rx0) * w}px`;
+  text.style.height = `${(ry1 - ry0) * h}px`;
+}
+
+// Shrink one balloon to its own line, anchored at the tail so it still points
+// at the same mouth. Called once the overlay is on the page, because it
+// measures the line as drawn rather than guessing at it.
+function fitSay(box) {
+  const say = box._say;
+  if (!say) return;
+
+  const spec = say.spec;
+  // The space this balloon's outline encloses, brought in for air. Art nobody
+  // has measured keeps the size and the mark it was drawn at.
+  const room = roomOf(spec.src, Boolean(spec.flipX));
+  if (!room) return;
+
+  say.room = textRoom(room);
+  say.tailX = tailXOf(spec.src, Boolean(spec.flipX));
+
+  // A balloon is a .layer, and layers glide between marks over 700ms — that is
+  // for a character changing pose, not for this. Sizing has to land in one go,
+  // or the balloon pops in at the size it was drawn and is then seen shrinking
+  // onto its line. Nothing moves after the fit, so the transition can come
+  // straight back.
+  box.style.transition = "none";
+  fitToText(say.text, (scale) => placeSay(box, spec, scale), { min: SAY_MIN });
+  centreInk(say.text);
+  box.style.transition = "";
 }
 
 // Dialogue for the pitch-dark steps: the speaker's own colour, no bubble.

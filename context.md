@@ -108,6 +108,7 @@ frame coordinates.**
 | `js/data/screens.js` | Game data: screen arrays per level, **`levels` registry**, keypad, counter, number line, manifest |
 | `js/data/audio.js` | Every audio cue per screen/step id (`cues`), clip lengths |
 | `js/audio.js` | WebAudio: music bed, sfx, VO with pan, `playCues`/`clearCues` |
+| `js/fit.js` + `js/data/bubbles.js` | Speech balloons: where each balloon's round face and tail sit (measured), and the fitter that shrinks a balloon onto its own line |
 | `js/anchor.js` + `js/data/poses.js` | Pins each character's centre-x/feet per scene so pose swaps don't slide |
 | `devtools/` | The hamburger menu + live-edit mode |
 | `tools/gen-vo-game.js` | Regenerates game VO via msedge-tts (`npm i msedge-tts`, then `node tools/gen-vo-game.js assets/audios/vo`) |
@@ -128,6 +129,56 @@ Game engine facts that matter when adding a level:
 - Animations that must stay in sync are clocked by CSS vars (`--swarm-at`,
   `--d`); randomness is deterministic (`noise(i,k)` sin-hash — **never
   Math.random**, replays must be identical).
+- **Two faces, split by code point** (css/stage.css). The stack is
+  `"Fredoka One", "Baloo 2", …`, and Fredoka One's `@font-face` is declared
+  `unicode-range: U+0030-0039` — the digits and nothing else. So every number
+  (counter, number line, keypad, tap counts, and a number inside a line of
+  dialogue) is the face the game was designed in, and everything else —
+  the Hindi, the `?` `!` `,` `…` written with it, and any Latin — is Baloo 2.
+  Punctuation belongs to the sentence, not to the numbers. Nothing has to be
+  told which of the two it is. Fredoka One also claims `font-weight: 100 900`
+  so the body's 600 does not smear a synthetic bold over a one-weight font.
+- **A line is centred on its INK, not on its line box** (`centreInk` in
+  js/fit.js). A font reserves the same descent under every line, deep enough for
+  the lowest thing the script can draw; Devanagari rarely uses it, so a line
+  centred by its box sits 4–7px high inside the balloon. Measured per line with
+  canvas metrics and the text box moved by the difference.
+- **The keypad beats say nothing.** The pad arriving is the question
+  (`keypadAt: 800`, on its own sparkle). If nobody touches it for eight seconds
+  a nudge balloon — `bubble: { idle: true }` in screens.js, `armIdle()` in
+  js/game.js, `.bubble--idle` in css/game.css — comes up for three seconds and
+  goes again, re-arming each time. Any key press restarts the eight seconds.
+  The tutorial keeps its spoken question: it is the round that teaches.
+- **Speech balloons size themselves to their line** (`js/fit.js`, used by both
+  acts). A balloon's box in the data is the size it was DRAWN at and the size it
+  can never exceed; the fitter scales the art uniformly down to the smallest
+  size the line still fits at, plus a little air, anchored at the tail so it
+  keeps pointing at the same mouth. Notes:
+  - A line is laid out in the balloon's **room** — the largest rectangle that
+    fits inside the outline, measured against the pale paper so it starts where
+    the border ends. Its bounding **face** is not the same thing: a face
+    includes the corners the balloon curves away from, and text laid out in one
+    runs into the border on the top and bottom lines. `ROOM_INSET` in js/fit.js
+    brings it in a little further for air. Both, plus the tail, are measured per
+    file by `tools/measure-bubbles.js` into `js/data/bubbles.js` — re-run that
+    tool when balloon art changes.
+  - The leading is **1.3x** the type (52px in the game, 54px in the story). The
+    1.5x it had before was set against the old bounding-box text area; in the
+    room a balloon actually encloses, it left no two-line balloon able to shrink.
+  - Never test the fit with `scrollWidth`: the line is centred, so a line that
+    is too wide spills past both edges and the left half is not scrollable. The
+    fitter measures a `Range` over the text instead.
+  - The story's balloon is a `.layer`, and layers glide between marks over
+    700ms; fitting turns that transition off for the moment it resizes, or the
+    balloon is seen shrinking after it pops in.
+  - A line too long for even a full-size balloon takes the type down a few
+    percent instead (only the longest line in the script needs it).
+  - devtools reports and applies balloon edits in the DRAWN numbers, not the
+    fitted ones (`_design`/`_fitAt` in js/game.js and js/story.js, `read()` and
+    `write()` in devtools/edit.js) — otherwise an exported edit would bake in
+    the shrunken size and the balloon would walk smaller with every round of
+    edits. The story's `say.text` is no longer separately draggable: it follows
+    its balloon.
 - The lamp beats are staged with the lamp at the LEFT of frame and both
   characters on the right (`LAMP_STAGE` anchor in screens.js; Agni's pose is
   flipped so she points at it). The tap beat plays a small camera move — the

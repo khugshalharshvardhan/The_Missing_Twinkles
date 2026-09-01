@@ -98,6 +98,23 @@
   transform: scale(1);
 }
 
+/* A nudge, not a line. The keypad beats say nothing when the pad arrives, so
+   this balloon sits out the beat's opening and is shown by armIdle() in
+   js/game.js only once the pad has gone untouched for eight seconds — then
+   takes itself away again three seconds later. It fades a little more slowly
+   than a line does, so it reads as arriving to help rather than as the beat
+   changing under the player. */
+#game .scene.is-begun .bubble--idle {
+  opacity: 0;
+  transform: scale(0.92);
+  transition: opacity 420ms var(--ease), transform 420ms var(--ease);
+}
+
+#game .scene.is-begun .bubble--idle.is-shown {
+  opacity: 1;
+  transform: scale(1);
+}
+
 /* The outgoing balloon leaves faster than the pose dissolves. Both panes are on
    screen for the whole 620ms cross-fade, and two lines of text laid over each
    other for that long is the muddiest thing on the screen — the art underneath
@@ -122,7 +139,12 @@
   margin: 0;
   color: #000;
   font-size: 40px;
-  line-height: 60px;
+  /* 1.3x. Devanagari needs headroom over the line for its matras and a little
+     under it for the marks that hang below, and this is what that comes to —
+     the 1.5x it had before was set against a text box that reached into the
+     corners of the balloon, which is space the balloon does not actually
+     enclose. */
+  line-height: 52px;
   text-align: center;
 }
 

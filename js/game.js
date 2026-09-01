@@ -12,7 +12,8 @@
 
 import { levels, epilogue, keypad, counter, numberLine, FRAME_W } from "./data/screens.js";
 import { gameCues } from "./data/audio.js";
-import { faceOf } from "./data/bubbles.js";
+import { roomOf, tailXOf } from "./data/bubbles.js";
+import { fitToText, centreInk, textRoom } from "./fit.js";
 import { anchorOffset, bodyBox, castOf } from "./anchor.js";
 import { clearCues, playCues, playSfx, playVo, clipLength } from "./audio.js";
 
@@ -227,9 +228,14 @@ function go(target) {
   const leaving = round.screens[index];
 
   clearTimeout(timer);
+  clearIdle();
   index = target;
   busy = true;
   back.replaceChildren(render(screen));
+  // The balloon can only be measured once it is in the document, and the pane
+  // is laid out even while it is still faded out — so this happens before the
+  // reader ever sees the beat.
+  back.querySelectorAll(".bubble").forEach(fitBubble);
   // All are per-beat states and the pane is reused: is-cleared left behind
   // would arrive with the next screen and hide a bubble that was never shown,
   // and is-counted-out left behind hides every count number on the NEXT count
@@ -271,6 +277,8 @@ function speak(screen) {
   panes[front].classList.add("is-begun");
   scheduleReveals(screen, panes[front]);
 
+  armIdle(panes[front]);
+
   const cue = gameCues[screen.id];
   playCues(cue);
   const spokenEnd = dynamicVoice(screen);
@@ -295,6 +303,38 @@ function speak(screen) {
   // Dialogue reads itself; an interactive beat waits for the player, and its
   // own handler queues the advance once the player is done.
   if (!screen.interact) advanceIn(wait);
+}
+
+// A beat whose balloon is a nudge rather than a line: nothing is said when the
+// pad arrives — the pad IS the question — and this only comes up if the player
+// has not touched it for a while, then goes again on its own. It re-arms, so a
+// child who is still thinking gets it again rather than once and never after.
+const IDLE_AFTER = 8000;
+const IDLE_FOR = 3000;
+
+let idleTimers = [];
+
+function clearIdle() {
+  idleTimers.forEach(window.clearTimeout);
+  idleTimers = [];
+}
+
+// Start, or restart, the wait. Called when a nudging beat begins and again on
+// every key the player presses, so the eight seconds are eight seconds of
+// nobody doing anything.
+function armIdle(pane) {
+  const nudge = pane?.querySelector(".bubble--idle");
+  if (!nudge) return;
+
+  clearIdle();
+  nudge.classList.remove("is-shown");
+  idleTimers.push(window.setTimeout(() => {
+    nudge.classList.add("is-shown");
+    idleTimers.push(window.setTimeout(() => {
+      nudge.classList.remove("is-shown");
+      armIdle(pane);
+    }, IDLE_FOR));
+  }, IDLE_AFTER));
 }
 
 // What a beat holds back until its line has been said. The swarm's own delay
@@ -372,7 +412,8 @@ function settle() {
 function readingTime(screen) {
   if (screen.dwell) return screen.dwell;
 
-  const chars = screen.bubble ? screen.bubble.text.length : 0;
+  // A nudge is not a line to be read: the beat waits for the player either way.
+  const chars = screen.bubble && !screen.bubble.idle ? screen.bubble.text.length : 0;
   return Math.min(READ_MAX, Math.max(READ_MIN, READ_BASE + chars * READ_PER_CHAR));
 }
 
@@ -1001,6 +1042,10 @@ function keypadPanel(screen) {
     btn.addEventListener("click", () => {
       if (guess !== null) return; // committed; ignore taps mid-advance
 
+      // Anything the player does starts the wait again — the nudge is for a
+      // pad nobody is touching, not for one being thought about between keys.
+      armIdle(panes[front]);
+
       if (action === "confirm") return commit(btn);
 
       if (action === "clear") {
@@ -1220,10 +1265,6 @@ function inset(el, [top, right, bottom, left]) {
   el.style.inset = `${top}% ${right}% ${bottom}% ${left}%`;
 }
 
-// Side breathing room inside the balloon, as a fraction of the bubble box. It
-// is symmetric, so it never pulls the words off centre.
-const BUBBLE_PAD_X = 0.1;
-
 // Where the tail sits across the balloon, as a fraction of its width. Measured
 // off all twelve balloon files: every one of them draws it here, on the left.
 // Mirroring the art puts it at 1 - this, on the right.
@@ -1253,12 +1294,27 @@ function tailToward(spec, screen) {
   return Math.abs(right - mark) < Math.abs(left - mark);
 }
 
+// How small a balloon may go, and how much air to leave around its line. A
+// little more air than the story gets, because these lines wrap rather than
+// being broken by hand, and a wrapped line at its tightest width reads cramped.
+const BUBBLE_MIN = 0.55;
+const BUBBLE_AIR = 1.08;
+
+// Shrink one balloon to its own line — see js/fit.js. Called once the pane is
+// in the document, because it measures real wrapped text.
+function fitBubble(box) {
+  if (!box._fitTo) return;
+  const text = box.querySelector(".bubble__text");
+  if (!text) return;
+  fitToText(text, box._fitTo, { min: BUBBLE_MIN, air: BUBBLE_AIR });
+  centreInk(text);
+}
+
 function bubble(spec, screen) {
   const box = document.createElement("div");
 
-  box.className = "bubble";
+  box.className = spec.idle ? "bubble bubble--idle" : "bubble";
   box.dataset.role = "bubble";
-  place(box, spec);
 
   // The art sits in its own inset box so the image can fill that box exactly;
   // a percentage width on the image itself would resolve against the whole
@@ -1280,29 +1336,47 @@ function bubble(spec, screen) {
   // face measured off its own art (and mirrored when the art is), so the words
   // land in the middle of the shape the reader actually sees.
   const [aTop, aRight, aBottom, aLeft] = spec.artInset ?? [0, 0, 0, 0];
-  const face = faceOf(spec.art, Boolean(tailToward(spec, screen)));
-  const artW = spec.w * (1 - (aLeft + aRight) / 100);
-  const artH = spec.h * (1 - (aTop + aBottom) / 100);
+  const mirrored = Boolean(tailToward(spec, screen));
+  // Where the words are allowed to go: the space enclosed by this balloon's
+  // outline, brought in for air — not its bounding box, which includes the
+  // corners the shape curves away from.
+  const room = textRoom(roomOf(spec.art, mirrored));
 
   const line = document.createElement("p");
   line.className = "bubble__text";
   line.textContent = fill(spec.text);
 
-  if (face) {
-    const [fx0, fx1, fy0, fy1] = face;
-    // A little air inside the face so the words never touch the outline.
-    const padX = BUBBLE_PAD_X * (fx1 - fx0) * artW;
-    line.style.left = `${(aLeft / 100) * spec.w + fx0 * artW + padX}px`;
-    line.style.right = `${(aRight / 100) * spec.w + (1 - fx1) * artW + padX}px`;
-    line.style.top = `${(aTop / 100) * spec.h + fy0 * artH}px`;
-    line.style.bottom = `${(aBottom / 100) * spec.h + (1 - fy1) * artH}px`;
-  } else {
-    const padX = BUBBLE_PAD_X * spec.w;
-    line.style.left = `${(aLeft / 100) * spec.w + padX}px`;
-    line.style.right = `${(aRight / 100) * spec.w + padX}px`;
-    line.style.top = `${(aTop / 100) * spec.h}px`;
-    line.style.bottom = `${(aBottom / 100) * spec.h}px`;
-  }
+  // Lay the balloon out at any size. The tail's tip is the fixed point, so
+  // whatever size the line asks for, the balloon still points where it did.
+  const tailX = tailXOf(spec.art, mirrored);
+  const anchorX = spec.x + tailX * spec.w;
+  const anchorY = spec.y + spec.h;
+
+  box._fitTo = (s) => {
+    const w = spec.w * s;
+    const h = spec.h * s;
+    const x = anchorX - tailX * w;
+    const y = anchorY - h;
+    box.style.left = `${x}px`;
+    box.style.top = `${y}px`;
+    box.style.width = `${w}px`;
+    box.style.height = `${h}px`;
+    // What the balloon was drawn at, and where the fitting has just put it.
+    // devtools/edit.js reports edits against the drawn numbers, because those
+    // are what the scene data holds — see read() there.
+    box._design = { x: spec.x, y: spec.y, w: spec.w, h: spec.h };
+    box._fitAt = { x, y, w, h };
+
+    const artW = w * (1 - (aLeft + aRight) / 100);
+    const artH = h * (1 - (aTop + aBottom) / 100);
+    const [rx0, rx1, ry0, ry1] = room;
+    line.style.left = `${(aLeft / 100) * w + rx0 * artW}px`;
+    line.style.right = `${(aRight / 100) * w + (1 - rx1) * artW}px`;
+    line.style.top = `${(aTop / 100) * h + ry0 * artH}px`;
+    line.style.bottom = `${(aBottom / 100) * h + (1 - ry1) * artH}px`;
+  };
+
+  box._fitTo(1);
 
   box.append(art, line);
   return box;

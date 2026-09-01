@@ -568,29 +568,13 @@ export const screens = [
       text: "अब तुम्हारी बारी है।"
     }
   },
-
-  // ---- SCREEN 6.1b — the loop restated (106:672) ----
-  {
-    id: "6.2",
-    anchor: TOGETHER,
-    layers: [
-      BG,
-      { src: `${IMG}agni_e.webp`, x: 441, y: 389, w: 450, h: 623, fill: CROP.agniE, fx: "breathe" },
-      { src: `${IMG}neel_g.webp`, x: 1039, y: 366, w: 462, h: 646, fill: CROP.neelG, fx: "breathe-slow" }
-    ],
-    bubble: {
-      art: `${IMG}bub_62.webp`, who: "agni",
-      x: 667, y: 77, w: 492, h: 281,
-      text: "अंदाज़ा लगाओ, और गिनकर देखो!"
-    }
-  }
 ];
 
 /* ---- Level 1 — the practice round in the meadow (sheet: Practice Game
    Screens). The tutorial's own loop, run by the player: look, guess, count,
    verdict, lamp. The four story beats that set the problem up (1.1..1.4) and
-   the two that hand the game over (6.1, 6.2) belong to the tutorial and are
-   not repeated; the readback beat (2.2) is not either — there Neel models a
+   the one that hands the game over (6.1) belongs to the tutorial and is not
+   repeated; the readback beat (2.2) is not either — there Neel models a
    guess, and here the guess is the player's own.
 
    Poses, marks, bubbles and fittings are the tutorial's: the pair stand on
@@ -631,31 +615,16 @@ export const level1 = [
       { src: `${IMG}neel_think.webp`, x: 1369, y: 386, w: 372, h: 617, fill: CROP.neelThink, flipX: true, fx: "breathe-slow" }
     ],
     keypad: true,
-    // vo_l1_howmany runs 500 to 2250.
-    keypadAt: 2350,
+    // Nothing is said here: the pad arriving IS the question. It comes in on
+    // its own sparkle, straight after the pane change.
+    keypadAt: 800,
     bubble: {
       art: `${IMG}bub_15.webp`, who: "agni",
       x: 0, y: 185, w: 514, h: 277,
-      text: "तो कितने बेर थे?"
-    }
-  },
-
-  // ---- P3 — the berries come back, dim, to be counted ----
-  {
-    id: "p3",
-    anchor: THE_CLEARING,
-    counter: "guess",
-    layers: [
-      BG_MEADOW,
-      { src: `${IMG}agni_g.webp`, x: 80, y: 490, w: 554, h: 512, fill: CROP.agniG, fx: "breathe" },
-      { src: `${IMG}neel_c.webp`, x: 1382, y: 428, w: 434, h: 611, fill: CROP.neelC, fx: "breathe-slow" }
-    ],
-    fireflies: { x: 773, y: 140, dim: true },
-    bubble: {
-      art: `${IMG}bub_3.webp`, who: "agni",
-      x: 127, y: 229, w: 557, h: 282,
-      artInset: [18.09, 9.69, 0, 17.06],
-      text: "चलो, गिनकर देखते हैं कि हमारा अंदाज़ा कितना सही था।"
+      // Not part of the beat's opening — see idle in js/game.js. It comes up
+      // only if nobody has typed for a while, and goes again by itself.
+      idle: true,
+      text: "अब अपना अंदाज़ा लिखो।"
     }
   },
 
@@ -822,31 +791,16 @@ export const level2 = [
       { src: `${IMG}neel_think.webp`, x: 1369, y: 386, w: 372, h: 617, fill: CROP.neelThink, flipX: true, fx: "breathe-slow" }
     ],
     keypad: true,
-    // vo_l2_howmany runs 500 to 2250 — same length as level 1's question.
-    keypadAt: 2350,
+    // Nothing is said here: the pad arriving IS the question. It comes in on
+    // its own sparkle, straight after the pane change.
+    keypadAt: 800,
     bubble: {
       art: `${IMG}bub_15.webp`, who: "agni",
       x: 0, y: 185, w: 514, h: 277,
-      text: "तो कितने तारे थे?"
-    }
-  },
-
-  // ---- S3 — the stars come back, dim, to be counted ----
-  {
-    id: "s3",
-    anchor: THE_CLEARING,
-    counter: "guess",
-    layers: [
-      BG_VALLEY,
-      { src: `${IMG}agni_g.webp`, x: 80, y: 490, w: 554, h: 512, fill: CROP.agniG, fx: "breathe" },
-      { src: `${IMG}neel_c.webp`, x: 1382, y: 428, w: 434, h: 611, fill: CROP.neelC, fx: "breathe-slow" }
-    ],
-    fireflies: { x: 688, y: 174, dim: true },
-    bubble: {
-      art: `${IMG}bub_3.webp`, who: "agni",
-      x: 127, y: 229, w: 557, h: 282,
-      artInset: [18.09, 9.69, 0, 17.06],
-      text: "चलो, गिनकर देखते हैं कि हमारा अंदाज़ा कितना सही था।"
+      // Not part of the beat's opening — see idle in js/game.js. It comes up
+      // only if nobody has typed for a while, and goes again by itself.
+      idle: true,
+      text: "अब अपना अंदाज़ा लिखो।"
     }
   },
 
@@ -1015,31 +969,16 @@ export const level3 = [
       { src: `${IMG}neel_think.webp`, x: 1369, y: 386, w: 372, h: 617, fill: CROP.neelThink, flipX: true, fx: "breathe-slow" }
     ],
     keypad: true,
-    // vo_l3_howmany runs 500 to 2250 — the same length as the other two.
-    keypadAt: 2350,
+    // Nothing is said here: the pad arriving IS the question. It comes in on
+    // its own sparkle, straight after the pane change.
+    keypadAt: 800,
     bubble: {
       art: `${IMG}bub_15.webp`, who: "agni",
       x: 0, y: 185, w: 514, h: 277,
-      text: "तो कितने जादुई बीज थे?"
-    }
-  },
-
-  // ---- M3 — the seeds come back, dim, to be counted ----
-  {
-    id: "m3",
-    anchor: THE_CLEARING,
-    counter: "guess",
-    layers: [
-      BG_FOREST,
-      { src: `${IMG}agni_g.webp`, x: 80, y: 490, w: 554, h: 512, fill: CROP.agniG, fx: "breathe" },
-      { src: `${IMG}neel_c.webp`, x: 1382, y: 428, w: 434, h: 611, fill: CROP.neelC, fx: "breathe-slow" }
-    ],
-    fireflies: { x: 696, y: 85, dim: true },
-    bubble: {
-      art: `${IMG}bub_3.webp`, who: "agni",
-      x: 127, y: 229, w: 557, h: 282,
-      artInset: [18.09, 9.69, 0, 17.06],
-      text: "चलो, गिनकर देखते हैं कि हमारा अंदाज़ा कितना सही था।"
+      // Not part of the beat's opening — see idle in js/game.js. It comes up
+      // only if nobody has typed for a while, and goes again by itself.
+      idle: true,
+      text: "अब अपना अंदाज़ा लिखो।"
     }
   },
 
@@ -1206,31 +1145,16 @@ export const level4 = [
       { src: `${IMG}neel_think.webp`, x: 1369, y: 386, w: 372, h: 617, fill: CROP.neelThink, flipX: true, fx: "breathe-slow" }
     ],
     keypad: true,
-    // vo_l4_howmany runs 500 to 2250, as the other three questions do.
-    keypadAt: 2350,
+    // Nothing is said here: the pad arriving IS the question. It comes in on
+    // its own sparkle, straight after the pane change.
+    keypadAt: 800,
     bubble: {
       art: `${IMG}bub_15.webp`, who: "agni",
       x: 0, y: 185, w: 514, h: 277,
-      text: "तो कितने फूल थे?"
-    }
-  },
-
-  // ---- F3 — the flowers come back, dim, to be counted ----
-  {
-    id: "f3",
-    anchor: THE_CLEARING,
-    counter: "guess",
-    layers: [
-      BG_FLOWERMEADOW,
-      { src: `${IMG}agni_g.webp`, x: 80, y: 490, w: 554, h: 512, fill: CROP.agniG, fx: "breathe" },
-      { src: `${IMG}neel_c.webp`, x: 1382, y: 428, w: 434, h: 611, fill: CROP.neelC, fx: "breathe-slow" }
-    ],
-    fireflies: { x: 623, y: 138, dim: true },
-    bubble: {
-      art: `${IMG}bub_3.webp`, who: "agni",
-      x: 127, y: 229, w: 557, h: 282,
-      artInset: [18.09, 9.69, 0, 17.06],
-      text: "चलो, गिनकर देखते हैं कि हमारा अंदाज़ा कितना सही था।"
+      // Not part of the beat's opening — see idle in js/game.js. It comes up
+      // only if nobody has typed for a while, and goes again by itself.
+      idle: true,
+      text: "अब अपना अंदाज़ा लिखो।"
     }
   },
 

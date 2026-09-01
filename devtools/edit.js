@@ -17,7 +17,9 @@ const TARGETS = {
     "#layers > .layer",
     "#layers > .fxlayer",
     "#overlays > .say__bubble",
-    "#overlays > .say__text",
+    // Not the line itself: it is centred on the balloon's face and follows it
+    // wherever the balloon goes (js/story.js), so there is nothing here for an
+    // export to carry. Move the balloon and the words come with it.
     "#overlays > .voice",
     "#overlays > .sfx",
     "#overlays > .sfx-laugh"
@@ -95,7 +97,7 @@ export function pick(el) {
 export function nudge(field, value) {
   if (!picked) return;
   remember(picked);
-  picked.style[field] = `${value}px`;
+  write(picked, field, value);
   onChange(describe(picked));
 }
 
@@ -105,6 +107,32 @@ function read(el) {
   const px = (v) => (v === "" ? null : Math.round(parseFloat(v)));
   const box = el.getBoundingClientRect();
   const scale = stageScale();
+
+  // A speech balloon is no longer the size it was drawn at: it shrinks onto
+  // whatever line it is holding (js/fit.js). Reading its live box would export
+  // the shrunken numbers, the fitter would shrink those again next time, and
+  // the balloon would walk away over a few rounds of edits. So an edit is
+  // reported against the DRAWN box instead — dragging moves it by the same
+  // amount the balloon moved, and pulling the grip scales it by the same
+  // factor the balloon grew or shrank by.
+  if (el._design && el._fitAt) {
+    const fit = el._fitAt;
+    const drawn = el._design;
+    const live = {
+      x: px(el.style.left) ?? fit.x,
+      y: px(el.style.top) ?? fit.y,
+      w: px(el.style.width) ?? fit.w,
+      h: px(el.style.height) ?? fit.h
+    };
+    return {
+      x: Math.round(drawn.x + live.x - fit.x),
+      y: Math.round(drawn.y + live.y - fit.y),
+      w: Math.round(drawn.w * (fit.w ? live.w / fit.w : 1)),
+      h: Math.round(drawn.h * (fit.h ? live.h / fit.h : 1)),
+      freeH: false
+    };
+  }
+
   return {
     x: px(el.style.left) ?? 0,
     y: px(el.style.top) ?? 0,
@@ -114,6 +142,24 @@ function read(el) {
     h: px(el.style.height) ?? Math.round(box.height / scale),
     freeH: el.style.height === ""
   };
+}
+
+// Put one number back on a box. The counterpart to read(): a balloon is read
+// in the numbers the scene data holds, so it has to be written in them too,
+// and turned back into wherever the fitting has actually put it.
+function write(el, field, value) {
+  if (el._design && el._fitAt) {
+    const fit = el._fitAt;
+    const drawn = el._design;
+    const live =
+      field === "left" ? fit.x + (value - drawn.x)
+      : field === "top" ? fit.y + (value - drawn.y)
+      : field === "width" ? fit.w * (drawn.w ? value / drawn.w : 1)
+      : fit.h * (drawn.h ? value / drawn.h : 1);
+    el.style[field] = `${Math.round(live)}px`;
+    return;
+  }
+  el.style[field] = `${value}px`;
 }
 
 function stageScale() {
@@ -195,8 +241,8 @@ function startDrag(event, el) {
   const y0 = event.clientY;
 
   const move = (e) => {
-    el.style.left = `${Math.round(from.x + (e.clientX - x0) / scale)}px`;
-    el.style.top = `${Math.round(from.y + (e.clientY - y0) / scale)}px`;
+    write(el, "left", Math.round(from.x + (e.clientX - x0) / scale));
+    write(el, "top", Math.round(from.y + (e.clientY - y0) / scale));
     onChange(describe(el));
   };
   const up = () => {
@@ -218,12 +264,11 @@ function startResize(event) {
   const y0 = event.clientY;
 
   const move = (e) => {
-    const w = Math.max(8, Math.round(from.w + (e.clientX - x0) / scale));
-    el.style.width = `${w}px`;
+    write(el, "width", Math.max(8, Math.round(from.w + (e.clientX - x0) / scale)));
     // A text box keeps its automatic height — forcing one would just clip the
     // words. Everything else resizes on both axes.
     if (!from.freeH) {
-      el.style.height = `${Math.max(8, Math.round(from.h + (e.clientY - y0) / scale))}px`;
+      write(el, "height", Math.max(8, Math.round(from.h + (e.clientY - y0) / scale)));
     }
     onChange(describe(el));
   };
@@ -249,8 +294,8 @@ function onKeyDown(event) {
   event.preventDefault();
   remember(picked);
   const now = read(picked);
-  picked.style.left = `${now.x + by[0]}px`;
-  picked.style.top = `${now.y + by[1]}px`;
+  write(picked, "left", now.x + by[0]);
+  write(picked, "top", now.y + by[1]);
   onChange(describe(picked));
 }
 

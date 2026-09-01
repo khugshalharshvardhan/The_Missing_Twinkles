@@ -331,10 +331,6 @@ export const gameCues = {
     sfx: [{ id: "cheer_swell", at: 240, gain: 0.7 }],
     vo: { id: "vo_g_yourturn", at: 620 }
   },
-  "6.2": {
-    sfx: [{ id: "sparkle", at: 400, gain: 0.5 }],
-    vo: { id: "vo_g_guesscount", at: 500 }
-  },
 
   /* ---------- Level 1 — the glowberries ----------
      The tutorial's own cues on the meadow's beats. Lines that do not name the
@@ -350,16 +346,10 @@ export const gameCues = {
       { id: "magic_vanish", at: 8600, gain: 0.7 }],
     vo: { id: "vo_g_guess", at: 500, pan: -0.5 }
   },
-  // The keypad — the pad appears once the question is asked (keypadAt 2350).
+  // The keypad — nothing is said, so the pad comes in on its own sparkle.
   "p2": {
     sfx: [{ id: "page_air", at: 0, gain: 0.5 },
-      { id: "sparkle", at: 2350, gain: 0.55 }],
-    vo: { id: "vo_l1_howmany", at: 500, pan: -0.6 }
-  },
-
-  // ---- counting ----
-  "p3": {
-        vo: { id: "vo_g_count", at: 500, pan: -0.5 }
+      { id: "sparkle", at: 800, gain: 0.55 }]
   },
   "p3.2": {
     sfx: [{ id: "page_air", at: 0, gain: 0.5 }],
@@ -402,16 +392,10 @@ export const gameCues = {
       { id: "magic_vanish", at: 8600, gain: 0.7 }],
     vo: { id: "vo_g_guess", at: 500, pan: -0.5 }
   },
-  // The keypad — the pad appears once the question is asked (keypadAt 2350).
+  // The keypad — nothing is said, so the pad comes in on its own sparkle.
   "s2": {
     sfx: [{ id: "page_air", at: 0, gain: 0.5 },
-      { id: "sparkle", at: 2350, gain: 0.55 }],
-    vo: { id: "vo_l2_howmany", at: 500, pan: -0.6 }
-  },
-
-  // ---- counting ----
-  "s3": {
-    vo: { id: "vo_g_count", at: 500, pan: -0.5 }
+      { id: "sparkle", at: 800, gain: 0.55 }]
   },
   "s3.2": {
     sfx: [{ id: "page_air", at: 0, gain: 0.5 }],
@@ -452,16 +436,10 @@ export const gameCues = {
       { id: "magic_vanish", at: 8600, gain: 0.7 }],
     vo: { id: "vo_g_guess", at: 500, pan: -0.5 }
   },
-  // The keypad — the pad appears once the question is asked (keypadAt 2350).
+  // The keypad — nothing is said, so the pad comes in on its own sparkle.
   "m2": {
     sfx: [{ id: "page_air", at: 0, gain: 0.5 },
-      { id: "sparkle", at: 2350, gain: 0.55 }],
-    vo: { id: "vo_l3_howmany", at: 500, pan: -0.6 }
-  },
-
-  // ---- counting ----
-  "m3": {
-    vo: { id: "vo_g_count", at: 500, pan: -0.5 }
+      { id: "sparkle", at: 800, gain: 0.55 }]
   },
   "m3.2": {
     sfx: [{ id: "page_air", at: 0, gain: 0.5 }],
@@ -502,16 +480,10 @@ export const gameCues = {
       { id: "magic_vanish", at: 8600, gain: 0.7 }],
     vo: { id: "vo_g_guess", at: 500, pan: -0.5 }
   },
-  // The keypad — the pad appears once the question is asked (keypadAt 2350).
+  // The keypad — nothing is said, so the pad comes in on its own sparkle.
   "f2": {
     sfx: [{ id: "page_air", at: 0, gain: 0.5 },
-      { id: "sparkle", at: 2350, gain: 0.55 }],
-    vo: { id: "vo_l4_howmany", at: 500, pan: -0.6 }
-  },
-
-  // ---- counting ----
-  "f3": {
-    vo: { id: "vo_g_count", at: 500, pan: -0.5 }
+      { id: "sparkle", at: 800, gain: 0.55 }]
   },
   "f3.2": {
     sfx: [{ id: "page_air", at: 0, gain: 0.5 }],
