@@ -25,7 +25,6 @@ const overlayHost = document.getElementById("overlays");
 const transition = document.getElementById("transition");
 const hud = document.getElementById("hud");
 const beatLine = document.getElementById("beat");
-const dots = document.getElementById("dots");
 
 const SVG_NS = "http://www.w3.org/2000/svg";
 
@@ -68,8 +67,6 @@ let onComplete = () => {};
 
 export function initStory(handlers) {
   onComplete = handlers.onComplete;
-  // One dot per page, matching how the chapter reads.
-  dots.replaceChildren(...pages.map(() => document.createElement("li")));
 }
 
 export function startStory() {
@@ -215,7 +212,6 @@ function paint(entry, { silent = false } = {}) {
   overlayHost.replaceChildren(overlays(step));
 
   beatLine.textContent = step.beat ?? "";
-  markProgress(entry);
   reached = Math.max(reached, entry.p);
   paintNav(entry);
 
@@ -865,12 +861,7 @@ function finish() {
   clearTimers();
   setWaiting(false);
   hud.classList.remove("is-active", "has-prev", "has-prev-off");
-  markProgress(timeline[timeline.length - 1]);
   onComplete();
 }
 
-function markProgress(entry) {
-  Array.from(dots.children).forEach((dot, i) => {
-    dot.classList.toggle("is-on", i === entry.p);
-  });
-}
+

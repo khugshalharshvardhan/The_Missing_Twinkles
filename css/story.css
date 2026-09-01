@@ -876,31 +876,6 @@
 
 .beat:empty { opacity: 0; }
 
-/* ---- progress ---- */
-.dots {
-  position: absolute;
-  left: 50%;
-  bottom: 34px;
-  z-index: 2;
-  display: flex;
-  gap: 12px;
-  transform: translateX(-50%);
-  pointer-events: none;
-}
-
-.dots li {
-  width: 13px;
-  height: 13px;
-  border-radius: 50%;
-  background: rgba(253, 246, 230, 0.28);
-  transition: background var(--speed) var(--ease), transform var(--speed) var(--ease);
-}
-
-.dots li.is-on {
-  background: var(--ember);
-  transform: scale(1.5);
-}
-
 /* =========================================================
    Sound toggle — above the loader and end card, so it is always reachable
    ========================================================= */

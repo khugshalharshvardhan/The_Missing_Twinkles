@@ -94,13 +94,13 @@ export const cues = {
       { id: "heartbeat", at: 1700, gain: 0.55 },
       { id: "heartbeat", at: 2500, gain: 0.6 },
       // The lamp answers his line: two magical stutters (a glassy flutter,
-      // not a buzz — nothing in this town is electric), its sparks, and the
-      // light drawn away in a falling shimmer. All panned hard left, where it
-      // stands. Times match LAMP_GUTTER / LAMPS_FLARE / LAMP_SPARKS in
-      // scenes.js and the keyframes in story.css.
+      // not a buzz — nothing in this town is electric), then the light drawn
+      // away in a falling shimmer. No sparkle on the way out — it reads as
+      // something arriving, and this is the opposite. Both panned hard left,
+      // where it stands. Times match LAMP_GUTTER / LAMPS_FLARE in scenes.js
+      // and the keyframes in story.css.
       { id: "magic_gutter", at: 4000, gain: 0.8, pan: -0.69 },
       { id: "magic_gutter", at: 4400, gain: 0.88, rate: 0.94, pan: -0.69 },
-      { id: "sparkle", at: 4990, gain: 0.75, pan: -0.6 },
       { id: "magic_out", at: 5050, gain: 0.9, pan: -0.69 }
     ],
     vo: { id: "vo_neel_what", at: 3160 }
