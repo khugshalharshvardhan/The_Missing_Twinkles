@@ -19,6 +19,7 @@ import { pages, timeline } from "./data/scenes.js";
 import { cues } from "./data/audio.js";
 import { clearCues, playCues, stopAudio } from "./audio.js";
 import { anchorOffset } from "./anchor.js";
+import { faceOf } from "./data/bubbles.js";
 
 const layerHost = document.getElementById("layers");
 const overlayHost = document.getElementById("overlays");
@@ -466,14 +467,30 @@ function fillImage(layer) {
   return img;
 }
 
-function line({ text, lines }) {
+// The line, centred on the balloon's BODY rather than sat at a hand-placed
+// mark. Each balloon is a body plus a tail, so the middle of its layer box is
+// not the middle of the shape — js/data/bubbles.js carries the face, measured
+// off the art and mirrored when the art is. `text` still decides nothing but
+// the width when a balloon has no measurement to fall back on.
+function line({ bubble, text, lines }) {
   const el = document.createElement("p");
 
   el.className = "say__text";
   el.textContent = lines.join("\n");
-  el.style.left = `${text.x}px`;
-  el.style.top = `${text.y}px`;
-  el.style.width = `${text.w}px`;
+
+  const face = bubble && faceOf(bubble.src, Boolean(bubble.flipX));
+  if (face) {
+    const [fx0, fx1, fy0, fy1] = face;
+    const padX = 0.08 * (fx1 - fx0) * bubble.w;
+    el.style.left = `${bubble.x + fx0 * bubble.w + padX}px`;
+    el.style.top = `${bubble.y + fy0 * bubble.h}px`;
+    el.style.width = `${(fx1 - fx0) * bubble.w - padX * 2}px`;
+    el.style.height = `${(fy1 - fy0) * bubble.h}px`;
+  } else {
+    el.style.left = `${text.x}px`;
+    el.style.top = `${text.y}px`;
+    el.style.width = `${text.w}px`;
+  }
 
   return el;
 }

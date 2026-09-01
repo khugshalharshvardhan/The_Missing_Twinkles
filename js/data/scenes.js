@@ -297,7 +297,7 @@ export const pages = [
         say: {
           bubble: BUBBLE_NEEL,
           text: { x: 777, y: 224, w: 342 },
-          lines: ["हम्म…", "केक की खुशबू?"]
+          lines: ["हम्म…", "केक?"]
         }
       },
 
@@ -313,7 +313,7 @@ export const pages = [
         say: {
           bubble: { src: `${IMG}bubble_agni.webp`, x: 128, y: 190, w: 586, h: 294, flipX: true },
           text: { x: 179, y: 265.95, w: 482 },
-          lines: ["नील! अभी तो तुमने", "कुछ खाया था!"]
+          lines: ["नील! अभी तो तुमने", "कुछ खाया था"]
         }
       },
 

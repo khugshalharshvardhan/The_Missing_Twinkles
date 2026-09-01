@@ -12,6 +12,10 @@
   <link rel="stylesheet" href="css/game.css?v=2" />
   <link rel="stylesheet" href="css/walk.css?v=2" />
 
+  <!-- The Devanagari subset carries every line of dialogue, so it is fetched
+       up front; the Latin one only has the digits and is small enough to wait
+       for the stylesheet. -->
+  <link rel="preload" href="assets/fonts/Baloo2-SemiBold-devanagari.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="preload" href="assets/fonts/FredokaOne-Regular.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="preload" href="assets/fonts/Creepster-Regular.woff2" as="font" type="font/woff2" crossorigin />
   <!-- The cover is the first thing on screen, so it is fetched ahead of the

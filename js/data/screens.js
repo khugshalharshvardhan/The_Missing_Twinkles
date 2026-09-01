@@ -332,7 +332,7 @@ export const screens = [
     bubble: {
       art: `${IMG}bub_neel.webp`, who: "neel",
       x: 1183, y: 142, w: 400, h: 237,
-      text: "फिर हम उन्हें पकड़ सकते हैं!"
+      text: "तो इस बार ध्यान से देखो!"
     }
   },
 
@@ -357,7 +357,7 @@ export const screens = [
     bubble: {
       art: `${IMG}bub_15.webp`, who: "agni",
       x: 224, y: 107, w: 514, h: 277,
-      text: "ध्यान से देखो और अंदाज़ा लगाओ!"
+      text: "और अंदाज़ा लगाओ कि कितने जुगनू हैं।"
     }
   },
 
@@ -421,7 +421,7 @@ export const screens = [
       art: `${IMG}bub_3.webp`, who: "agni",
       x: 127, y: 229, w: 557, h: 282,
       artInset: [18.09, 9.69, 0, 17.06],
-      text: "चलो, गिनकर देखते हैं।"
+      text: "चलो, गिनकर देखते हैं कि हमारा अंदाज़ा कितना सही था।"
     }
   },
 
@@ -466,7 +466,7 @@ export const screens = [
     bubble: {
       art: `${IMG}bub_4.webp`, who: "agni",
       x: 199, y: 269, w: 417, h: 201,
-      text: "वहाँ कुल {total} जुगनू थे।"
+      text: "लेकिन वहाँ कुल {total} जुगनू थे!"
     }
   },
 
@@ -615,7 +615,7 @@ export const level1 = [
     bubble: {
       art: `${IMG}bub_15.webp`, who: "agni",
       x: 224, y: 107, w: 514, h: 277,
-      text: "ध्यान से देखो और अंदाज़ा लगाओ!"
+      text: "ध्यान से देखो और अंदाज़ा लगाओ।"
     }
   },
 
@@ -655,7 +655,7 @@ export const level1 = [
       art: `${IMG}bub_3.webp`, who: "agni",
       x: 127, y: 229, w: 557, h: 282,
       artInset: [18.09, 9.69, 0, 17.06],
-      text: "चलो, गिनकर देखते हैं।"
+      text: "चलो, गिनकर देखते हैं कि हमारा अंदाज़ा कितना सही था।"
     }
   },
 
@@ -697,7 +697,7 @@ export const level1 = [
     bubble: {
       art: `${IMG}bub_4.webp`, who: "agni",
       x: 199, y: 269, w: 417, h: 201,
-      text: "वहाँ कुल {total} बेर थे।"
+      text: "लेकिन वहाँ कुल {total} बेर थे!"
     }
   },
 
@@ -806,7 +806,7 @@ export const level2 = [
     bubble: {
       art: `${IMG}bub_15.webp`, who: "agni",
       x: 224, y: 107, w: 514, h: 277,
-      text: "ध्यान से देखो और अंदाज़ा लगाओ!"
+      text: "ध्यान से देखो और अंदाज़ा लगाओ।"
     }
   },
 
@@ -846,7 +846,7 @@ export const level2 = [
       art: `${IMG}bub_3.webp`, who: "agni",
       x: 127, y: 229, w: 557, h: 282,
       artInset: [18.09, 9.69, 0, 17.06],
-      text: "चलो, गिनकर देखते हैं।"
+      text: "चलो, गिनकर देखते हैं कि हमारा अंदाज़ा कितना सही था।"
     }
   },
 
@@ -891,7 +891,7 @@ export const level2 = [
     bubble: {
       art: `${IMG}bub_4.webp`, who: "agni",
       x: 199, y: 269, w: 417, h: 201,
-      text: "वहाँ कुल {total} तारे थे।"
+      text: "लेकिन वहाँ कुल {total} तारे थे!"
     }
   },
 
@@ -999,7 +999,7 @@ export const level3 = [
     bubble: {
       art: `${IMG}bub_15.webp`, who: "agni",
       x: 224, y: 107, w: 514, h: 277,
-      text: "ध्यान से देखो और अंदाज़ा लगाओ!"
+      text: "ध्यान से देखो और अंदाज़ा लगाओ।"
     }
   },
 
@@ -1039,7 +1039,7 @@ export const level3 = [
       art: `${IMG}bub_3.webp`, who: "agni",
       x: 127, y: 229, w: 557, h: 282,
       artInset: [18.09, 9.69, 0, 17.06],
-      text: "चलो, गिनकर देखते हैं।"
+      text: "चलो, गिनकर देखते हैं कि हमारा अंदाज़ा कितना सही था।"
     }
   },
 
@@ -1083,7 +1083,7 @@ export const level3 = [
     bubble: {
       art: `${IMG}bub_4.webp`, who: "agni",
       x: 199, y: 269, w: 417, h: 201,
-      text: "वहाँ कुल {total} जादुई बीज थे।"
+      text: "लेकिन वहाँ कुल {total} जादुई बीज थे!"
     }
   },
 
@@ -1190,7 +1190,7 @@ export const level4 = [
     bubble: {
       art: `${IMG}bub_15.webp`, who: "agni",
       x: 224, y: 107, w: 514, h: 277,
-      text: "ध्यान से देखो और अंदाज़ा लगाओ!"
+      text: "ध्यान से देखो और अंदाज़ा लगाओ।"
     }
   },
 
@@ -1230,7 +1230,7 @@ export const level4 = [
       art: `${IMG}bub_3.webp`, who: "agni",
       x: 127, y: 229, w: 557, h: 282,
       artInset: [18.09, 9.69, 0, 17.06],
-      text: "चलो, गिनकर देखते हैं।"
+      text: "चलो, गिनकर देखते हैं कि हमारा अंदाज़ा कितना सही था।"
     }
   },
 
@@ -1274,7 +1274,7 @@ export const level4 = [
     bubble: {
       art: `${IMG}bub_4.webp`, who: "agni",
       x: 199, y: 269, w: 417, h: 201,
-      text: "वहाँ कुल {total} फूल थे।"
+      text: "लेकिन वहाँ कुल {total} फूल थे!"
     }
   },
 

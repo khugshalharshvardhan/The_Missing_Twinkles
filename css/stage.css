@@ -1,4 +1,33 @@
-/* ---- font ---- */
+/* ---- font ----
+
+   Baloo 2 SemiBold, self-hosted in two subsets so the browser only fetches the
+   script a reader actually needs. Baloo 2 is the DEVANAGARI member of the Baloo
+   superfamily: Baloo Bhai 2 is the Gujarati one and ships no Devanagari at all,
+   so it cannot set this game's Hindi — the Latin design is the same across the
+   family, so this is the same look with the script that works.
+
+   FredokaOne is kept on disk and stays last in the stack as a fallback. */
+@font-face {
+  font-family: "Baloo 2";
+  src: url("../assets/fonts/Baloo2-SemiBold-devanagari.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0900-097F, U+1CD0-1CF9, U+200C-200D, U+20A8, U+20B9, U+25CC,
+    U+A830-A839, U+A8E0-A8FF;
+}
+
+@font-face {
+  font-family: "Baloo 2";
+  src: url("../assets/fonts/Baloo2-SemiBold-latin.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191,
+    U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
 @font-face {
   font-family: "Fredoka One";
   src: url("../assets/fonts/FredokaOne-Regular.woff2") format("woff2");
@@ -28,7 +57,7 @@
   --ember:     #ef5a24;
   --dusk:      #1b2036;
 
-  --font-display: "Fredoka One", "Trebuchet MS", system-ui, sans-serif;
+  --font-display: "Baloo 2", "Fredoka One", "Trebuchet MS", system-ui, sans-serif;
   --font-creepy: "Creepster", "Trebuchet MS", system-ui, sans-serif;
 
   --speed:      480ms;
@@ -41,6 +70,7 @@ body {
   background: var(--letterbox);
   color: var(--paper);
   font-family: var(--font-display);
+  font-weight: 600;
   overflow: hidden;
   overscroll-behavior: none;
   -webkit-font-smoothing: antialiased;

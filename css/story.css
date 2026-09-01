@@ -91,8 +91,15 @@
   animation: pop 420ms var(--ease) 260ms both;
 }
 
+/* A flex box rather than a run of text, so the line sits in the middle of the
+   balloon's face on BOTH axes — see line() in js/story.js for where the box
+   comes from. */
 .say__text {
   position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
   font-size: 42px;
   line-height: 60px;
   color: var(--ink);

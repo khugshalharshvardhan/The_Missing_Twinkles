@@ -12,6 +12,7 @@
 
 import { levels, epilogue, keypad, counter, numberLine, FRAME_W } from "./data/screens.js";
 import { gameCues } from "./data/audio.js";
+import { faceOf } from "./data/bubbles.js";
 import { anchorOffset, bodyBox, castOf } from "./anchor.js";
 import { clearCues, playCues, playSfx, playVo, clipLength } from "./audio.js";
 
@@ -1273,20 +1274,35 @@ function bubble(spec, screen) {
   artImg.alt = "";
   art.append(artImg);
 
-  // Dead centre of the balloon, both ways. The box measured is the art's own,
-  // not the bubble frame's — on two screens Figma insets the balloon inside
-  // its frame — and the insets are applied symmetrically, so the centre of
-  // the text box is exactly the centre of the balloon on both axes.
+  // Dead centre of the balloon's BODY, both ways — not of the layer box. The
+  // box has to be tall enough to hold the tail as well, so centring in it sits
+  // every line about 4% of the box low. js/data/bubbles.js has each balloon's
+  // face measured off its own art (and mirrored when the art is), so the words
+  // land in the middle of the shape the reader actually sees.
   const [aTop, aRight, aBottom, aLeft] = spec.artInset ?? [0, 0, 0, 0];
-  const padX = BUBBLE_PAD_X * spec.w;
+  const face = faceOf(spec.art, Boolean(tailToward(spec, screen)));
+  const artW = spec.w * (1 - (aLeft + aRight) / 100);
+  const artH = spec.h * (1 - (aTop + aBottom) / 100);
 
   const line = document.createElement("p");
   line.className = "bubble__text";
   line.textContent = fill(spec.text);
-  line.style.left = `${(aLeft / 100) * spec.w + padX}px`;
-  line.style.right = `${(aRight / 100) * spec.w + padX}px`;
-  line.style.top = `${(aTop / 100) * spec.h}px`;
-  line.style.bottom = `${(aBottom / 100) * spec.h}px`;
+
+  if (face) {
+    const [fx0, fx1, fy0, fy1] = face;
+    // A little air inside the face so the words never touch the outline.
+    const padX = BUBBLE_PAD_X * (fx1 - fx0) * artW;
+    line.style.left = `${(aLeft / 100) * spec.w + fx0 * artW + padX}px`;
+    line.style.right = `${(aRight / 100) * spec.w + (1 - fx1) * artW + padX}px`;
+    line.style.top = `${(aTop / 100) * spec.h + fy0 * artH}px`;
+    line.style.bottom = `${(aBottom / 100) * spec.h + (1 - fy1) * artH}px`;
+  } else {
+    const padX = BUBBLE_PAD_X * spec.w;
+    line.style.left = `${(aLeft / 100) * spec.w + padX}px`;
+    line.style.right = `${(aRight / 100) * spec.w + padX}px`;
+    line.style.top = `${(aTop / 100) * spec.h}px`;
+    line.style.bottom = `${(aBottom / 100) * spec.h}px`;
+  }
 
   box.append(art, line);
   return box;
