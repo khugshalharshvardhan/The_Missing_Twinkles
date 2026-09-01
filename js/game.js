@@ -389,10 +389,10 @@ function finish() {
 // drift apart. None of them is a buzzer: guessing wrong and then counting is the
 // whole point of the game, so the worst case still sounds like encouragement.
 const VERDICTS = {
-  none: { text: "Let us try again!", vo: "vo_g_tryagain", sfx: "try_chime" },
-  exact: { text: "Spot on!", vo: "vo_g_spoton", sfx: "correct_chime" },
-  near: { text: "That was close!", vo: "vo_g_close", sfx: "near_chime" },
-  far: { text: "Good try — now we know!", vo: "vo_g_goodtry", sfx: "try_chime" }
+  none: { text: "चलो, फिर से कोशिश करें!", vo: "vo_g_tryagain", sfx: "try_chime" },
+  exact: { text: "बिलकुल सही अंदाज़ा!", vo: "vo_g_spoton", sfx: "correct_chime" },
+  near: { text: "तुम्हारा अंदाज़ा काफ़ी पास था!", vo: "vo_g_close", sfx: "near_chime" },
+  far: { text: "अच्छी कोशिश! अब हमें पता चल गया।", vo: "vo_g_goodtry", sfx: "try_chime" }
 };
 
 function verdictKey() {
@@ -716,6 +716,19 @@ function shout(spec) {
 
   // `at` holds the whole word back — The End waits for the iris to close.
   const from = spec.at ?? 0;
+
+  // Devanagari cannot be cut into characters and re-assembled: a matra or a
+  // conjunct only shapes correctly while it sits beside the letter it belongs
+  // to, and splitting "समाप्त" into <b>s scattered its vowel marks as loose
+  // rings. So a Hindi shout pops as one word instead of letter by letter —
+  // the same overshoot and rock, just on the whole thing.
+  if (/[ऀ-ॿ]/.test(spec.text)) {
+    const b = document.createElement("b");
+    b.textContent = spec.text;
+    b.style.animationDelay = `${from + 180}ms`;
+    wrap.append(b);
+    return wrap;
+  }
 
   [...spec.text].forEach((ch, i) => {
     const b = document.createElement("b");

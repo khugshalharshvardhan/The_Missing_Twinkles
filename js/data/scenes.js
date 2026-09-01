@@ -297,7 +297,7 @@ export const pages = [
         say: {
           bubble: BUBBLE_NEEL,
           text: { x: 777, y: 224, w: 342 },
-          lines: ["Mmm…", "do I smell cake?"]
+          lines: ["हम्म…", "केक की खुशबू?"]
         }
       },
 
@@ -313,7 +313,7 @@ export const pages = [
         say: {
           bubble: { src: `${IMG}bubble_agni.webp`, x: 128, y: 190, w: 586, h: 294, flipX: true },
           text: { x: 179, y: 265.95, w: 482 },
-          lines: ["Oh, come on. You just", "had a cookie!"]
+          lines: ["नील! अभी तो तुमने", "कुछ खाया था!"]
         }
       },
 
@@ -356,7 +356,7 @@ export const pages = [
           at: 2600,
           bubble: BUBBLE_NEEL,
           text: { x: 777, y: 265, w: 342 },
-          lines: ["What was that?"]
+          lines: ["अरे! ये क्या हो रहा है?"]
         }
       },
       // Figma 2.2 — the near lamp has just died, and now the town goes with
@@ -401,7 +401,7 @@ export const pages = [
         id: "3.2",
         hold: 1900, // "Neil?" runs 0.69s from 340; the rest is one blink
         layers: [{ key: "night", kind: "night" }, EYES],
-        voices: [{ x: 355, y: 700, w: 400, tone: "agni", text: "Neil?" }]
+        voices: [{ x: 355, y: 700, w: 400, tone: "agni", text: "नील?" }]
       },
 
       {
@@ -416,7 +416,7 @@ export const pages = [
           EYES,
           LONE_TWINKLE
         ],
-        voices: [{ x: 1040, y: 690, w: 560, tone: "neel", text: "I am here… I think." }]
+        voices: [{ x: 1040, y: 690, w: 560, tone: "neel", text: "हाँ, मैं यहीं हूँ!" }]
       }
     ]
   },
@@ -447,7 +447,7 @@ export const pages = [
         say: {
           bubble: { src: `${IMG}bubble_agni.webp`, x: 118, y: 96, w: 586, h: 294, flipX: true },
           text: { x: 169, y: 153, w: 482 },
-          lines: ["I think Mr. Giggles", "has scared the little", "twinkles!"]
+          lines: ["लगता है मिस्टर गिगल्स ने", "सभी जुगनुओं को", "डरा दिया है।"]
         }
       },
 
@@ -465,7 +465,7 @@ export const pages = [
         say: {
           bubble: { src: `${IMG}bubble_agni.webp`, x: 54, y: 78, w: 606, h: 326, flipX: true },
           text: { x: 117, y: 169, w: 481 },
-          lines: ["Let us find them and", "light the town again!"]
+          lines: ["चलो, उन्हें ढूँढ़कर", "शहर को फिर से रोशन करें!"]
         }
       }
     ]

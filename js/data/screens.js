@@ -283,7 +283,7 @@ export const screens = [
     bubble: {
       art: `${IMG}bub_11.webp`, who: "agni",
       x: 213, y: 263, w: 416, h: 229,
-      text: "Look, twinkles!"
+      text: "वो देखो, जुगनू!"
     }
   },
 
@@ -299,7 +299,7 @@ export const screens = [
     bubble: {
       art: `${IMG}bub_12.webp`, who: "agni",
       x: 216, y: 209, w: 495, h: 253,
-      text: "Huh? Where did they go?"
+      text: "अरे! कहाँ गए?"
     }
   },
 
@@ -316,7 +316,7 @@ export const screens = [
       art: `${IMG}bub_13.webp`, who: "agni",
       x: 234, y: 130, w: 596, h: 314,
       artInset: [8.7, 0, 0, 3.23],
-      text: "We need to find how many twinkles were there."
+      text: "हमें पता लगाना होगा कि कुल कितने जुगनू थे।"
     }
   },
 
@@ -332,7 +332,7 @@ export const screens = [
     bubble: {
       art: `${IMG}bub_neel.webp`, who: "neel",
       x: 1183, y: 142, w: 400, h: 237,
-      text: "Then we can catch them!"
+      text: "फिर हम उन्हें पकड़ सकते हैं!"
     }
   },
 
@@ -357,7 +357,7 @@ export const screens = [
     bubble: {
       art: `${IMG}bub_15.webp`, who: "agni",
       x: 224, y: 107, w: 514, h: 277,
-      text: "Look closely and make a guess!"
+      text: "ध्यान से देखो और अंदाज़ा लगाओ!"
     }
   },
 
@@ -380,7 +380,7 @@ export const screens = [
     bubble: {
       art: `${IMG}bub_15.webp`, who: "agni",
       x: 0, y: 185, w: 514, h: 277,
-      text: "How many twinkles were there?"
+      text: "तो कितने जुगनू थे?"
     }
   },
 
@@ -402,7 +402,7 @@ export const screens = [
     bubble: {
       art: `${IMG}bub_neel.webp`, who: "neel",
       x: 1157, y: 209, w: 400, h: 237,
-      text: "Hmm… I think there were {guess}."
+      text: "हम्म… मुझे लगता है {guess} जुगनू थे।"
     }
   },
 
@@ -421,7 +421,7 @@ export const screens = [
       art: `${IMG}bub_3.webp`, who: "agni",
       x: 127, y: 229, w: 557, h: 282,
       artInset: [18.09, 9.69, 0, 17.06],
-      text: "Let us count to check."
+      text: "चलो, गिनकर देखते हैं।"
     }
   },
 
@@ -442,7 +442,7 @@ export const screens = [
     bubble: {
       art: `${IMG}bub_32.webp`, who: "agni",
       x: 172, y: 252, w: 489, h: 256,
-      text: "Tap each twinkle to count."
+      text: "गिनने के लिए हर जुगनू पर टैप करो।"
     }
   },
 
@@ -466,7 +466,7 @@ export const screens = [
     bubble: {
       art: `${IMG}bub_4.webp`, who: "agni",
       x: 199, y: 269, w: 417, h: 201,
-      text: "There are {total} twinkles"
+      text: "वहाँ कुल {total} जुगनू थे।"
     }
   },
 
@@ -490,7 +490,7 @@ export const screens = [
     bubble: {
       art: `${IMG}bub_4.webp`, who: "agni",
       x: 199, y: 269, w: 417, h: 201,
-      text: "You guessed {guess}."
+      text: "तुम्हारा अंदाज़ा था {guess}।"
     }
   },
 
@@ -533,7 +533,7 @@ export const screens = [
     bubble: {
       art: `${IMG}bub_51.webp`, who: "agni",
       x: 693, y: 210, w: 383, h: 184,
-      text: "Tap the lamp!"
+      text: "लैंप पर टैप करो!"
     }
   },
 
@@ -550,7 +550,7 @@ export const screens = [
     ],
     // Neel's cheer, drawn as well as heard: comic-burst lettering over his
     // head as he spins to the lit lamp. Matches vo_neel_yay in the cue table.
-    shout: { text: "YAY!", x: 150, y: 236, tilt: 9 }
+    shout: { text: "यय!", x: 150, y: 236, tilt: 9 }
   },
 
   // ---- SCREEN 6.1 — handing over (99:587) ----
@@ -565,7 +565,7 @@ export const screens = [
     bubble: {
       art: `${IMG}bub_61.webp`, who: "agni",
       x: 646, y: 186, w: 361, h: 199,
-      text: "Now, it is your turn."
+      text: "अब तुम्हारी बारी है।"
     }
   },
 
@@ -581,7 +581,7 @@ export const screens = [
     bubble: {
       art: `${IMG}bub_62.webp`, who: "agni",
       x: 667, y: 77, w: 492, h: 281,
-      text: "Make a guess, and count to check!"
+      text: "अंदाज़ा लगाओ, और गिनकर देखो!"
     }
   }
 ];
@@ -615,7 +615,7 @@ export const level1 = [
     bubble: {
       art: `${IMG}bub_15.webp`, who: "agni",
       x: 224, y: 107, w: 514, h: 277,
-      text: "Look closely and make a guess!"
+      text: "ध्यान से देखो और अंदाज़ा लगाओ!"
     }
   },
 
@@ -636,7 +636,7 @@ export const level1 = [
     bubble: {
       art: `${IMG}bub_15.webp`, who: "agni",
       x: 0, y: 185, w: 514, h: 277,
-      text: "How many glowberries were there?"
+      text: "तो कितने बेर थे?"
     }
   },
 
@@ -655,7 +655,7 @@ export const level1 = [
       art: `${IMG}bub_3.webp`, who: "agni",
       x: 127, y: 229, w: 557, h: 282,
       artInset: [18.09, 9.69, 0, 17.06],
-      text: "Let us count to check."
+      text: "चलो, गिनकर देखते हैं।"
     }
   },
 
@@ -676,7 +676,7 @@ export const level1 = [
     bubble: {
       art: `${IMG}bub_32.webp`, who: "agni",
       x: 172, y: 252, w: 489, h: 256,
-      text: "Tap each glowberry to count."
+      text: "गिनने के लिए हर बेर पर टैप करो।"
     }
   },
 
@@ -697,7 +697,7 @@ export const level1 = [
     bubble: {
       art: `${IMG}bub_4.webp`, who: "agni",
       x: 199, y: 269, w: 417, h: 201,
-      text: "There are {total} glowberries"
+      text: "वहाँ कुल {total} बेर थे।"
     }
   },
 
@@ -718,7 +718,7 @@ export const level1 = [
     bubble: {
       art: `${IMG}bub_4.webp`, who: "agni",
       x: 199, y: 269, w: 417, h: 201,
-      text: "You guessed {guess}."
+      text: "तुम्हारा अंदाज़ा था {guess}।"
     }
   },
 
@@ -756,7 +756,7 @@ export const level1 = [
     bubble: {
       art: `${IMG}bub_51.webp`, who: "agni",
       x: 693, y: 210, w: 383, h: 184,
-      text: "Tap the lamp!"
+      text: "लैंप पर टैप करो!"
     }
   },
 
@@ -773,7 +773,7 @@ export const level1 = [
       // firefly.
       { src: BERRY_SRC, x: 1627, y: 262, w: 24, h: 27, fx: "flicker" }
     ],
-    shout: { text: "YAY!", x: 150, y: 236, tilt: 9 }
+    shout: { text: "यय!", x: 150, y: 236, tilt: 9 }
   }
 ];
 
@@ -806,7 +806,7 @@ export const level2 = [
     bubble: {
       art: `${IMG}bub_15.webp`, who: "agni",
       x: 224, y: 107, w: 514, h: 277,
-      text: "Look closely and make a guess!"
+      text: "ध्यान से देखो और अंदाज़ा लगाओ!"
     }
   },
 
@@ -827,7 +827,7 @@ export const level2 = [
     bubble: {
       art: `${IMG}bub_15.webp`, who: "agni",
       x: 0, y: 185, w: 514, h: 277,
-      text: "How many starlights were there?"
+      text: "तो कितने तारे थे?"
     }
   },
 
@@ -846,7 +846,7 @@ export const level2 = [
       art: `${IMG}bub_3.webp`, who: "agni",
       x: 127, y: 229, w: 557, h: 282,
       artInset: [18.09, 9.69, 0, 17.06],
-      text: "Let us count to check."
+      text: "चलो, गिनकर देखते हैं।"
     }
   },
 
@@ -870,7 +870,7 @@ export const level2 = [
     bubble: {
       art: `${IMG}bub_32.webp`, who: "agni",
       x: 172, y: 252, w: 489, h: 256,
-      text: "Tap each starlight to count."
+      text: "गिनने के लिए हर तारे पर टैप करो।"
     }
   },
 
@@ -891,7 +891,7 @@ export const level2 = [
     bubble: {
       art: `${IMG}bub_4.webp`, who: "agni",
       x: 199, y: 269, w: 417, h: 201,
-      text: "There are {total} starlights"
+      text: "वहाँ कुल {total} तारे थे।"
     }
   },
 
@@ -912,7 +912,7 @@ export const level2 = [
     bubble: {
       art: `${IMG}bub_4.webp`, who: "agni",
       x: 199, y: 269, w: 417, h: 201,
-      text: "You guessed {guess}."
+      text: "तुम्हारा अंदाज़ा था {guess}।"
     }
   },
 
@@ -950,7 +950,7 @@ export const level2 = [
     bubble: {
       art: `${IMG}bub_51.webp`, who: "agni",
       x: 693, y: 210, w: 383, h: 184,
-      text: "Tap the lamp!"
+      text: "लैंप पर टैप करो!"
     }
   },
 
@@ -968,7 +968,7 @@ export const level2 = [
       // hold their catch in exactly the same spot.
       { src: STARLIGHT_SRC, x: 1626, y: 263, w: 26, h: 25, fx: "flicker" }
     ],
-    shout: { text: "YAY!", x: 150, y: 236, tilt: 9 }
+    shout: { text: "यय!", x: 150, y: 236, tilt: 9 }
   }
 ];
 
@@ -999,7 +999,7 @@ export const level3 = [
     bubble: {
       art: `${IMG}bub_15.webp`, who: "agni",
       x: 224, y: 107, w: 514, h: 277,
-      text: "Look closely and make a guess!"
+      text: "ध्यान से देखो और अंदाज़ा लगाओ!"
     }
   },
 
@@ -1020,7 +1020,7 @@ export const level3 = [
     bubble: {
       art: `${IMG}bub_15.webp`, who: "agni",
       x: 0, y: 185, w: 514, h: 277,
-      text: "How many magic seeds were there?"
+      text: "तो कितने जादुई बीज थे?"
     }
   },
 
@@ -1039,7 +1039,7 @@ export const level3 = [
       art: `${IMG}bub_3.webp`, who: "agni",
       x: 127, y: 229, w: 557, h: 282,
       artInset: [18.09, 9.69, 0, 17.06],
-      text: "Let us count to check."
+      text: "चलो, गिनकर देखते हैं।"
     }
   },
 
@@ -1062,7 +1062,7 @@ export const level3 = [
     bubble: {
       art: `${IMG}bub_32.webp`, who: "agni",
       x: 172, y: 252, w: 489, h: 256,
-      text: "Tap each magic seed to count."
+      text: "गिनने के लिए हर बीज पर टैप करो।"
     }
   },
 
@@ -1083,7 +1083,7 @@ export const level3 = [
     bubble: {
       art: `${IMG}bub_4.webp`, who: "agni",
       x: 199, y: 269, w: 417, h: 201,
-      text: "There are {total} magic seeds"
+      text: "वहाँ कुल {total} जादुई बीज थे।"
     }
   },
 
@@ -1104,7 +1104,7 @@ export const level3 = [
     bubble: {
       art: `${IMG}bub_4.webp`, who: "agni",
       x: 199, y: 269, w: 417, h: 201,
-      text: "You guessed {guess}."
+      text: "तुम्हारा अंदाज़ा था {guess}।"
     }
   },
 
@@ -1142,7 +1142,7 @@ export const level3 = [
     bubble: {
       art: `${IMG}bub_51.webp`, who: "agni",
       x: 693, y: 210, w: 383, h: 184,
-      text: "Tap the lamp!"
+      text: "लैंप पर टैप करो!"
     }
   },
 
@@ -1159,7 +1159,7 @@ export const level3 = [
       // (845, 276) — the same spot all four levels hold their catch.
       { src: SEED_SRC, x: 1683, y: 261, w: 22, h: 29, fx: "flicker" }
     ],
-    shout: { text: "YAY!", x: 150, y: 236, tilt: 9 }
+    shout: { text: "यय!", x: 150, y: 236, tilt: 9 }
   }
 ];
 
@@ -1190,7 +1190,7 @@ export const level4 = [
     bubble: {
       art: `${IMG}bub_15.webp`, who: "agni",
       x: 224, y: 107, w: 514, h: 277,
-      text: "Look closely and make a guess!"
+      text: "ध्यान से देखो और अंदाज़ा लगाओ!"
     }
   },
 
@@ -1211,7 +1211,7 @@ export const level4 = [
     bubble: {
       art: `${IMG}bub_15.webp`, who: "agni",
       x: 0, y: 185, w: 514, h: 277,
-      text: "How many glow flowers were there?"
+      text: "तो कितने फूल थे?"
     }
   },
 
@@ -1230,7 +1230,7 @@ export const level4 = [
       art: `${IMG}bub_3.webp`, who: "agni",
       x: 127, y: 229, w: 557, h: 282,
       artInset: [18.09, 9.69, 0, 17.06],
-      text: "Let us count to check."
+      text: "चलो, गिनकर देखते हैं।"
     }
   },
 
@@ -1253,7 +1253,7 @@ export const level4 = [
     bubble: {
       art: `${IMG}bub_32.webp`, who: "agni",
       x: 108, y: 252, w: 489, h: 256,
-      text: "Tap each glow flower to count."
+      text: "गिनने के लिए हर फूल पर टैप करो।"
     }
   },
 
@@ -1274,7 +1274,7 @@ export const level4 = [
     bubble: {
       art: `${IMG}bub_4.webp`, who: "agni",
       x: 199, y: 269, w: 417, h: 201,
-      text: "There are {total} glow flowers"
+      text: "वहाँ कुल {total} फूल थे।"
     }
   },
 
@@ -1295,7 +1295,7 @@ export const level4 = [
     bubble: {
       art: `${IMG}bub_4.webp`, who: "agni",
       x: 199, y: 269, w: 417, h: 201,
-      text: "You guessed {guess}."
+      text: "तुम्हारा अंदाज़ा था {guess}।"
     }
   },
 
@@ -1333,7 +1333,7 @@ export const level4 = [
     bubble: {
       art: `${IMG}bub_51.webp`, who: "agni",
       x: 693, y: 210, w: 383, h: 184,
-      text: "Tap the lamp!"
+      text: "लैंप पर टैप करो!"
     }
   },
 
@@ -1350,7 +1350,7 @@ export const level4 = [
       // (845, 276) — the same spot all four levels hold their catch.
       { src: FLOWER_SRC, x: 1682, y: 262, w: 25, h: 27, fx: "flicker" }
     ],
-    shout: { text: "YAY!", x: 150, y: 236, tilt: 9 }
+    shout: { text: "यय!", x: 150, y: 236, tilt: 9 }
   }
 ];
 
@@ -1463,7 +1463,7 @@ export const epilogueScreens = [
     bubble: {
       art: `${IMG}bub_51.webp`, who: "agni",
       x: 679, y: 268, w: 322, h: 167,
-      text: "We did it, Neel!"
+      text: "हमने कर दिखाया, नील!"
     }
   },
 
@@ -1478,7 +1478,7 @@ export const epilogueScreens = [
     bubble: {
       art: `${IMG}bub_51.webp`, who: "agni",
       x: 657, y: 238, w: 400, h: 196,
-      text: "The town is shining again!"
+      text: "शहर फिर से चमक रहा है!"
     }
   },
 
@@ -1494,7 +1494,7 @@ export const epilogueScreens = [
     bubble: {
       art: `${IMG}bub_51.webp`, who: "agni",
       x: 668, y: 385, w: 280, h: 157,
-      text: "Neel?"
+      text: "नील?"
     }
   },
 
@@ -1519,7 +1519,7 @@ export const epilogueScreens = [
     // the letterbox shows through, so the cross-fade from the clipped-black
     // video is invisible. Then the words.
     layers: [],
-    shout: { text: "The End", x: 585, y: 380, tilt: -3, size: 150, at: 450 },
+    shout: { text: "समाप्त", x: 585, y: 380, tilt: -3, size: 150, at: 450 },
     dwell: 5000
   }
 ];
