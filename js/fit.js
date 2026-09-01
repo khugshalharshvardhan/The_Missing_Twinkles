@@ -30,11 +30,12 @@ export function textRoom(room) {
   return [x0 + inX, x1 - inX, y0 + inY, y1 - inY];
 }
 
-// How far the type itself may come down for a line too long for even a
-// full-size balloon. Only the longest line in the script needs any of it, and
-// a few percent is under the threshold where a reader would notice one beat's
-// words being smaller than the next one's.
-export const FIT_TYPE_MIN = 0.72;
+// How far past the size it was drawn at a balloon may go for a line too long
+// to fit it. Every line in the game is set at ONE size — a beat whose words are
+// smaller than the last one's reads as a mistake, and these are children
+// learning to read the words as much as to count what is behind them — so it is
+// the balloon that gives, never the type.
+export const FIT_MAX = 1.35;
 
 // The real size of a piece of text, in stage pixels.
 //
@@ -53,22 +54,6 @@ export function textBox(el) {
   const scale = el.offsetWidth > 0 && box.width > 0 ? box.width / el.offsetWidth : 1;
 
   return { w: drawn.width / scale, h: drawn.height / scale };
-}
-
-// Set the type a few percent smaller, leading and all, so the line keeps its
-// shape as it comes down. Remembers the stylesheet's own size the first time,
-// so repeated fitting can never walk the size downwards.
-function setType(line, scale) {
-  let base = line._fitType;
-  if (!base) {
-    const style = getComputedStyle(line);
-    base = line._fitType = {
-      size: parseFloat(style.fontSize),
-      lead: parseFloat(style.lineHeight)
-    };
-  }
-  line.style.fontSize = `${base.size * scale}px`;
-  if (base.lead > 0) line.style.lineHeight = `${base.lead * scale}px`;
 }
 
 // How far the INK of a line sits above or below the middle of the box holding
@@ -128,23 +113,23 @@ export function fitToText(line, place, { min = FIT_MIN, air = FIT_AIR } = {}) {
     return drawn.w <= line.clientWidth + 1 && drawn.h <= line.clientHeight + 1;
   };
 
-  setType(line, 1);
-
-  // The drawn size is the ceiling. A line that does not fit even that is the
-  // longest one in the script inside the biggest balloon there is: the balloon
-  // cannot grow — it was placed against the characters — so the type comes
-  // down by the few percent it takes instead.
+  // A line too long for the size its balloon was drawn at needs a bigger
+  // balloon. It grows from the tail, like every other resize here, so it still
+  // points at the same mouth — and it is capped, because these were laid out
+  // against the characters and one that grew without limit would cover them.
   place(1);
   if (!fits()) {
-    let fitting = FIT_TYPE_MIN;
-    let tooBig = 1;
-    for (let i = 0; i < 6; i++) {
-      const mid = (fitting + tooBig) / 2;
-      setType(line, mid);
-      if (fits()) fitting = mid; else tooBig = mid;
+    let small = 1;
+    let big = FIT_MAX;
+    place(big);
+    if (!fits()) return big;
+    for (let i = 0; i < 8; i++) {
+      const mid = (small + big) / 2;
+      place(mid);
+      if (fits()) big = mid; else small = mid;
     }
-    setType(line, fitting);
-    return 1;
+    place(Math.min(FIT_MAX, big * air));
+    return big;
   }
 
   let lo = min;

@@ -446,30 +446,6 @@ export const screens = [
     }
   },
 
-  // ---- SCREEN 4 — the true count (99:491) ----
-  {
-    id: "4",
-    anchor: THE_CLEARING,
-    role: "totalline",
-    numberLine: true,
-    // Long enough to watch the number travel down to the line and then read
-    // it there. On reading pace alone this beat ended about a tenth of a
-    // second after the marker landed.
-    dwell: 3800,
-    layers: [
-      BG,
-      { src: `${IMG}agni_f.webp`, x: 9, y: 481, w: 605, h: 553, fx: "breathe" },
-      { src: `${IMG}neel_f.webp`, x: 1372, y: 424, w: 465, h: 589, fx: "breathe-slow" }
-    ],
-    fireflies: { x: 749, y: 197 },
-    counter: "total",
-    bubble: {
-      art: `${IMG}bub_4.webp`, who: "agni",
-      x: 199, y: 269, w: 417, h: 201,
-      text: "लेकिन वहाँ कुल {total} जुगनू थे!"
-    }
-  },
-
   // ---- SCREEN 16 — the guess, next to the truth (119:734) ----
   {
     id: "16",
@@ -490,10 +466,34 @@ export const screens = [
     bubble: {
       art: `${IMG}bub_4.webp`, who: "agni",
       x: 199, y: 269, w: 417, h: 201,
-      text: "तुम्हारा अंदाज़ा था {guess}।"
+      text: "तुम्हारा अंदाज़ा था {guess}!"
     }
   },
 
+
+  // ---- SCREEN 4 — the true count (99:491) ----
+  {
+    id: "4",
+    anchor: THE_CLEARING,
+    role: "totalline",
+    numberLine: true,
+    // Long enough to watch the number travel down to the line and then read
+    // it there. On reading pace alone this beat ended about a tenth of a
+    // second after the marker landed.
+    dwell: 3800,
+    layers: [
+      BG,
+      { src: `${IMG}agni_f.webp`, x: 9, y: 481, w: 605, h: 553, fx: "breathe" },
+      { src: `${IMG}neel_f.webp`, x: 1372, y: 424, w: 465, h: 589, fx: "breathe-slow" }
+    ],
+    fireflies: { x: 749, y: 197 },
+    counter: "total",
+    bubble: {
+      art: `${IMG}bub_4.webp`, who: "agni",
+      x: 199, y: 269, w: 417, h: 201,
+      text: "{but}वहाँ कुल {total} जुगनू थे!"
+    }
+  },
   // ---- SCREEN 4.2 — the verdict (106:657) ----
   {
     id: "4.2",
@@ -649,27 +649,6 @@ export const level1 = [
     }
   },
 
-  // ---- P4 — the true count ----
-  {
-    id: "p4",
-    anchor: THE_CLEARING,
-    role: "totalline",
-    numberLine: true,
-    dwell: 3800,
-    layers: [
-      BG_MEADOW,
-      { src: `${IMG}agni_f.webp`, x: 9, y: 481, w: 605, h: 553, fx: "breathe" },
-      { src: `${IMG}neel_f.webp`, x: 1372, y: 424, w: 465, h: 589, fx: "breathe-slow" }
-    ],
-    fireflies: { x: 773, y: 140 },
-    counter: "total",
-    bubble: {
-      art: `${IMG}bub_4.webp`, who: "agni",
-      x: 199, y: 269, w: 417, h: 201,
-      text: "लेकिन वहाँ कुल {total} बेर थे!"
-    }
-  },
-
   // ---- P16 — the guess, next to the truth ----
   {
     id: "p16",
@@ -687,10 +666,31 @@ export const level1 = [
     bubble: {
       art: `${IMG}bub_4.webp`, who: "agni",
       x: 199, y: 269, w: 417, h: 201,
-      text: "तुम्हारा अंदाज़ा था {guess}।"
+      text: "तुम्हारा अंदाज़ा था {guess}!"
     }
   },
 
+
+  // ---- P4 — the true count ----
+  {
+    id: "p4",
+    anchor: THE_CLEARING,
+    role: "totalline",
+    numberLine: true,
+    dwell: 3800,
+    layers: [
+      BG_MEADOW,
+      { src: `${IMG}agni_f.webp`, x: 9, y: 481, w: 605, h: 553, fx: "breathe" },
+      { src: `${IMG}neel_f.webp`, x: 1372, y: 424, w: 465, h: 589, fx: "breathe-slow" }
+    ],
+    fireflies: { x: 773, y: 140 },
+    counter: "total",
+    bubble: {
+      art: `${IMG}bub_4.webp`, who: "agni",
+      x: 199, y: 269, w: 417, h: 201,
+      text: "{but}वहाँ कुल {total} बेर थे!"
+    }
+  },
   // ---- P4.2 — the verdict ----
   {
     id: "p4.2",
@@ -828,27 +828,6 @@ export const level2 = [
     }
   },
 
-  // ---- S4 — the true count ----
-  {
-    id: "s4",
-    anchor: THE_CLEARING,
-    role: "totalline",
-    numberLine: true,
-    dwell: 3800,
-    layers: [
-      BG_VALLEY,
-      { src: `${IMG}agni_f.webp`, x: 9, y: 481, w: 605, h: 553, fx: "breathe" },
-      { src: `${IMG}neel_f.webp`, x: 1372, y: 424, w: 465, h: 589, fx: "breathe-slow" }
-    ],
-    fireflies: { x: 688, y: 174 },
-    counter: "total",
-    bubble: {
-      art: `${IMG}bub_4.webp`, who: "agni",
-      x: 199, y: 269, w: 417, h: 201,
-      text: "लेकिन वहाँ कुल {total} तारे थे!"
-    }
-  },
-
   // ---- S16 — the guess, next to the truth ----
   {
     id: "s16",
@@ -866,10 +845,31 @@ export const level2 = [
     bubble: {
       art: `${IMG}bub_4.webp`, who: "agni",
       x: 199, y: 269, w: 417, h: 201,
-      text: "तुम्हारा अंदाज़ा था {guess}।"
+      text: "तुम्हारा अंदाज़ा था {guess}!"
     }
   },
 
+
+  // ---- S4 — the true count ----
+  {
+    id: "s4",
+    anchor: THE_CLEARING,
+    role: "totalline",
+    numberLine: true,
+    dwell: 3800,
+    layers: [
+      BG_VALLEY,
+      { src: `${IMG}agni_f.webp`, x: 9, y: 481, w: 605, h: 553, fx: "breathe" },
+      { src: `${IMG}neel_f.webp`, x: 1372, y: 424, w: 465, h: 589, fx: "breathe-slow" }
+    ],
+    fireflies: { x: 688, y: 174 },
+    counter: "total",
+    bubble: {
+      art: `${IMG}bub_4.webp`, who: "agni",
+      x: 199, y: 269, w: 417, h: 201,
+      text: "{but}वहाँ कुल {total} तारे थे!"
+    }
+  },
   // ---- S4.2 — the verdict ----
   {
     id: "s4.2",
@@ -1005,27 +1005,6 @@ export const level3 = [
     }
   },
 
-  // ---- M4 — the true count ----
-  {
-    id: "m4",
-    anchor: THE_CLEARING,
-    role: "totalline",
-    numberLine: true,
-    dwell: 3800,
-    layers: [
-      BG_FOREST,
-      { src: `${IMG}agni_f.webp`, x: 9, y: 481, w: 605, h: 553, fx: "breathe" },
-      { src: `${IMG}neel_f.webp`, x: 1372, y: 424, w: 465, h: 589, fx: "breathe-slow" }
-    ],
-    fireflies: { x: 696, y: 85 },
-    counter: "total",
-    bubble: {
-      art: `${IMG}bub_4.webp`, who: "agni",
-      x: 199, y: 269, w: 417, h: 201,
-      text: "लेकिन वहाँ कुल {total} जादुई बीज थे!"
-    }
-  },
-
   // ---- M16 — the guess, next to the truth ----
   {
     id: "m16",
@@ -1043,10 +1022,31 @@ export const level3 = [
     bubble: {
       art: `${IMG}bub_4.webp`, who: "agni",
       x: 199, y: 269, w: 417, h: 201,
-      text: "तुम्हारा अंदाज़ा था {guess}।"
+      text: "तुम्हारा अंदाज़ा था {guess}!"
     }
   },
 
+
+  // ---- M4 — the true count ----
+  {
+    id: "m4",
+    anchor: THE_CLEARING,
+    role: "totalline",
+    numberLine: true,
+    dwell: 3800,
+    layers: [
+      BG_FOREST,
+      { src: `${IMG}agni_f.webp`, x: 9, y: 481, w: 605, h: 553, fx: "breathe" },
+      { src: `${IMG}neel_f.webp`, x: 1372, y: 424, w: 465, h: 589, fx: "breathe-slow" }
+    ],
+    fireflies: { x: 696, y: 85 },
+    counter: "total",
+    bubble: {
+      art: `${IMG}bub_4.webp`, who: "agni",
+      x: 199, y: 269, w: 417, h: 201,
+      text: "{but}वहाँ कुल {total} जादुई बीज थे!"
+    }
+  },
   // ---- M4.2 — the verdict ----
   {
     id: "m4.2",
@@ -1181,27 +1181,6 @@ export const level4 = [
     }
   },
 
-  // ---- F4 — the true count ----
-  {
-    id: "f4",
-    anchor: THE_CLEARING,
-    role: "totalline",
-    numberLine: true,
-    dwell: 3800,
-    layers: [
-      BG_FLOWERMEADOW,
-      { src: `${IMG}agni_f.webp`, x: 9, y: 481, w: 605, h: 553, fx: "breathe" },
-      { src: `${IMG}neel_f.webp`, x: 1372, y: 424, w: 465, h: 589, fx: "breathe-slow" }
-    ],
-    fireflies: { x: 623, y: 138 },
-    counter: "total",
-    bubble: {
-      art: `${IMG}bub_4.webp`, who: "agni",
-      x: 199, y: 269, w: 417, h: 201,
-      text: "लेकिन वहाँ कुल {total} फूल थे!"
-    }
-  },
-
   // ---- F16 — the guess, next to the truth ----
   {
     id: "f16",
@@ -1219,10 +1198,31 @@ export const level4 = [
     bubble: {
       art: `${IMG}bub_4.webp`, who: "agni",
       x: 199, y: 269, w: 417, h: 201,
-      text: "तुम्हारा अंदाज़ा था {guess}।"
+      text: "तुम्हारा अंदाज़ा था {guess}!"
     }
   },
 
+
+  // ---- F4 — the true count ----
+  {
+    id: "f4",
+    anchor: THE_CLEARING,
+    role: "totalline",
+    numberLine: true,
+    dwell: 3800,
+    layers: [
+      BG_FLOWERMEADOW,
+      { src: `${IMG}agni_f.webp`, x: 9, y: 481, w: 605, h: 553, fx: "breathe" },
+      { src: `${IMG}neel_f.webp`, x: 1372, y: 424, w: 465, h: 589, fx: "breathe-slow" }
+    ],
+    fireflies: { x: 623, y: 138 },
+    counter: "total",
+    bubble: {
+      art: `${IMG}bub_4.webp`, who: "agni",
+      x: 199, y: 269, w: 417, h: 201,
+      text: "{but}वहाँ कुल {total} फूल थे!"
+    }
+  },
   // ---- F4.2 — the verdict ----
   {
     id: "f4.2",

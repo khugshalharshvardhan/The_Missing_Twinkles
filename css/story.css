@@ -100,9 +100,10 @@
   align-items: center;
   justify-content: center;
   margin: 0;
-  font-size: 42px;
-  /* 1.3x — see the note on #game .bubble__text. */
-  line-height: 54px;
+  /* The same size as the counting game's lines — see #game .bubble__text.
+     Every balloon in this project is set at this size and no other. */
+  font-size: 40px;
+  line-height: 52px;
   color: var(--ink);
   text-align: center;
   white-space: pre-line;

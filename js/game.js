@@ -516,6 +516,10 @@ function dynamicVoice(screen) {
 
 function fill(text) {
   return text
+    // The answer beat says "but there were 8" — which is only an answer to a
+    // guess that was not 8. A player who guessed right is told the count
+    // plainly, with nothing to argue against.
+    .replace("{but}", verdictKey() === "exact" ? "" : "लेकिन ")
     .replace("{guess}", guess === null ? "?" : guess)
     .replace("{total}", round.total)
     .replace("{verdict}", verdict());
@@ -1180,17 +1184,20 @@ function numberLineStrip(screen) {
 
   // What the earlier beats already put there. Marked `is-placed`, so it does
   // not fly in a second time — only the beat's own number arrives. Keyed by
-  // role, not the tutorial's id ("16"), so the guess lands NEXT TO the answer
-  // on every level's readback of it, not just the tutorial's.
-  if (screen && (screen.role === "guessline" || screen.role === "verdict")) {
-    // The count when it happened, the level's own total on a dev jump past
-    // the counting — same fallback the spoken line uses.
-    level(mark(wrap, "total", counted || round.total), true);
+  // role, not by id, so every round behaves the same.
+  //
+  // The guess goes down first — Agni reads it back, and only then does the
+  // answer arrive beside it — so it is the guess that is already waiting when
+  // the answer lands, and both that are waiting under the verdict.
+  if (screen && (screen.role === "totalline" || screen.role === "verdict")) {
+    level(mark(wrap, "guess", guess), true);
   }
   // The verdict keeps the whole comparison in view: both numbers sit on the
-  // line under "Spot on!" / "That was close!", already placed.
+  // line under "Spot on!" / "That was close!", already placed. The count when
+  // it happened, the level's own total on a dev jump past the counting — the
+  // same fallback the spoken line uses.
   if (screen && screen.role === "verdict") {
-    level(mark(wrap, "guess", guess), true);
+    level(mark(wrap, "total", counted || round.total), true);
   }
 
   return wrap;

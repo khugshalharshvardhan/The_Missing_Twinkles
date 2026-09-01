@@ -143,6 +143,17 @@ Game engine facts that matter when adding a level:
   the lowest thing the script can draw; Devanagari rarely uses it, so a line
   centred by its box sits 4–7px high inside the balloon. Measured per line with
   canvas metrics and the text box moved by the difference.
+- **After the counting, the sheet's order is guess → answer → verdict**: Agni
+  reads the player's guess back ("तुम्हारा अंदाज़ा था {guess}!"), then the answer
+  arrives beside it ("लेकिन वहाँ कुल {total} … थे!"), then the verdict. The build
+  had the answer first, which gave away the thing the guess was about to be
+  measured against. The answer line carries a `{but}` token: "लेकिन" is only
+  filled in when the guess was wrong, because "but there were 7" argues with a
+  player who already said 7. The number line follows: `numberLineStrip()` pre-places the
+  GUESS on the totalline and verdict beats, and the total only on the verdict.
+  NOTE: the sheet gives the answer line to नील; it is still spoken from Agni's
+  mark, because on that beat the right of frame is taken by the swarm, the
+  counter card and Neel himself, with nowhere clean for a second balloon.
 - **The keypad beats say nothing.** The pad arriving is the question
   (`keypadAt: 800`, on its own sparkle). If nobody touches it for eight seconds
   a nudge balloon — `bubble: { idle: true }` in screens.js, `armIdle()` in
@@ -171,8 +182,11 @@ Game engine facts that matter when adding a level:
   - The story's balloon is a `.layer`, and layers glide between marks over
     700ms; fitting turns that transition off for the moment it resizes, or the
     balloon is seen shrinking after it pops in.
-  - A line too long for even a full-size balloon takes the type down a few
-    percent instead (only the longest line in the script needs it).
+  - **Every line in the project is set at one size** (40px/52px, both acts). A
+    beat whose words are smaller than the last one's reads as a mistake, so a
+    line too long for the size its balloon was drawn at makes the BALLOON
+    bigger — up to `FIT_MAX` (1.35x), grown from the tail like every other
+    resize. Four balloons in the whole game use any of it.
   - devtools reports and applies balloon edits in the DRAWN numbers, not the
     fitted ones (`_design`/`_fitAt` in js/game.js and js/story.js, `read()` and
     `write()` in devtools/edit.js) — otherwise an exported edit would bake in
