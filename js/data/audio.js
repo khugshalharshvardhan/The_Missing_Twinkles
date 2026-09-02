@@ -195,6 +195,18 @@ export const cues = {
   // One walking loop, faded out across the settle — WALK_MS is 4000 with
   // SETTLE_MS 1100, so it starts leaving at 2900 and is gone as they stop.
   // Change those, change this.
+  // The hand-over between levels (js/warp.js): one place travelling out to the
+  // left, the next arriving behind it, and a seam of light sweeping the screen
+  // between them. The air moves the way the scene does, so its pass is panned
+  // across; the twinkle lands as the new place settles. The music runs straight
+  // through — it is a change of scene, not of chapter.
+  warp: {
+    sfx: [{ id: "page_air", at: 0, gain: 0.62, pan: 0.5 },
+      { id: "sparkle", at: 180, gain: 0.5, pan: 0.2 },
+      { id: "twinkle", at: 780, gain: 0.42, pan: -0.3 }
+    ]
+  },
+
   walk: {
     bed: "bed_main",
     sfx: [{ id: "footsteps_walk", at: 120, gain: 0.55, fade: { at: 2850, over: 1.1 } },

@@ -1,0 +1,178 @@
+/* =========================================================
+   The warp — what happens between one level and the next.
+
+   The pair used to walk the road to every location, which was lovely once and
+   long by the fourth time. The road is still walked twice, out of the story and
+   home again at the end; in between, a level hands over like this.
+
+   The idea is the road without the walking. The place they have just finished
+   slides away to the left and the next one arrives behind it, the same
+   direction they have been travelling all chapter — and where the two meet,
+   the light they have been collecting runs down the join and throws sparks off
+   it. So it is still a journey, in one second rather than six.
+
+   The scene that leaves is the REAL one: js/warp.js clones the live pane into
+   this overlay before the game builds the next round underneath, so both
+   places are on screen at once without the game having to hold two levels.
+
+   Timings here and in js/warp.js are the same clock. Change one, change both.
+   ========================================================= */
+
+#warp {
+  position: absolute;
+  inset: 0;
+  z-index: 6;              /* over both game panes, under the HUD and the loader */
+  pointer-events: none;
+  visibility: hidden;
+}
+
+#warp.is-running { visibility: visible; }
+
+/* ---- the place they are leaving ----
+
+   The cloned pane, travelling left out of frame at the same rate the new one
+   arrives, so the join between them stays a join. It must NOT be scaled on the
+   way out: a pane at 0.94 has its edges three per cent inside the frame, and
+   the letterbox shows through the gap. The depth comes from the dusk that
+   falls on it instead. */
+.warp__away {
+  position: absolute;
+  inset: 0;
+  transform-origin: 50% 50%;
+  will-change: transform;
+}
+
+.is-running .warp__away {
+  animation: warp-away var(--warp-ms) cubic-bezier(0.62, 0, 0.24, 1) both;
+}
+
+@keyframes warp-away {
+  0%   { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(-100%, 0, 0); }
+}
+
+/* The dusk that falls on it as it goes, so it is plainly behind the new place
+   rather than beside it. */
+.warp__dim {
+  position: absolute;
+  inset: 0;
+  background: #070a18;
+  opacity: 0;
+}
+
+.is-running .warp__dim {
+  animation: warp-dim var(--warp-ms) linear both;
+}
+
+@keyframes warp-dim {
+  0%   { opacity: 0; }
+  100% { opacity: 0.5; }
+}
+
+/* ---- the join ----
+
+   A line of light down the seam where the two places meet, travelling with it.
+   This is the piece that makes the change magic rather than mechanical: it is
+   the same gold as the lamps, and it is what the whole chapter has been
+   collecting. It rides the outgoing pane, so it sweeps the screen right to
+   left exactly as the join does. */
+.warp__seam {
+  position: absolute;
+  top: -6%;
+  left: 100%;
+  width: 54px;
+  height: 112%;
+  margin-left: -27px;
+  /* A hot core with the gold falling away either side of it. Narrow, because
+     the light is meant to be a line drawn down the join — a wide one is a
+     smear across two scenes rather than the edge between them. */
+  background: linear-gradient(90deg,
+    rgba(255, 206, 110, 0) 0%,
+    rgba(255, 226, 150, 0.55) 30%,
+    #fffdf2 47%,
+    #fffdf2 53%,
+    rgba(255, 226, 150, 0.55) 70%,
+    rgba(255, 206, 110, 0) 100%);
+  box-shadow:
+    0 0 60px 26px rgba(255, 200, 100, 0.42),
+    0 0 160px 70px rgba(255, 178, 70, 0.22);
+  opacity: 0;
+}
+
+/* The wider bloom it throws ahead of and behind itself, softer than the core
+   and wide enough to touch both places at once. */
+.warp__seam::before {
+  content: "";
+  position: absolute;
+  inset: -4% -240px;
+  background: radial-gradient(52% 50% at 50% 50%,
+    rgba(255, 205, 108, 0.42), rgba(255, 190, 84, 0) 70%);
+}
+
+.is-running .warp__seam {
+  animation: warp-seam var(--warp-ms) cubic-bezier(0.62, 0, 0.24, 1) both;
+}
+
+@keyframes warp-seam {
+  0%   { opacity: 0; }
+  16%  { opacity: 1; }
+  82%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* ---- the sparks ----
+
+   Thrown off the seam as it passes, drifting and dying behind it. Each gets
+   its own place, size and delay from js/warp.js, deterministically, so the
+   hand-over looks the same every time it is played. */
+.warp__spark {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: var(--size);
+  height: var(--size);
+  margin: calc(var(--size) / -2) 0 0 calc(var(--size) / -2);
+  border-radius: 50%;
+  background: radial-gradient(circle, #fffdf6 0%, #ffe9b4 38%, rgba(255, 202, 96, 0) 76%);
+  box-shadow: 0 0 24px 7px rgba(255, 212, 124, 0.6);
+  opacity: 0;
+}
+
+.is-running .warp__spark {
+  animation: warp-spark var(--life) ease-out var(--delay) both;
+}
+
+@keyframes warp-spark {
+  0%   { opacity: 0; transform: translate3d(0, 0, 0) scale(0.3); }
+  22%  { opacity: 1; transform: translate3d(calc(var(--dx) * 0.3), calc(var(--dy) * 0.3), 0) scale(1); }
+  100% { opacity: 0; transform: translate3d(var(--dx), var(--dy), 0) scale(0.4); }
+}
+
+/* ---- the place they are arriving at ----
+
+   The game's own container, brought in from the right under the seam. The
+   round inside it has already been built and is being held, so nothing is
+   playing while it travels. */
+#game.is-warping {
+  animation: warp-in var(--warp-ms, 1000ms) cubic-bezier(0.62, 0, 0.24, 1) both;
+}
+
+@keyframes warp-in {
+  0%   { transform: translate3d(100%, 0, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+
+/* ---- the reader's own frame rate ----
+   With motion turned down nothing travels: the old place fades out over the
+   new one, which is the part that is doing the work. */
+@media (prefers-reduced-motion: reduce) {
+  .is-running .warp__away { animation: warp-hold var(--warp-ms) linear both; }
+  .is-running .warp__seam,
+  .is-running .warp__spark { animation: none; opacity: 0; }
+  #game.is-warping { animation: none; }
+}
+
+@keyframes warp-hold {
+  0%   { opacity: 1; }
+  100% { opacity: 0; }
+}

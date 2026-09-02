@@ -169,12 +169,17 @@ function buildTrees() {
   // menu: each is the act leading into a level. `dest` picks where it ends up.
   // Read off the levels rather than listed by hand, so a new level brings its
   // own walk into the menu the same way it brings its own beats.
+  // The chapter itself only walks twice — into the tutorial and home again;
+  // between levels it warps (js/warp.js). The rest of the destinations are
+  // still here to be looked at, which is what this menu is for.
   ui.gameTree.append(
-    group("The walks", "between the acts",
+    group("The walks", "two in the chapter, the rest to look at",
       [
-        ...levels.map((level) => (
-          { label: `walk  ·  to the ${level.walkTo}`, act: "walk", index: 0, dest: level.walkTo }
-        )),
+        { label: "warp  ·  level to level", act: "warp" },
+        ...levels.map((level, li) => ({
+          label: `walk  ·  to the ${level.walkTo}${li > 0 ? "  ·  not in the chapter" : ""}`,
+          act: "walk", index: 0, dest: level.walkTo
+        })),
         // The one walk that is not on the way to a level.
         { label: "walk  ·  home, all together", act: "walk", index: 0, dest: "home", home: true }
       ], false)
@@ -256,6 +261,10 @@ function group(name, note, rows, open) {
 function jump(row) {
   const { act, index } = row;
   deselect();
+
+  // The warp is not an act — it is an overlay played over the game while the
+  // round underneath changes. Pressing its row plays the real hand-over.
+  if (act === "warp") return api.warp?.();
 
   if (act !== api.act()) api.setAct(act);
 

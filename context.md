@@ -108,6 +108,7 @@ frame coordinates.**
 | `js/data/screens.js` | Game data: screen arrays per level, **`levels` registry**, keypad, counter, number line, manifest |
 | `js/data/audio.js` | Every audio cue per screen/step id (`cues`), clip lengths |
 | `js/audio.js` | WebAudio: music bed, sfx, VO with pan, `playCues`/`clearCues` |
+| `js/warp.js` + `css/warp.css` | The hand-over between levels: the finished place travelling out to the left, the next one arriving behind it, a seam of light down the join |
 | `js/fit.js` + `js/data/bubbles.js` | Speech balloons: where each balloon's round face and tail sit (measured), and the fitter that shrinks a balloon onto its own line |
 | `js/anchor.js` + `js/data/poses.js` | Pins each character's centre-x/feet per scene so pose swaps don't slide |
 | `devtools/` | The hamburger menu + live-edit mode |
@@ -160,6 +161,27 @@ Game engine facts that matter when adding a level:
   js/game.js, `.bubble--idle` in css/game.css — comes up for three seconds and
   goes again, re-arming each time. Any key press restarts the eight seconds.
   The tutorial keeps its spoken question: it is the round that teaches.
+- **The road is walked twice in the whole chapter, not six times.** Out of the
+  story into the tutorial, and home again at the end — those two are the scenes
+  the parallax was built for. Every level after the tutorial hands over in a
+  **warp** instead (`warpOn()` in js/main.js, js/warp.js) — the road without
+  the walking. The place they have just finished travels out to the left and
+  the next one arrives behind it, the same direction they have gone all
+  chapter, with a line of gold running down the join between them and throwing
+  sparks off it. 1.05s against the walk's ~6s, four times over.
+  - The scene that leaves is the REAL one: the live pane is `cloneNode`d into
+    the overlay first, so `startGame()` is free to empty the panes and build
+    the next round underneath while both places are on screen. Nothing has to
+    hold two levels at once.
+  - The arriving half is `#game` itself, animated by `.is-warping`. The pane
+    transform is left alone — the lamp beat's camera pan lives there.
+  - The leaving pane must not be SCALED on its way out: at 0.94 its edges sit
+    three per cent inside the frame and the letterbox shows through the gap.
+    The depth comes from `.warp__dim` instead.
+  - The new round is held (`armHold`/`releaseHold`) for the whole trip, so its
+    first line starts on arrival rather than while it is still moving.
+  The dev menu has a `warp · level to level` row that plays the real thing, and
+  marks the walk rows the chapter no longer takes.
 - **Speech balloons size themselves to their line** (`js/fit.js`, used by both
   acts). A balloon's box in the data is the size it was DRAWN at and the size it
   can never exceed; the fitter scales the art uniformly down to the smallest

@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="css/story.css?v=2" />
   <link rel="stylesheet" href="css/game.css?v=2" />
   <link rel="stylesheet" href="css/walk.css?v=2" />
+  <link rel="stylesheet" href="css/warp.css?v=2" />
 
   <!-- The Devanagari subset carries every line of dialogue, so it is fetched
        up front; the Latin one only has the digits and is small enough to wait
@@ -59,6 +60,12 @@
         <div class="scene" id="game-b"></div>
       </div>
 
+
+      <!-- Between one level and the next: the lamp's light swelling out over
+           the frame while the rescued twinkles streak away across it, the new
+           location swapped in underneath at the brightest moment. The road is
+           still walked once, out of the story — see js/warp.js. -->
+      <div id="warp"></div>
 
       <!-- ===== HUD ===== -->
       <div class="hud" id="hud">

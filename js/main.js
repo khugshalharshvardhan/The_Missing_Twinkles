@@ -22,6 +22,7 @@ import { preload } from "./preload.js";
 import { initStory, startStory, nextPage, prevPage } from "./story.js";
 import { initGame, startGame, startEpilogue, releaseHold, armHold, currentLevel } from "./game.js";
 import { initWalk, startWalk, endWalk } from "./walk.js";
+import { initWarp, playWarp, WARP_HOLD_MS } from "./warp.js";
 import { layers as walkLayers, foreground as walkFore, cast as walkCast,
          guide as walkGuide, destinations, homeMode,
          SPARK_SHEET, HAND_OVER_MS } from "./data/walk.js";
@@ -64,10 +65,13 @@ paintSound();
 initStory({ onComplete: handOver });
 
 initWalk({ onArrive: arrive });
+initWarp();
 
 // Which round is playing — an index into `levels`. The chapter runs them in
-// order, a walk leading into each: story, walk to the clearing, the tutorial,
-// walk to the meadow, the glowberries, and only then the end card.
+// order: the story, the walk down the road to the clearing, the tutorial, and
+// then the levels one after another, each handing over to the next in a warp
+// (js/warp.js). The road is walked twice in the whole chapter — once out of
+// the story, and once home at the end — which is what keeps it worth watching.
 let chapter = straightToGame ? jumpLevel : 0;
 
 initGame({
@@ -78,9 +82,11 @@ initGame({
   hold: !straightToGame
 });
 
-// A round is done: walk on to the next level's place — or, after the last
-// lamp, they walk home: the same road in reverse, the whole rescued flock
-// flying ahead of them, dissolving into the town with every light back on.
+// A round is done: warp to the next level's place — or, after the last lamp,
+// they walk home: the same road in reverse, the whole rescued flock flying
+// ahead of them, dissolving into the town with every light back on. Home keeps
+// its walk. It is the end of the chapter rather than a join between two levels,
+// and the flock flying ahead of them down it is the point of the scene.
 let goingHome = false;
 
 function gameDone() {
@@ -97,7 +103,7 @@ function gameDone() {
   chapter = Math.max(chapter, currentLevel());
   if (chapter + 1 < levels.length) {
     chapter += 1;
-    enterWalk(destinations[levels[chapter].walkTo]);
+    warpOn();
     return;
   }
   goingHome = true;
@@ -203,6 +209,15 @@ async function handOver() {
 
   await Promise.all([prefetchWalk(), prefetchGame()]);
   enterWalk(destinations[levels[chapter].walkTo]);
+}
+
+// Level to level. The next round is built inside the glare — held, like every
+// other arrival, so its first line does not start under the light — and begins
+// as the light draws off it.
+function warpOn() {
+  armHold();
+  playWarp(() => enterGame());
+  window.setTimeout(releaseHold, WARP_HOLD_MS);
 }
 
 function enterWalk(dest, mode = null) {
@@ -338,6 +353,14 @@ if (devMode) {
         setChapter: (i, home = false) => {
           chapter = Math.min(Math.max(i, 0), levels.length - 1);
           goingHome = Boolean(home);
+        },
+        // Play the hand-over itself, from wherever the menu has left us: it
+        // warps on to the next round, wrapping back to the tutorial after the
+        // last one so the row can be pressed again.
+        warp: () => {
+          if (document.body.dataset.act !== "game") devSetAct("game");
+          chapter = (Math.max(chapter, currentLevel()) + 1) % levels.length;
+          warpOn();
         }
       }))
     .catch((err) => console.warn("dev tools failed to load", err));
