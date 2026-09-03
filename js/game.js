@@ -272,23 +272,34 @@ function go(target) {
 // pane, so gating only the cues left them on screen under the hand-over while
 // the pair were still walking.
 function speak(screen) {
+  const cue = gameCues[screen.id];
+  const lineEnd = cue?.vo ? (cue.vo.at ?? 0) + clipLength(cue.vo.id) : 0;
+  const swarmAt = swarmDelay(screen, lineEnd);
+
   // `front` has already been flipped by go() at this point, so the pane that
   // just became active is panes[front], not panes[1 - front].
+  //
+  // The swarm's whole life is clocked off this one number, and it is set here
+  // rather than when the pane was built because .is-begun below is what starts
+  // that clock — and because how long the line takes is only known now.
+  if (swarmAt) {
+    panes[front].querySelector(".swarm")?.style.setProperty("--swarm-at", `${swarmAt}ms`);
+  }
   panes[front].classList.add("is-begun");
-  scheduleReveals(screen, panes[front]);
+  scheduleReveals(screen, panes[front], swarmAt);
 
   armIdle(panes[front]);
 
-  const cue = gameCues[screen.id];
-  playCues(cue);
+  playCues(cue, { swarmAt });
   const spokenEnd = dynamicVoice(screen);
 
-  // A beat lasts the longest of three things: long enough to read, long enough
-  // for its own line to finish, and long enough for whatever the player's answer
-  // added. Reading pace alone was cutting lines off — it is counted from the
-  // caption, and a caption is a poor guide to how long it takes to say.
-  const lineEnd = cue?.vo ? (cue.vo.at ?? 0) + clipLength(cue.vo.id) : 0;
-  const wait = Math.max(readingTime(screen), lineEnd + VO_TAIL, spokenEnd + VO_TAIL);
+  // A beat lasts the longest of four things: long enough to read, long enough
+  // for its own line to finish, long enough for whatever the player's answer
+  // added, and long enough for the twinkles to arrive, be looked at and go.
+  // Reading pace alone was cutting lines off — it is counted from the caption,
+  // and a caption is a poor guide to how long it takes to say.
+  const wait = Math.max(readingTime(screen), lineEnd + VO_TAIL, spokenEnd + VO_TAIL,
+    swarmAt ? swarmAt + SWARM_LIFE : 0);
 
   // The count beat's swarm cannot be tapped over the instruction — the pane
   // holds .is-line until the line has been said, which also holds the hint
@@ -338,6 +349,24 @@ function armIdle(pane) {
   }, IDLE_AFTER));
 }
 
+// When the twinkles land, and how long they are on screen for.
+//
+// `at` in the screen data is the EARLIEST they may come, not the answer: they
+// must never arrive on top of the line that is introducing them, because a
+// child looks up the moment they appear and stops listening to the rest of it.
+// The recordings have been replaced twice already, each take its own length, so
+// this is measured rather than written down.
+//
+// SWARM_LIFE is what css/game.css gives them once they are here: 5820ms before
+// the poof and 700ms of poof, plus air.
+const SWARM_AFTER_LINE = 300;
+const SWARM_LIFE = 6900;
+
+function swarmDelay(screen, lineEnd) {
+  const asked = screen.fireflies?.at ?? 0;
+  return asked ? Math.max(asked, lineEnd + SWARM_AFTER_LINE) : 0;
+}
+
 // What a beat holds back until its line has been said. The swarm's own delay
 // lives in CSS (--swarm-at, set by swarm()); these are the parts CSS cannot do:
 // the bubble leaving as the twinkles arrive, and the keypad coming in on its
@@ -345,15 +374,15 @@ function armIdle(pane) {
 // wrong pane.
 let revealTimers = [];
 
-function scheduleReveals(screen, pane) {
+function scheduleReveals(screen, pane, swarmAt = 0) {
   revealTimers.forEach(clearTimeout);
   revealTimers = [];
 
   // 1.5: her line ends, the bubble goes, and only then do the twinkles come.
-  if (screen.fireflies?.at) {
+  if (swarmAt) {
     revealTimers.push(window.setTimeout(() => {
       pane.classList.add("is-cleared");
-    }, screen.fireflies.at - 150));
+    }, swarmAt - 150));
   }
 
   // The float: feet leave the ground — the standing pose fades under the
@@ -486,10 +515,17 @@ function dynamicVoice(screen) {
     return v ? (v.at ?? 0) + clipLength(v.id) + 120 : 620;
   };
 
-  // "Hmm... I think there were {guess}." — Neel's voice finishes his sentence.
+  // "हम्म… मुझे लगता है {guess} जुगनू थे।" — the number the player typed goes in
+  // the MIDDLE of his sentence, so the line is said in three pieces: the words
+  // before it, the number itself, and the words after. Without the third one he
+  // trails off on the number and the sentence never lands.
   if (screen.role === "readback") {
     const at = afterStem();
-    return sayNumber(guess, at, 0.55, "neel") ? at + clipLength(`vo_nn_${guess}`) : 0;
+    if (!sayNumber(guess, at, 0.55, "neel")) return 0;
+
+    const after = at + clipLength(`vo_nn_${guess}`) + 60;
+    playVo({ id: "vo_g_ithink_tail", at: after, pan: 0.55 });
+    return after + clipLength("vo_g_ithink_tail");
   }
 
   // "You guessed {guess}." — the number is said and drops onto the line with it.
@@ -1314,6 +1350,10 @@ const BUBBLE_TAIL_X = 0.32;
 // out of step with one. Falls back to leaving the art unmirrored when the
 // speaker is not on the screen.
 function tailToward(spec, screen) {
+  // Said outright, for the one balloon too wide to decide by position: the
+  // tutorial's "चलो, गिनकर देखते हैं…" is most of the frame across, so its middle
+  // can never get past Agni however far left it starts.
+  if (spec.tail) return spec.tail === "right";
   if (!screen || !spec.who) return false;
 
   let mark = null;

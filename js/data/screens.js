@@ -278,11 +278,11 @@ export const screens = [
     //
     // Timing lives in @keyframes ff-swarm in css/game.css: 0.9s in, 5s held,
     // 0.7s to vanish where they stand. Change one, change the other.
-    fireflies: { x: 749, y: 197, enter: "left" },
+    fireflies: { x: 628, y: 197, enter: "left" },
     dwell: 7100,
     bubble: {
       art: `${IMG}bub_11.webp`, who: "agni",
-      x: 213, y: 263, w: 416, h: 229,
+      x: 80, y: 263, w: 416, h: 229,
       text: "वो देखो, जुगनू!"
     }
   },
@@ -298,7 +298,7 @@ export const screens = [
     ],
     bubble: {
       art: `${IMG}bub_12.webp`, who: "agni",
-      x: 216, y: 209, w: 495, h: 253,
+      x: 59, y: 209, w: 495, h: 253,
       text: "अरे! कहाँ गए?"
     }
   },
@@ -314,7 +314,7 @@ export const screens = [
     ],
     bubble: {
       art: `${IMG}bub_13.webp`, who: "agni",
-      x: 234, y: 130, w: 596, h: 314,
+      x: 20, y: 130, w: 596, h: 314,
       artInset: [8.7, 0, 0, 3.23],
       text: "हमें पता लगाना होगा कि कुल कितने जुगनू थे।"
     }
@@ -352,11 +352,11 @@ export const screens = [
     // runs 500 to 2581), holds its five seconds, and vanishes the same way.
     // The player is asked to guess at something they have just watched appear
     // and disappear by magic.
-    fireflies: { x: 749, y: 197, enter: "magic", at: 2650 },
+    fireflies: { x: 628, y: 197, enter: "magic", at: 2650 },
     dwell: 10000,
     bubble: {
       art: `${IMG}bub_15.webp`, who: "agni",
-      x: 224, y: 107, w: 514, h: 277,
+      x: 21, y: 107, w: 514, h: 277,
       text: "और अंदाज़ा लगाओ कि कितने जुगनू हैं।"
     }
   },
@@ -416,11 +416,15 @@ export const screens = [
       { src: `${IMG}agni_g.webp`, x: 80, y: 490, w: 554, h: 512, fill: CROP.agniG, fx: "breathe" },
       { src: `${IMG}neel_c.webp`, x: 1382, y: 428, w: 434, h: 611, fill: CROP.neelC, fx: "breathe-slow" }
     ],
-    fireflies: { x: 749, y: 197, dim: true },
+    fireflies: { x: 628, y: 197, dim: true },
     bubble: {
-      art: `${IMG}bub_3.webp`, who: "agni",
-      x: 127, y: 229, w: 557, h: 282,
-      artInset: [18.09, 9.69, 0, 17.06],
+      art: `${IMG}bub_3.webp`, who: "agni", tail: "right",
+      // The box IS the art here. Figma's inset put the balloon in the middle
+      // third of a much larger box, which left the longest line in the game a
+      // third of the room it looked like it had — so it grew to a full 1.35x
+      // and sat on the twinkles beside it. Given the whole box, and given more
+      // height than width, the line fits without the balloon growing at all.
+      x: 60, y: 150, w: 520, h: 380,
       text: "चलो, गिनकर देखते हैं कि हमारा अंदाज़ा कितना सही था।"
     }
   },
@@ -435,13 +439,13 @@ export const screens = [
       { src: `${IMG}agni_g.webp`, x: 80, y: 490, w: 554, h: 512, fill: CROP.agniG, fx: "breathe" },
       { src: `${IMG}neel_c.webp`, x: 1382, y: 428, w: 434, h: 611, fill: CROP.neelC, fx: "breathe-slow" }
     ],
-    fireflies: { x: 749, y: 197 },
+    fireflies: { x: 628, y: 197 },
     counter: "guess",
     numberLine: true,
     hint: { src: `${SHARED}hand_nudge.svg`, x: 653, y: 180, w: 308.396, h: 308.396 },
     bubble: {
       art: `${IMG}bub_32.webp`, who: "agni",
-      x: 172, y: 252, w: 489, h: 256,
+      x: 33, y: 252, w: 489, h: 256,
       text: "गिनने के लिए हर जुगनू पर टैप करो।"
     }
   },
@@ -461,11 +465,11 @@ export const screens = [
       { src: `${IMG}agni_f.webp`, x: 9, y: 481, w: 605, h: 553, fx: "breathe" },
       { src: `${IMG}neel_f.webp`, x: 1372, y: 424, w: 465, h: 589, fx: "breathe-slow" }
     ],
-    fireflies: { x: 749, y: 197 },
+    fireflies: { x: 628, y: 197 },
     counter: "guess",
     bubble: {
       art: `${IMG}bub_4.webp`, who: "agni",
-      x: 199, y: 269, w: 417, h: 201,
+      x: 61, y: 269, w: 417, h: 201,
       text: "तुम्हारा अंदाज़ा था {guess}!"
     }
   },
@@ -486,7 +490,7 @@ export const screens = [
       { src: `${IMG}agni_f.webp`, x: 9, y: 481, w: 605, h: 553, fx: "breathe" },
       { src: `${IMG}neel_f.webp`, x: 1372, y: 424, w: 465, h: 589, fx: "breathe-slow" }
     ],
-    fireflies: { x: 749, y: 197 },
+    fireflies: { x: 628, y: 197 },
     // No counter card here: it would be repeating the number the line is
     // about to show, and the top right of the frame is the only room Neel's
     // balloon has. The answer flies down from the twinkles instead — see
@@ -513,7 +517,7 @@ export const screens = [
     ],
     bubble: {
       art: `${IMG}bub_42.webp`, who: "agni",
-      x: 276, y: 222, w: 376, h: 226,
+      x: 94, y: 222, w: 376, h: 226,
       text: "{verdict}"
     }
   },
@@ -570,7 +574,7 @@ export const screens = [
     ],
     bubble: {
       art: `${IMG}bub_61.webp`, who: "agni",
-      x: 646, y: 186, w: 361, h: 199,
+      x: 406, y: 186, w: 361, h: 199,
       text: "अब तुम्हारी बारी है।"
     }
   },
@@ -600,11 +604,11 @@ export const level1 = [
     ],
     // Same clock as tutorial 1.5: her line ends (vo_g_guess runs 500 to 2581),
     // the bubble goes, the berries materialise, hold five seconds, vanish.
-    fireflies: { x: 773, y: 140, enter: "magic", at: 2650 },
+    fireflies: { x: 716, y: 140, enter: "magic", at: 2650 },
     dwell: 10000,
     bubble: {
       art: `${IMG}bub_15.webp`, who: "agni",
-      x: 224, y: 107, w: 514, h: 277,
+      x: 33, y: 107, w: 514, h: 277,
       text: "ध्यान से देखो और अंदाज़ा लगाओ।"
     }
   },
@@ -644,13 +648,13 @@ export const level1 = [
       { src: `${IMG}agni_g.webp`, x: 80, y: 490, w: 554, h: 512, fill: CROP.agniG, fx: "breathe" },
       { src: `${IMG}neel_c.webp`, x: 1382, y: 428, w: 434, h: 611, fill: CROP.neelC, fx: "breathe-slow" }
     ],
-    fireflies: { x: 773, y: 140 },
+    fireflies: { x: 716, y: 140 },
     counter: "guess",
     numberLine: true,
     hint: { src: `${SHARED}hand_nudge.svg`, x: 909, y: 123, w: 308.396, h: 308.396 },
     bubble: {
       art: `${IMG}bub_32.webp`, who: "agni",
-      x: 172, y: 252, w: 489, h: 256,
+      x: 40, y: 252, w: 489, h: 256,
       text: "गिनने के लिए हर बेर पर टैप करो।"
     }
   },
@@ -667,11 +671,11 @@ export const level1 = [
       { src: `${IMG}agni_f.webp`, x: 9, y: 481, w: 605, h: 553, fx: "breathe" },
       { src: `${IMG}neel_f.webp`, x: 1372, y: 424, w: 465, h: 589, fx: "breathe-slow" }
     ],
-    fireflies: { x: 773, y: 140 },
+    fireflies: { x: 716, y: 140 },
     counter: "guess",
     bubble: {
       art: `${IMG}bub_4.webp`, who: "agni",
-      x: 199, y: 269, w: 417, h: 201,
+      x: 61, y: 269, w: 417, h: 201,
       text: "तुम्हारा अंदाज़ा था {guess}!"
     }
   },
@@ -689,7 +693,7 @@ export const level1 = [
       { src: `${IMG}agni_f.webp`, x: 9, y: 481, w: 605, h: 553, fx: "breathe" },
       { src: `${IMG}neel_f.webp`, x: 1372, y: 424, w: 465, h: 589, fx: "breathe-slow" }
     ],
-    fireflies: { x: 773, y: 140 },
+    fireflies: { x: 716, y: 140 },
     // No counter card here: it would be repeating the number the line is
     // about to show, and the top right of the frame is the only room Neel's
     // balloon has. The answer flies down from the twinkles instead — see
@@ -716,7 +720,7 @@ export const level1 = [
     ],
     bubble: {
       art: `${IMG}bub_42.webp`, who: "agni",
-      x: 276, y: 222, w: 376, h: 226,
+      x: 96, y: 222, w: 376, h: 226,
       text: "{verdict}"
     }
   },
@@ -782,11 +786,11 @@ export const level2 = [
     ],
     // Same clock as level 1's p1: her line ends (vo_g_guess runs 500 to 2581),
     // the bubble goes, the stars materialise, hold five seconds, vanish.
-    fireflies: { x: 688, y: 174, enter: "magic", at: 2650 },
+    fireflies: { x: 631, y: 174, enter: "magic", at: 2650 },
     dwell: 10000,
     bubble: {
       art: `${IMG}bub_15.webp`, who: "agni",
-      x: 224, y: 107, w: 514, h: 277,
+      x: 33, y: 107, w: 514, h: 277,
       text: "ध्यान से देखो और अंदाज़ा लगाओ।"
     }
   },
@@ -826,7 +830,7 @@ export const level2 = [
       { src: `${IMG}agni_g.webp`, x: 80, y: 490, w: 554, h: 512, fill: CROP.agniG, fx: "breathe" },
       { src: `${IMG}neel_c.webp`, x: 1382, y: 428, w: 434, h: 611, fill: CROP.neelC, fx: "breathe-slow" }
     ],
-    fireflies: { x: 688, y: 174 },
+    fireflies: { x: 631, y: 174 },
     counter: "guess",
     numberLine: true,
     // The hand keeps the offset it has from the first countable on level 1
@@ -835,7 +839,7 @@ export const level2 = [
     hint: { src: `${SHARED}hand_nudge.svg`, x: 654, y: 157, w: 308.396, h: 308.396 },
     bubble: {
       art: `${IMG}bub_32.webp`, who: "agni",
-      x: 172, y: 252, w: 489, h: 256,
+      x: 40, y: 252, w: 489, h: 256,
       text: "गिनने के लिए हर तारे पर टैप करो।"
     }
   },
@@ -852,11 +856,11 @@ export const level2 = [
       { src: `${IMG}agni_f.webp`, x: 9, y: 481, w: 605, h: 553, fx: "breathe" },
       { src: `${IMG}neel_f.webp`, x: 1372, y: 424, w: 465, h: 589, fx: "breathe-slow" }
     ],
-    fireflies: { x: 688, y: 174 },
+    fireflies: { x: 631, y: 174 },
     counter: "guess",
     bubble: {
       art: `${IMG}bub_4.webp`, who: "agni",
-      x: 199, y: 269, w: 417, h: 201,
+      x: 61, y: 269, w: 417, h: 201,
       text: "तुम्हारा अंदाज़ा था {guess}!"
     }
   },
@@ -874,7 +878,7 @@ export const level2 = [
       { src: `${IMG}agni_f.webp`, x: 9, y: 481, w: 605, h: 553, fx: "breathe" },
       { src: `${IMG}neel_f.webp`, x: 1372, y: 424, w: 465, h: 589, fx: "breathe-slow" }
     ],
-    fireflies: { x: 688, y: 174 },
+    fireflies: { x: 631, y: 174 },
     // No counter card here: it would be repeating the number the line is
     // about to show, and the top right of the frame is the only room Neel's
     // balloon has. The answer flies down from the twinkles instead — see
@@ -901,7 +905,7 @@ export const level2 = [
     ],
     bubble: {
       art: `${IMG}bub_42.webp`, who: "agni",
-      x: 276, y: 222, w: 376, h: 226,
+      x: 94, y: 222, w: 376, h: 226,
       text: "{verdict}"
     }
   },
@@ -966,11 +970,11 @@ export const level3 = [
     ],
     // Same clock as p1 and s1: her line ends (vo_g_guess runs 500 to 2581),
     // the bubble goes, the seeds materialise, hold five seconds, vanish.
-    fireflies: { x: 696, y: 85, enter: "magic", at: 2650 },
+    fireflies: { x: 639, y: 85, enter: "magic", at: 2650 },
     dwell: 10000,
     bubble: {
       art: `${IMG}bub_15.webp`, who: "agni",
-      x: 224, y: 107, w: 514, h: 277,
+      x: 33, y: 107, w: 514, h: 277,
       text: "ध्यान से देखो और अंदाज़ा लगाओ।"
     }
   },
@@ -1010,7 +1014,7 @@ export const level3 = [
       { src: `${IMG}agni_g.webp`, x: 80, y: 490, w: 554, h: 512, fill: CROP.agniG, fx: "breathe" },
       { src: `${IMG}neel_c.webp`, x: 1382, y: 428, w: 434, h: 611, fill: CROP.neelC, fx: "breathe-slow" }
     ],
-    fireflies: { x: 696, y: 85 },
+    fireflies: { x: 639, y: 85 },
     counter: "guess",
     numberLine: true,
     // The hand keeps level 1's offset from the first countable's own box
@@ -1018,7 +1022,7 @@ export const level3 = [
     hint: { src: `${SHARED}hand_nudge.svg`, x: 662, y: 68, w: 308.396, h: 308.396 },
     bubble: {
       art: `${IMG}bub_32.webp`, who: "agni",
-      x: 172, y: 252, w: 489, h: 256,
+      x: 38, y: 252, w: 489, h: 256,
       text: "गिनने के लिए हर बीज पर टैप करो।"
     }
   },
@@ -1035,11 +1039,11 @@ export const level3 = [
       { src: `${IMG}agni_f.webp`, x: 9, y: 481, w: 605, h: 553, fx: "breathe" },
       { src: `${IMG}neel_f.webp`, x: 1372, y: 424, w: 465, h: 589, fx: "breathe-slow" }
     ],
-    fireflies: { x: 696, y: 85 },
+    fireflies: { x: 639, y: 85 },
     counter: "guess",
     bubble: {
       art: `${IMG}bub_4.webp`, who: "agni",
-      x: 199, y: 269, w: 417, h: 201,
+      x: 61, y: 269, w: 417, h: 201,
       text: "तुम्हारा अंदाज़ा था {guess}!"
     }
   },
@@ -1057,7 +1061,7 @@ export const level3 = [
       { src: `${IMG}agni_f.webp`, x: 9, y: 481, w: 605, h: 553, fx: "breathe" },
       { src: `${IMG}neel_f.webp`, x: 1372, y: 424, w: 465, h: 589, fx: "breathe-slow" }
     ],
-    fireflies: { x: 696, y: 85 },
+    fireflies: { x: 639, y: 85 },
     // No counter card here: it would be repeating the number the line is
     // about to show, and the top right of the frame is the only room Neel's
     // balloon has. The answer flies down from the twinkles instead — see
@@ -1084,7 +1088,7 @@ export const level3 = [
     ],
     bubble: {
       art: `${IMG}bub_42.webp`, who: "agni",
-      x: 276, y: 222, w: 376, h: 226,
+      x: 94, y: 222, w: 376, h: 226,
       text: "{verdict}"
     }
   },
@@ -1148,11 +1152,11 @@ export const level4 = [
     ],
     // Same clock as every other look beat: her line ends (vo_g_guess runs 500
     // to 2581), the bubble goes, the flowers open, hold five seconds, vanish.
-    fireflies: { x: 623, y: 138, enter: "magic", at: 2650 },
+    fireflies: { x: 566, y: 138, enter: "magic", at: 2650 },
     dwell: 10000,
     bubble: {
       art: `${IMG}bub_15.webp`, who: "agni",
-      x: 224, y: 107, w: 514, h: 277,
+      x: 33, y: 107, w: 514, h: 277,
       text: "ध्यान से देखो और अंदाज़ा लगाओ।"
     }
   },
@@ -1192,7 +1196,7 @@ export const level4 = [
       { src: `${IMG}agni_g.webp`, x: 80, y: 490, w: 554, h: 512, fill: CROP.agniG, fx: "breathe" },
       { src: `${IMG}neel_c.webp`, x: 1382, y: 428, w: 434, h: 611, fill: CROP.neelC, fx: "breathe-slow" }
     ],
-    fireflies: { x: 623, y: 138 },
+    fireflies: { x: 566, y: 138 },
     counter: "guess",
     numberLine: true,
     // The hand keeps level 1's offset from the first countable's own box
@@ -1200,7 +1204,7 @@ export const level4 = [
     hint: { src: `${SHARED}hand_nudge.svg`, x: 589, y: 121, w: 308.396, h: 308.396 },
     bubble: {
       art: `${IMG}bub_32.webp`, who: "agni",
-      x: 108, y: 252, w: 489, h: 256,
+      x: 38, y: 252, w: 489, h: 256,
       text: "गिनने के लिए हर फूल पर टैप करो।"
     }
   },
@@ -1217,11 +1221,11 @@ export const level4 = [
       { src: `${IMG}agni_f.webp`, x: 9, y: 481, w: 605, h: 553, fx: "breathe" },
       { src: `${IMG}neel_f.webp`, x: 1372, y: 424, w: 465, h: 589, fx: "breathe-slow" }
     ],
-    fireflies: { x: 623, y: 138 },
+    fireflies: { x: 566, y: 138 },
     counter: "guess",
     bubble: {
       art: `${IMG}bub_4.webp`, who: "agni",
-      x: 199, y: 269, w: 417, h: 201,
+      x: 61, y: 269, w: 417, h: 201,
       text: "तुम्हारा अंदाज़ा था {guess}!"
     }
   },
@@ -1239,7 +1243,7 @@ export const level4 = [
       { src: `${IMG}agni_f.webp`, x: 9, y: 481, w: 605, h: 553, fx: "breathe" },
       { src: `${IMG}neel_f.webp`, x: 1372, y: 424, w: 465, h: 589, fx: "breathe-slow" }
     ],
-    fireflies: { x: 623, y: 138 },
+    fireflies: { x: 566, y: 138 },
     // No counter card here: it would be repeating the number the line is
     // about to show, and the top right of the frame is the only room Neel's
     // balloon has. The answer flies down from the twinkles instead — see
@@ -1266,7 +1270,7 @@ export const level4 = [
     ],
     bubble: {
       art: `${IMG}bub_42.webp`, who: "agni",
-      x: 276, y: 222, w: 376, h: 226,
+      x: 68, y: 222, w: 376, h: 226,
       text: "{verdict}"
     }
   },
@@ -1458,7 +1462,7 @@ export const epilogueScreens = [
     ],
     bubble: {
       art: `${IMG}bub_51.webp`, who: "agni",
-      x: 668, y: 385, w: 280, h: 157,
+      x: 490, y: 385, w: 280, h: 157,
       text: "नील?"
     }
   },

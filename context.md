@@ -178,6 +178,8 @@ Game engine facts that matter when adding a level:
     at his mark. And the lamp beats re-stage the pair (`LAMP_STAGE`: Neel at
     cx 264, Agni at 823), so their pans had to move with them — his cheer was
     coming from the right while the word was drawn over his head on the left.
+- The loader and the title screen use `cover_hindi.webp` — the Hindi cover,
+  converted from `assets/game/Hindi_Cover.png` at the frame's own 1920x1080.
 - **Two faces, split by code point** (css/stage.css). The stack is
   `"Fredoka One", "Baloo 2", …`, and Fredoka One's `@font-face` is declared
   `unicode-range: U+0030-0039` — the digits and nothing else. So every number
@@ -203,6 +205,36 @@ Game engine facts that matter when adding a level:
   NOTE: the sheet gives the answer line to नील; it is still spoken from Agni's
   mark, because on that beat the right of frame is taken by the swarm, the
   counter card and Neel himself, with nowhere clean for a second balloon.
+- **The twinkles wait for the line that introduces them** (`swarmDelay()` in
+  js/game.js). `fireflies.at` in the data is the EARLIEST they may arrive, not
+  the answer: a child looks up the moment they appear and stops listening, so
+  the arrival is held to `max(at, line end + 300)`. The whole swarm — entry,
+  hold, poof — is clocked off `--swarm-at`, and the two sounds that belong to it
+  are marked `onSwarm: true` in the cue table so they travel with it rather than
+  sitting at fixed times. The beat's own length grows to cover it too.
+- **The twinkles sit in the middle of the frame** — every round's swarm mark is
+  set so its formation centres on 941 — and no balloon touches them. Two things
+  came out of that:
+  - `tail: "right"` on a bubble spec forces the mirror. The tutorial's
+    "चलो, गिनकर देखते हैं…" is too wide for its middle to ever pass Agni, so it
+    could not flip by position like the rest.
+  - That balloon's `artInset` was Figma's: the art sat in the middle third of a
+    much bigger box, so the longest line in the game had a third of the room it
+    appeared to have, grew to the full 1.35x, and landed on the twinkles. Its
+    box IS the art now, taller than it is wide.
+- **Neel's readback is said in three pieces.** "हम्म… मुझे लगता है {guess} जुगनू थे।"
+  puts the player's number in the MIDDLE, so the words after it are their own
+  clip (`vo_g_ithink_tail`), cut at a 114ms dip that only shows at -30dB. A
+  fragment cut out of another line takes THAT line's gain (`like:` in
+  tools/install-vo.js) — levelled on its own merits, the end of a sentence gets
+  more voice than the words before it.
+- **Agni's balloons sit OVER her, tail pointing down-right at her.** They used to
+  sit to her right, which put the tail on the left and the balloon itself in the
+  middle of the frame — where the twinkles are, which is why they stopped
+  looking centred. `tailToward()` flips the art when the balloon's middle passes
+  the speaker's, so this is a matter of position, not of art: each balloon was
+  measured against where Agni actually stands and moved past her. Screen 2 was
+  already like this and is the reference.
 - **The keypad beats say nothing.** The pad arriving is the question
   (`keypadAt: 800`, on its own sparkle). If nobody touches it for eight seconds
   a nudge balloon — `bubble: { idle: true }` in screens.js, `armIdle()` in

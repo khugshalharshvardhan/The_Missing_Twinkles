@@ -282,11 +282,14 @@ export const gameCues = {
     sfx: [{ id: "grin_boing", at: 120, gain: 0.5, pan: 0.4 }],
     vo: { id: "vo_g_catch", at: 500, pan: 0.5 }
   },
-  // The swarm waits for her line (fireflies.at 2650 in screens.js): a twinkle
-  // as they arrive, the sparkle as they vanish 5.9s later.
+  // The swarm waits for her line — `at` in screens.js is the earliest it may
+  // come, and js/game.js holds it back further if the recording runs longer.
+  // A twinkle as they arrive, the shimmer as they vanish 5.9s later.
   "1.5": {
-    sfx: [{ id: "twinkle", at: 2750, gain: 0.4, pan: 0.2 },
-      { id: "magic_vanish", at: 8600, gain: 0.7 }],
+    // Both timed off the twinkles, not off the beat: they arrive once her line
+    // has finished, and how long that takes is whatever the recording takes.
+    sfx: [{ id: "twinkle", onSwarm: true, at: 100, gain: 0.4, pan: 0.2 },
+      { id: "magic_vanish", onSwarm: true, at: 5950, gain: 0.7 }],
     // The tutorial's own wording — the levels' look beat says something
     // shorter and has vo_g_guess to itself.
     vo: { id: "vo_g_guess_tut", at: 500, pan: -0.5 }
@@ -359,8 +362,10 @@ export const gameCues = {
   // in screens.js) and vanish on their own falling shimmer 5.9s later.
   "p1": {
     bed: "bed_game",
-    sfx: [{ id: "twinkle", at: 2750, gain: 0.4, pan: 0.2 },
-      { id: "magic_vanish", at: 8600, gain: 0.7 }],
+    // Both timed off the twinkles, not off the beat: they arrive once her line
+    // has finished, and how long that takes is whatever the recording takes.
+    sfx: [{ id: "twinkle", onSwarm: true, at: 100, gain: 0.4, pan: 0.2 },
+      { id: "magic_vanish", onSwarm: true, at: 5950, gain: 0.7 }],
     vo: { id: "vo_g_guess", at: 500, pan: -0.5 }
   },
   // The keypad — nothing is said, so the pad comes in on its own sparkle.
@@ -408,8 +413,10 @@ export const gameCues = {
   // screens.js) and vanish on their own falling shimmer 5.9s later.
   "s1": {
     bed: "bed_game",
-    sfx: [{ id: "twinkle", at: 2750, gain: 0.4, pan: 0.2 },
-      { id: "magic_vanish", at: 8600, gain: 0.7 }],
+    // Both timed off the twinkles, not off the beat: they arrive once her line
+    // has finished, and how long that takes is whatever the recording takes.
+    sfx: [{ id: "twinkle", onSwarm: true, at: 100, gain: 0.4, pan: 0.2 },
+      { id: "magic_vanish", onSwarm: true, at: 5950, gain: 0.7 }],
     vo: { id: "vo_g_guess", at: 500, pan: -0.5 }
   },
   // The keypad — nothing is said, so the pad comes in on its own sparkle.
@@ -455,8 +462,10 @@ export const gameCues = {
   // screens.js) and vanish on their own falling shimmer 5.9s later.
   "m1": {
     bed: "bed_game",
-    sfx: [{ id: "twinkle", at: 2750, gain: 0.4, pan: 0.2 },
-      { id: "magic_vanish", at: 8600, gain: 0.7 }],
+    // Both timed off the twinkles, not off the beat: they arrive once her line
+    // has finished, and how long that takes is whatever the recording takes.
+    sfx: [{ id: "twinkle", onSwarm: true, at: 100, gain: 0.4, pan: 0.2 },
+      { id: "magic_vanish", onSwarm: true, at: 5950, gain: 0.7 }],
     vo: { id: "vo_g_guess", at: 500, pan: -0.5 }
   },
   // The keypad — nothing is said, so the pad comes in on its own sparkle.
@@ -502,8 +511,10 @@ export const gameCues = {
   // screens.js) and vanish on their own falling shimmer 5.9s later.
   "f1": {
     bed: "bed_game",
-    sfx: [{ id: "twinkle", at: 2750, gain: 0.4, pan: 0.2 },
-      { id: "magic_vanish", at: 8600, gain: 0.7 }],
+    // Both timed off the twinkles, not off the beat: they arrive once her line
+    // has finished, and how long that takes is whatever the recording takes.
+    sfx: [{ id: "twinkle", onSwarm: true, at: 100, gain: 0.4, pan: 0.2 },
+      { id: "magic_vanish", onSwarm: true, at: 5950, gain: 0.7 }],
     vo: { id: "vo_g_guess", at: 500, pan: -0.5 }
   },
   // The keypad — nothing is said, so the pad comes in on its own sparkle.
@@ -579,6 +590,8 @@ export const audioManifest = [
     "vo_g_total",
     "vo_g_total_plain",
     ...[1, 2, 3, 4].flatMap((n) => [`vo_l${n}_total`, `vo_l${n}_total_plain`]),
+    // What Neel says after the number in the middle of his sentence, on 2.2.
+    "vo_g_ithink_tail",
     // The nudge on a keypad nobody has touched, and Agni's answer to a twinkle
     // that has been counted already. Both are played straight from js/game.js.
     "vo_g_nudge",

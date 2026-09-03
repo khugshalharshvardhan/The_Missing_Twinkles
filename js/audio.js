@@ -281,7 +281,11 @@ export function clearCues({ keepVoice = false } = {}) {
   }
 }
 
-export function playCues(cues) {
+// `swarmAt` is when the twinkles land on this beat. A sound marked
+// `onSwarm` is timed from that rather than from the top of the beat, because
+// the swarm now waits for the line that introduces it and its arrival can no
+// longer be written down as a fixed number — see swarmDelay() in js/game.js.
+export function playCues(cues, { swarmAt = 0 } = {}) {
   if (!ctx || !cues) return;
 
   if (cues.bed !== undefined) {
@@ -295,7 +299,8 @@ export function playCues(cues) {
   // the one gain node.
   if (cues.music) setMusic(cues.music.to, cues.music.at ?? 0, cues.music.over);
 
-  (cues.sfx ?? []).forEach((cue) => fire(cue, "sfx"));
+  (cues.sfx ?? []).forEach((cue) =>
+    fire(cue.onSwarm ? { ...cue, at: (cue.at ?? 0) + swarmAt } : cue, "sfx"));
   if (cues.vo) fire(cues.vo, "vo");
 }
 

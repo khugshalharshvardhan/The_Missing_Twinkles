@@ -56,10 +56,13 @@ const SPLIT = {
   // "तुम्हारा अंदाज़ा था — 10". The pause runs 1.43 to 2.13; the line is kept and
   // the number dropped, because the number is the player's to choose.
   guessStem: { to: 1.56 },
-  // "हम्म… मुझे लगता है — 7 जुगनू थे". The pause before the number runs 2.28 to
-  // 2.59. The number and the words after it are one breath and cannot be
-  // separated, so the line ends where the player's own number begins.
+  // "हम्म… मुझे लगता है — 7 — जुगनू थे". The player's own number goes in the
+  // middle of this one, so it is cut into the words before and the words after.
+  // The pause before the number is plain at 2.28; the one after it is only a
+  // 114ms dip at 3.04, which shows at -30dB and not at -45. Cut in the middle
+  // of it and the trimmer finds the real edges of each half.
   ithinkStem: { to: 2.43 },
+  ithinkTail: { from: 3.09 },
   // "लेकिन वहाँ कुल — 8 जुगनू थे", for a guess that was wrong.
   total: {},
   // The same take from "कुल", for a guess that was right: there is no "but"
@@ -91,6 +94,10 @@ const LINES = [
   { id: "vo_g_howmany_q",  file: path.join(AGNI, "to kitne jugnu the (1).mp3") },
   { id: "vo_g_ithink",     file: path.join(NEEL2, "hmmm mujhe lgta hai 7 jugnu the neel (1).mp3"),
     cut: SPLIT.ithinkStem },
+  // "जुगनू थे।" — what he says after the number, so his sentence finishes
+  // instead of trailing off on whatever the player typed.
+  { id: "vo_g_ithink_tail", file: path.join(NEEL2, "hmmm mujhe lgta hai 7 jugnu the neel (1).mp3"),
+    cut: SPLIT.ithinkTail, like: "vo_g_ithink" },
   { id: "vo_g_count",      file: path.join(AGNI, "chalo gin kar dekte hai tumhara andaza kitna sahi tha (1).mp3") },
   { id: "vo_g_tapcount",   file: path.join(AGNI, "gin ne ke liye har jugnu pe tap kro (1).mp3") },
   { id: "vo_g_youguessed", file: path.join(AGNI, "tumhara andaza tha 10 (1).mp3"), cut: SPLIT.guessStem },
@@ -277,6 +284,8 @@ fs.mkdirSync(KEEP, { recursive: true });
 
 let done = 0;
 const missing = [];
+// What each clip was given, so a fragment cut out of one can be given the same.
+const gains = new Map();
 
 for (const line of LINES) {
   if (!fs.existsSync(line.file)) { missing.push(`${line.id}  <-  ${path.basename(line.file)}`); continue; }
@@ -311,10 +320,19 @@ for (const line of LINES) {
 
   // One gain for the whole clip: enough to reach the target, or enough to keep
   // the peak under the ceiling — whichever is the smaller move.
-  const { i, tp } = measure(stage);
-  const gain = Number.isFinite(i) && Number.isFinite(tp)
-    ? Math.min(TARGET_LUFS - i, TRUE_PEAK - tp)
-    : 0;
+  //
+  // A fragment cut out of another line takes THAT line's gain instead of its
+  // own. The end of a sentence is quieter than the whole of one, and levelling
+  // it on its own merits would hand the last two words of a thought more voice
+  // than the words before them.
+  let gain = gains.get(line.like);
+  if (gain === undefined) {
+    const { i, tp } = measure(stage);
+    gain = Number.isFinite(i) && Number.isFinite(tp)
+      ? Math.min(TARGET_LUFS - i, TRUE_PEAK - tp)
+      : 0;
+  }
+  gains.set(line.id, gain);
 
   ffmpeg(["-i", stage, "-af", `volume=${gain.toFixed(2)}dB`,
     "-codec:a", "libmp3lame", "-q:a", "3", path.join(VO, `${line.id}.mp3`)]);
