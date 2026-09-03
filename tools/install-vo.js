@@ -105,6 +105,10 @@ const LINES = [
   { id: "vo_g_goodtry",    file: path.join(AGNI2, "achi koshish ab hame pata chal gaya agni (1).mp3") },
   { id: "vo_g_tryagain",   file: path.join(AGNI2, "chalo fir se koshish kre agni (1).mp3") },
   { id: "vo_g_taplamp",    file: path.join(AGNI, "ab lamp par tap kro (1).mp3") },
+  // The lamp catches and they both cheer. Two takes, one each, so the beat is
+  // the pair of them rather than one of them twice.
+  { id: "vo_neel_yay",     file: path.join(NEEL2, "yayyyy neel (1).mp3") },
+  { id: "vo_agni_yay",     file: path.join(AGNI2, "yayyyy agni (1).mp3") },
   { id: "vo_g_yourturn",   file: path.join(AGNI, "ab tumhari bari hai (1).mp3") },
 
   /* ---- the levels ---- */

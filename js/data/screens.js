@@ -487,13 +487,16 @@ export const screens = [
       { src: `${IMG}neel_f.webp`, x: 1372, y: 424, w: 465, h: 589, fx: "breathe-slow" }
     ],
     fireflies: { x: 749, y: 197 },
-    counter: "total",
+    // No counter card here: it would be repeating the number the line is
+    // about to show, and the top right of the frame is the only room Neel's
+    // balloon has. The answer flies down from the twinkles instead — see
+    // dropFromCounter() in js/game.js.
     bubble: {
       art: `${IMG}bub_neel.webp`, who: "neel",
       // His line, so his balloon and his side of the frame. It sits in the
       // gap the beat leaves on the right: under the counter card, above his
       // head, and clear of the swarm still hanging in the middle.
-      x: 1408, y: 252, w: 400, h: 190,
+      x: 1390, y: 128, w: 465, h: 221,
       text: "{but}वहाँ कुल {total} जुगनू थे!"
     }
   },
@@ -687,13 +690,16 @@ export const level1 = [
       { src: `${IMG}neel_f.webp`, x: 1372, y: 424, w: 465, h: 589, fx: "breathe-slow" }
     ],
     fireflies: { x: 773, y: 140 },
-    counter: "total",
+    // No counter card here: it would be repeating the number the line is
+    // about to show, and the top right of the frame is the only room Neel's
+    // balloon has. The answer flies down from the twinkles instead — see
+    // dropFromCounter() in js/game.js.
     bubble: {
       art: `${IMG}bub_neel.webp`, who: "neel",
       // His line, so his balloon and his side of the frame. It sits in the
       // gap the beat leaves on the right: under the counter card, above his
       // head, and clear of the swarm still hanging in the middle.
-      x: 1408, y: 252, w: 400, h: 190,
+      x: 1390, y: 128, w: 465, h: 221,
       text: "{but}वहाँ कुल {total} बेर थे!"
     }
   },
@@ -869,13 +875,16 @@ export const level2 = [
       { src: `${IMG}neel_f.webp`, x: 1372, y: 424, w: 465, h: 589, fx: "breathe-slow" }
     ],
     fireflies: { x: 688, y: 174 },
-    counter: "total",
+    // No counter card here: it would be repeating the number the line is
+    // about to show, and the top right of the frame is the only room Neel's
+    // balloon has. The answer flies down from the twinkles instead — see
+    // dropFromCounter() in js/game.js.
     bubble: {
       art: `${IMG}bub_neel.webp`, who: "neel",
       // His line, so his balloon and his side of the frame. It sits in the
       // gap the beat leaves on the right: under the counter card, above his
       // head, and clear of the swarm still hanging in the middle.
-      x: 1408, y: 252, w: 400, h: 190,
+      x: 1390, y: 128, w: 465, h: 221,
       text: "{but}वहाँ कुल {total} तारे थे!"
     }
   },
@@ -1049,13 +1058,16 @@ export const level3 = [
       { src: `${IMG}neel_f.webp`, x: 1372, y: 424, w: 465, h: 589, fx: "breathe-slow" }
     ],
     fireflies: { x: 696, y: 85 },
-    counter: "total",
+    // No counter card here: it would be repeating the number the line is
+    // about to show, and the top right of the frame is the only room Neel's
+    // balloon has. The answer flies down from the twinkles instead — see
+    // dropFromCounter() in js/game.js.
     bubble: {
       art: `${IMG}bub_neel.webp`, who: "neel",
       // His line, so his balloon and his side of the frame. It sits in the
       // gap the beat leaves on the right: under the counter card, above his
       // head, and clear of the swarm still hanging in the middle.
-      x: 1408, y: 252, w: 400, h: 190,
+      x: 1390, y: 128, w: 465, h: 221,
       text: "{but}वहाँ कुल {total} जादुई बीज थे!"
     }
   },
@@ -1228,13 +1240,16 @@ export const level4 = [
       { src: `${IMG}neel_f.webp`, x: 1372, y: 424, w: 465, h: 589, fx: "breathe-slow" }
     ],
     fireflies: { x: 623, y: 138 },
-    counter: "total",
+    // No counter card here: it would be repeating the number the line is
+    // about to show, and the top right of the frame is the only room Neel's
+    // balloon has. The answer flies down from the twinkles instead — see
+    // dropFromCounter() in js/game.js.
     bubble: {
       art: `${IMG}bub_neel.webp`, who: "neel",
       // His line, so his balloon and his side of the frame. It sits in the
       // gap the beat leaves on the right: under the counter card, above his
       // head, and clear of the swarm still hanging in the middle.
-      x: 1408, y: 252, w: 400, h: 190,
+      x: 1390, y: 128, w: 465, h: 221,
       text: "{but}वहाँ कुल {total} फूल थे!"
     }
   },

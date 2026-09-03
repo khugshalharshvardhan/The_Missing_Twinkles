@@ -335,7 +335,11 @@ export const gameCues = {
   // He cheers as he spins to the lit lamp — his own voice, from his side of
   // the frame, landing with the YAY! lettering (screens.js draws it from 180ms).
   "5.2": {
-    sfx: [{ id: "catch_pop", at: 120, gain: 0.8 }, { id: "twinkle", at: 500, gain: 0.45 }],
+    sfx: [{ id: "catch_pop", at: 120, gain: 0.8 }, { id: "twinkle", at: 500, gain: 0.45 },
+      // Agni's own cheer. It rides with the sfx rather than as the beat's `vo`,
+      // because a beat has one voice line and this beat has two — hers a beat
+      // behind his, so they overlap the way two children actually cheer.
+      { id: "vo_agni_yay", at: 420, gain: 1, pan: -0.15 }],
     vo: { id: "vo_neel_yay", at: 260, pan: -0.7 }
   },
 
@@ -386,7 +390,11 @@ export const gameCues = {
     vo: { id: "vo_g_taplamp", at: 500, pan: -0.15 }
   },
   "p5.2": {
-    sfx: [{ id: "catch_pop", at: 120, gain: 0.8 }, { id: "twinkle", at: 500, gain: 0.45 }],
+    sfx: [{ id: "catch_pop", at: 120, gain: 0.8 }, { id: "twinkle", at: 500, gain: 0.45 },
+      // Agni's own cheer. It rides with the sfx rather than as the beat's `vo`,
+      // because a beat has one voice line and this beat has two — hers a beat
+      // behind his, so they overlap the way two children actually cheer.
+      { id: "vo_agni_yay", at: 420, gain: 1, pan: -0.15 }],
     vo: { id: "vo_neel_yay", at: 260, pan: -0.7 }
   },
 
@@ -431,7 +439,11 @@ export const gameCues = {
     vo: { id: "vo_g_taplamp", at: 500, pan: -0.15 }
   },
   "s5.2": {
-    sfx: [{ id: "catch_pop", at: 120, gain: 0.8 }, { id: "twinkle", at: 500, gain: 0.45 }],
+    sfx: [{ id: "catch_pop", at: 120, gain: 0.8 }, { id: "twinkle", at: 500, gain: 0.45 },
+      // Agni's own cheer. It rides with the sfx rather than as the beat's `vo`,
+      // because a beat has one voice line and this beat has two — hers a beat
+      // behind his, so they overlap the way two children actually cheer.
+      { id: "vo_agni_yay", at: 420, gain: 1, pan: -0.15 }],
     vo: { id: "vo_neel_yay", at: 260, pan: -0.7 }
   },
 
@@ -474,7 +486,11 @@ export const gameCues = {
     vo: { id: "vo_g_taplamp", at: 500, pan: -0.15 }
   },
   "m5.2": {
-    sfx: [{ id: "catch_pop", at: 120, gain: 0.8 }, { id: "twinkle", at: 500, gain: 0.45 }],
+    sfx: [{ id: "catch_pop", at: 120, gain: 0.8 }, { id: "twinkle", at: 500, gain: 0.45 },
+      // Agni's own cheer. It rides with the sfx rather than as the beat's `vo`,
+      // because a beat has one voice line and this beat has two — hers a beat
+      // behind his, so they overlap the way two children actually cheer.
+      { id: "vo_agni_yay", at: 420, gain: 1, pan: -0.15 }],
     vo: { id: "vo_neel_yay", at: 260, pan: -0.7 }
   },
 
@@ -517,7 +533,11 @@ export const gameCues = {
     vo: { id: "vo_g_taplamp", at: 500, pan: -0.15 }
   },
   "f5.2": {
-    sfx: [{ id: "catch_pop", at: 120, gain: 0.8 }, { id: "twinkle", at: 500, gain: 0.45 }],
+    sfx: [{ id: "catch_pop", at: 120, gain: 0.8 }, { id: "twinkle", at: 500, gain: 0.45 },
+      // Agni's own cheer. It rides with the sfx rather than as the beat's `vo`,
+      // because a beat has one voice line and this beat has two — hers a beat
+      // behind his, so they overlap the way two children actually cheer.
+      { id: "vo_agni_yay", at: 420, gain: 1, pan: -0.15 }],
     vo: { id: "vo_neel_yay", at: 260, pan: -0.7 }
   }
 };
@@ -563,6 +583,8 @@ export const audioManifest = [
     // that has been counted already. Both are played straight from js/game.js.
     "vo_g_nudge",
     "vo_g_counted",
+    // Agni's half of the cheer — listed because it is scheduled as an sfx.
+    "vo_agni_yay",
     // Agni counting, and finishing the two lines that end in a number the
     // player chose. Zero to twenty covers every count and every guess the
     // keypad can hold that is worth speaking.

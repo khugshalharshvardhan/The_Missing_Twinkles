@@ -155,8 +155,17 @@ Game engine facts that matter when adding a level:
     `agni_dilouge_new/` and `neel_dilouge_new/` with the verdicts, every level's
     own two lines, and re-takes of a handful. Where a line is in both, the
     installer maps the newer one.
-  - Still English: Neel's "यय!" at every lamp, his chuckle on story 1.4, and Mr
-    Giggles' two laughs. The last two are wordless; the cheer is not.
+  - The lamp beat cheers with BOTH of them — one take each, his a beat ahead of
+    hers, panned to where LAMP_STAGE puts them. Hers rides in the beat's `sfx`
+    list, because a beat has one `vo` and this beat has two voices.
+  - Still English: Neel's chuckle on story 1.4 and Mr Giggles' two laughs. Both
+    are wordless.
+  - **The answer beat has no counter card.** There was nowhere on Neel's side to
+    put his balloon — under the card is 163px and the line needs 176, below the
+    swarm the number line is in the way, and the band between them is 151px
+    wide. The card was repeating the number the line was about to show, so it
+    goes, and `dropFromCounter()` flies the answer down from the twinkles
+    themselves when there is no card to fly it from.
   - **A story step's `hold` is a floor, not the answer** (`holdFor()` in
     js/story.js). Those numbers were written against the English clips — the
     comments in js/data/scenes.js still quote their lengths — and four steps cut

@@ -1264,8 +1264,15 @@ function level(marker, placed) {
 // is scaled to fit and a screen pixel is not a frame pixel.
 function dropFromCounter(pane, kind, value) {
   const wrap = pane?.querySelector(".numline");
-  const card = pane?.querySelector(".counter__value");
-  if (!wrap || !card) return;
+  if (!wrap) return;
+
+  // Where the number comes from. The guess flies out of the counter card,
+  // which is where the player put it. The answer has no card on its beat —
+  // the card would be repeating what the line is about to show, and the top
+  // right of the frame is the only room Neel's balloon has — so it flies from
+  // the twinkles themselves, which is where the answer actually came from.
+  const from = pane.querySelector(".counter__value") ?? pane.querySelector(".swarm");
+  if (!from) return;
 
   const marker = mark(wrap, kind, value);
   if (!marker) return;
@@ -1281,9 +1288,9 @@ function dropFromCounter(pane, kind, value) {
   };
 
   const origin = at(wrap);
-  const from = at(card);
-  marker.style.setProperty("--from-x", `${from.x - origin.x}px`);
-  marker.style.setProperty("--from-y", `${from.y - origin.y}px`);
+  const start = at(from);
+  marker.style.setProperty("--from-x", `${start.x - origin.x}px`);
+  marker.style.setProperty("--from-y", `${start.y - origin.y}px`);
   level(marker, false);
   playSfx({ id: "sparkle", at: 120, gain: 0.55 });
 }
