@@ -10,9 +10,11 @@
 // where the two meet, a line of the light they have been collecting runs down
 // the join and throws sparks off it.
 //
-// The scene that leaves is the real one. The live pane is cloned into the
-// overlay first, so the game underneath is free to build the next round while
-// both places are still on screen; nothing has to hold two levels at once.
+// The scene that leaves is the real one: the live pane is cloned before the
+// swap, so the game is free to empty its panes and build the next round while
+// both places are on screen. The clone is put INSIDE #game, which matters —
+// every rule that styles a screen is scoped to #game, so a clone anywhere else
+// loses its layout entirely and its speech balloon fills the frame.
 //
 // Timings here and in css/warp.css are one clock. Change one, change both.
 
@@ -34,12 +36,10 @@ function noise(i, k) {
   return n - Math.floor(n);
 }
 
-let root = null;
 let game = null;
 let running = null;
 
 export function initWarp() {
-  root = document.getElementById("warp");
   game = document.getElementById("game");
 }
 
@@ -67,7 +67,7 @@ function spark(i) {
 // Hand over. `swap` builds the next round, and is called at the top — behind
 // the place that is still on its way out. Resolves once the new one has landed.
 export function playWarp(swap) {
-  if (!root || !game) return Promise.resolve(swap?.());
+  if (!game) return Promise.resolve(swap?.());
   // A second call while one is running would restart the travel under the
   // player; let the first one finish.
   if (running) return running;
@@ -76,7 +76,7 @@ export function playWarp(swap) {
   // swap, because the swap empties the panes it was built in.
   const live = game.querySelector(".scene.is-active");
   const away = document.createElement("div");
-  away.className = "warp__away";
+  away.className = "warp";
   if (live) {
     const copy = live.cloneNode(true);
     copy.classList.remove("is-active");
@@ -96,8 +96,7 @@ export function playWarp(swap) {
   for (let i = 0; i < SPARKS; i++) seam.append(spark(i));
 
   away.append(dim, seam);
-  root.replaceChildren(away);
-  root.style.setProperty("--warp-ms", `${WARP_MS}ms`);
+  game.append(away);
   game.style.setProperty("--warp-ms", `${WARP_MS}ms`);
 
   // Build the next round now, under the cover of the place still leaving, so
@@ -107,14 +106,12 @@ export function playWarp(swap) {
   running = new Promise((resolve) => {
     // One frame, so the clone and the new round start their travel together.
     requestAnimationFrame(() => {
-      root.classList.add("is-running");
       game.classList.add("is-warping");
       playCues(cues.warp);
 
       window.setTimeout(() => {
-        root.classList.remove("is-running");
         game.classList.remove("is-warping");
-        root.replaceChildren();
+        away.remove();
         running = null;
         resolve();
       }, WARP_MS);

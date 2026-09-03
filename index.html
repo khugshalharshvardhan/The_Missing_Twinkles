@@ -58,14 +58,13 @@
       <div id="game">
         <div class="scene" id="game-a"></div>
         <div class="scene" id="game-b"></div>
+        <!-- The hand-over between levels builds itself in here, as a child of
+             the game: the place being left is a CLONE of the live pane, and a
+             clone outside #game would lose all 150-odd rules scoped to it —
+             the balloon on it would come out unpositioned and fill the screen.
+             See js/warp.js. -->
       </div>
 
-
-      <!-- Between one level and the next: the lamp's light swelling out over
-           the frame while the rescued twinkles streak away across it, the new
-           location swapped in underneath at the brightest moment. The road is
-           still walked once, out of the story — see js/warp.js. -->
-      <div id="warp"></div>
 
       <!-- ===== HUD ===== -->
       <div class="hud" id="hud">

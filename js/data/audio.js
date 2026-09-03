@@ -287,7 +287,9 @@ export const gameCues = {
   "1.5": {
     sfx: [{ id: "twinkle", at: 2750, gain: 0.4, pan: 0.2 },
       { id: "magic_vanish", at: 8600, gain: 0.7 }],
-    vo: { id: "vo_g_guess", at: 500, pan: -0.5 }
+    // The tutorial's own wording — the levels' look beat says something
+    // shorter and has vo_g_guess to itself.
+    vo: { id: "vo_g_guess_tut", at: 500, pan: -0.5 }
   },
 
   // ---- the keypad. Key presses are played from js/game.js, on the tap ----
@@ -316,8 +318,7 @@ export const gameCues = {
 
   // ---- the total, and how the guess did ----
   "4": {
-    sfx: [{ id: "sparkle", at: 420, gain: 0.5 }],
-    vo: { id: "vo_g_total", at: 500, pan: -0.5 }
+    sfx: [{ id: "sparkle", at: 420, gain: 0.5 }]
   },
   // Stem only: js/game.js says the number after it.
   "16": {
@@ -329,13 +330,13 @@ export const gameCues = {
   // ---- the lamp. Striking it is played on the tap ----
   "5.1": {
     sfx: [{ id: "page_air", at: 0, gain: 0.5 }],
-    vo: { id: "vo_g_taplamp", at: 500, pan: -0.5 }
+    vo: { id: "vo_g_taplamp", at: 500, pan: -0.15 }
   },
   // He cheers as he spins to the lit lamp — his own voice, from his side of
   // the frame, landing with the YAY! lettering (screens.js draws it from 180ms).
   "5.2": {
     sfx: [{ id: "catch_pop", at: 120, gain: 0.8 }, { id: "twinkle", at: 500, gain: 0.45 }],
-    vo: { id: "vo_neel_yay", at: 260, pan: 0.5 }
+    vo: { id: "vo_neel_yay", at: 260, pan: -0.7 }
   },
 
   // ---- the town is theirs to light ----
@@ -370,8 +371,7 @@ export const gameCues = {
 
   // ---- the total, and how the guess did ----
   "p4": {
-    sfx: [{ id: "sparkle", at: 420, gain: 0.5 }],
-    vo: { id: "vo_l1_total", at: 500, pan: -0.5 }
+    sfx: [{ id: "sparkle", at: 420, gain: 0.5 }]
   },
   // Stem only: js/game.js says the number after it (role "guessline").
   "p16": {
@@ -383,11 +383,11 @@ export const gameCues = {
   // ---- the lamp ----
   "p5.1": {
     sfx: [{ id: "page_air", at: 0, gain: 0.5 }],
-    vo: { id: "vo_g_taplamp", at: 500, pan: -0.5 }
+    vo: { id: "vo_g_taplamp", at: 500, pan: -0.15 }
   },
   "p5.2": {
     sfx: [{ id: "catch_pop", at: 120, gain: 0.8 }, { id: "twinkle", at: 500, gain: 0.45 }],
-    vo: { id: "vo_neel_yay", at: 260, pan: 0.5 }
+    vo: { id: "vo_neel_yay", at: 260, pan: -0.7 }
   },
 
   /* ---------- Level 2 — the starlights ----------
@@ -416,8 +416,7 @@ export const gameCues = {
 
   // ---- the total, and how the guess did ----
   "s4": {
-    sfx: [{ id: "sparkle", at: 420, gain: 0.5 }],
-    vo: { id: "vo_l2_total", at: 500, pan: -0.5 }
+    sfx: [{ id: "sparkle", at: 420, gain: 0.5 }]
   },
   // Stem only: js/game.js says the number after it (role "guessline").
   "s16": {
@@ -429,11 +428,11 @@ export const gameCues = {
   // ---- the lamp ----
   "s5.1": {
     sfx: [{ id: "page_air", at: 0, gain: 0.5 }],
-    vo: { id: "vo_g_taplamp", at: 500, pan: -0.5 }
+    vo: { id: "vo_g_taplamp", at: 500, pan: -0.15 }
   },
   "s5.2": {
     sfx: [{ id: "catch_pop", at: 120, gain: 0.8 }, { id: "twinkle", at: 500, gain: 0.45 }],
-    vo: { id: "vo_neel_yay", at: 260, pan: 0.5 }
+    vo: { id: "vo_neel_yay", at: 260, pan: -0.7 }
   },
 
   /* ---------- Level 3 — the magic seeds ----------
@@ -460,8 +459,7 @@ export const gameCues = {
 
   // ---- the total, and how the guess did ----
   "m4": {
-    sfx: [{ id: "sparkle", at: 420, gain: 0.5 }],
-    vo: { id: "vo_l3_total", at: 500, pan: -0.5 }
+    sfx: [{ id: "sparkle", at: 420, gain: 0.5 }]
   },
   // Stem only: js/game.js says the number after it (role "guessline").
   "m16": {
@@ -473,11 +471,11 @@ export const gameCues = {
   // ---- the lamp ----
   "m5.1": {
     sfx: [{ id: "page_air", at: 0, gain: 0.5 }],
-    vo: { id: "vo_g_taplamp", at: 500, pan: -0.5 }
+    vo: { id: "vo_g_taplamp", at: 500, pan: -0.15 }
   },
   "m5.2": {
     sfx: [{ id: "catch_pop", at: 120, gain: 0.8 }, { id: "twinkle", at: 500, gain: 0.45 }],
-    vo: { id: "vo_neel_yay", at: 260, pan: 0.5 }
+    vo: { id: "vo_neel_yay", at: 260, pan: -0.7 }
   },
 
   /* ---------- Level 4 — the glow flowers ----------
@@ -504,8 +502,7 @@ export const gameCues = {
 
   // ---- the total, and how the guess did ----
   "f4": {
-    sfx: [{ id: "sparkle", at: 420, gain: 0.5 }],
-    vo: { id: "vo_l4_total", at: 500, pan: -0.5 }
+    sfx: [{ id: "sparkle", at: 420, gain: 0.5 }]
   },
   // Stem only: js/game.js says the number after it (role "guessline").
   "f16": {
@@ -517,11 +514,11 @@ export const gameCues = {
   // ---- the lamp ----
   "f5.1": {
     sfx: [{ id: "page_air", at: 0, gain: 0.5 }],
-    vo: { id: "vo_g_taplamp", at: 500, pan: -0.5 }
+    vo: { id: "vo_g_taplamp", at: 500, pan: -0.15 }
   },
   "f5.2": {
     sfx: [{ id: "catch_pop", at: 120, gain: 0.8 }, { id: "twinkle", at: 500, gain: 0.45 }],
-    vo: { id: "vo_neel_yay", at: 260, pan: 0.5 }
+    vo: { id: "vo_neel_yay", at: 260, pan: -0.7 }
   }
 };
 
@@ -556,13 +553,24 @@ export const audioManifest = [
     "vo_g_close",
     "vo_g_goodtry",
     "vo_g_tryagain",
+    // The answer beat, said one way for a guess that was wrong and another for
+    // one that was right, and once per round because the line names what was
+    // counted — see totalVo in js/data/screens.js.
+    "vo_g_total",
+    "vo_g_total_plain",
+    ...[1, 2, 3, 4].flatMap((n) => [`vo_l${n}_total`, `vo_l${n}_total_plain`]),
+    // The nudge on a keypad nobody has touched, and Agni's answer to a twinkle
+    // that has been counted already. Both are played straight from js/game.js.
+    "vo_g_nudge",
+    "vo_g_counted",
     // Agni counting, and finishing the two lines that end in a number the
     // player chose. Zero to twenty covers every count and every guess the
     // keypad can hold that is worth speaking.
     ...Array.from({ length: 21 }, (_, n) => `vo_n_${n}`),
-    // Neel's own nought to nine, for the number that finishes his sentence on
-    // screen 2.2. Without these listed here nothing fetches them, and the call
-    // to play one finds no buffer and quietly does nothing.
-    ...Array.from({ length: 10 }, (_, n) => `vo_nn_${n}`)
+    // Neel's own nought to twenty, for the number that finishes his sentence
+    // on screen 2.2 — he was recorded across the pad's whole range. Without
+    // these listed here nothing fetches them, and the call to play one finds no
+    // buffer and quietly does nothing.
+    ...Array.from({ length: 21 }, (_, n) => `vo_nn_${n}`)
   ])
 ];

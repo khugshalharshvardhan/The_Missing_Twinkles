@@ -17,7 +17,7 @@
 
 import { pages, timeline } from "./data/scenes.js";
 import { cues } from "./data/audio.js";
-import { clearCues, playCues, stopAudio } from "./audio.js";
+import { clearCues, playCues, stopAudio, clipLength } from "./audio.js";
 import { anchorOffset } from "./anchor.js";
 import { roomOf, tailXOf } from "./data/bubbles.js";
 import { fitToText, centreInk, textRoom } from "./fit.js";
@@ -207,6 +207,24 @@ function playTransition(cover, entry) {
   );
 }
 
+// The air a step leaves after its line before the next one starts. The game
+// uses 1700 for the same reason (VO_TAIL in js/game.js); the story is read at a
+// gentler pace, but the principle is the same — a beat that ends on the last
+// syllable reads as an interruption.
+const VO_TAIL = 1200;
+
+// How long a step stays up. The `hold` in the data is the FLOOR, not the
+// answer: it was written against the English recordings, and every one of them
+// has been replaced by a Hindi take of its own length. Whichever is longer —
+// what the scene needs to be watched for, or what the line needs to be said in
+// — is what the step gets.
+function holdFor(step) {
+  const floor = step.hold ?? 2400;
+  const vo = cues[step.id]?.vo;
+  if (!vo) return floor;
+  return Math.max(floor, (vo.at ?? 0) + clipLength(vo.id) + VO_TAIL);
+}
+
 function paint(entry, { silent = false } = {}) {
   const { page, step } = entry;
 
@@ -234,7 +252,7 @@ function paint(entry, { silent = false } = {}) {
       paintNav(entry);
     }, step.reveal ?? 0);
   } else {
-    holdTimer = window.setTimeout(next, step.hold ?? 2400);
+    holdTimer = window.setTimeout(next, holdFor(step));
   }
 }
 
@@ -293,7 +311,7 @@ export function devPause(on) {
   if (entry.last) {
     revealTimer = window.setTimeout(() => setWaiting(true), entry.step.reveal ?? 0);
   } else {
-    holdTimer = window.setTimeout(next, entry.step.hold ?? 2400);
+    holdTimer = window.setTimeout(next, holdFor(entry.step));
   }
 }
 

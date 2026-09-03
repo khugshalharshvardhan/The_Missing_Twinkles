@@ -108,6 +108,7 @@ frame coordinates.**
 | `js/data/screens.js` | Game data: screen arrays per level, **`levels` registry**, keypad, counter, number line, manifest |
 | `js/data/audio.js` | Every audio cue per screen/step id (`cues`), clip lengths |
 | `js/audio.js` | WebAudio: music bed, sfx, VO with pan, `playCues`/`clearCues` |
+| `tools/install-vo.js` | Puts the recorded Hindi takes where the game looks for them: maps take -> cue id, trims, levels, and cuts the two lines with a number spoken inside them |
 | `js/warp.js` + `css/warp.css` | The hand-over between levels: the finished place travelling out to the left, the next one arriving behind it, a seam of light down the join |
 | `js/fit.js` + `js/data/bubbles.js` | Speech balloons: where each balloon's round face and tail sit (measured), and the fitter that shrinks a balloon onto its own line |
 | `js/anchor.js` + `js/data/poses.js` | Pins each character's centre-x/feet per scene so pose swaps don't slide |
@@ -130,6 +131,44 @@ Game engine facts that matter when adding a level:
 - Animations that must stay in sync are clocked by CSS vars (`--swarm-at`,
   `--d`); randomness is deterministic (`noise(i,k)` sin-hash — **never
   Math.random**, replays must be identical).
+- **The voice is Hindi, installed by `node tools/install-vo.js`.** The takes
+  live under `assets/audios/vo/agni dilouge/` and `assets/audios/vo/neel/`,
+  named for what they say; the game asks for `vo_<id>.mp3`, and that tool is
+  the mapping. It never touches the recordings — it writes the vo_*.mp3 the
+  engine loads, and moves the English take it replaces into `vo/en/` first.
+  Re-run it whenever a take is added or redone. Things it does that matter:
+  - **Trims by measured bounds, not `silenceremove`.** Several takes end with a
+    30ms click a second after the last word, and silenceremove stops at the
+    click — leaving a second of room tone that the engine then schedules the
+    next beat behind. It reads the silence map and keeps the speech.
+  - **Numbers are single words**, so a take with a long pause in it is a word
+    read twice; the fuller read is kept. Two of them are (agni 10, 10 NEEL).
+  - **Two takes have a number spoken inside them** and the number is the
+    player's: "तुम्हारा अंदाज़ा था — 10" is cut before it, and Neel's
+    "मुझे लगता है — 10 जुगनू थे" ends where the number begins, because the number
+    and the words after it are one breath.
+  - **The answer beat has two takes**, with and without "लेकिन", chosen by the
+    same test the words use — `totalVo` on the round in js/data/screens.js,
+    read by `dynamicVoice()`. It is per-round because the line names what was
+    counted: the tutorial's जुगनू take cannot play over a meadow of berries.
+  - The takes came in two deliveries: `agni dilouge/` and `neel/` first, then
+    `agni_dilouge_new/` and `neel_dilouge_new/` with the verdicts, every level's
+    own two lines, and re-takes of a handful. Where a line is in both, the
+    installer maps the newer one.
+  - Still English: Neel's "यय!" at every lamp, his chuckle on story 1.4, and Mr
+    Giggles' two laughs. The last two are wordless; the cheer is not.
+  - **A story step's `hold` is a floor, not the answer** (`holdFor()` in
+    js/story.js). Those numbers were written against the English clips — the
+    comments in js/data/scenes.js still quote their lengths — and four steps cut
+    their Hindi line off, one by 3.2 seconds. The step now holds for whichever
+    is longer, what the scene needs watching for or what the line needs saying
+    in. The game already did this in `speak()`.
+  - **Whose voice must match whose balloon.** The answer beat is नील's in the
+    sheet and his in the recording, but its balloon was Agni's on Agni's side —
+    every round ended with his voice out of her mouth. The balloon is his now,
+    at his mark. And the lamp beats re-stage the pair (`LAMP_STAGE`: Neel at
+    cx 264, Agni at 823), so their pans had to move with them — his cheer was
+    coming from the right while the word was drawn over his head on the left.
 - **Two faces, split by code point** (css/stage.css). The stack is
   `"Fredoka One", "Baloo 2", …`, and Fredoka One's `@font-face` is declared
   `unicode-range: U+0030-0039` — the digits and nothing else. So every number

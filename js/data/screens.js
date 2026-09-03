@@ -489,8 +489,11 @@ export const screens = [
     fireflies: { x: 749, y: 197 },
     counter: "total",
     bubble: {
-      art: `${IMG}bub_4.webp`, who: "agni",
-      x: 199, y: 269, w: 417, h: 201,
+      art: `${IMG}bub_neel.webp`, who: "neel",
+      // His line, so his balloon and his side of the frame. It sits in the
+      // gap the beat leaves on the right: under the counter card, above his
+      // head, and clear of the swarm still hanging in the middle.
+      x: 1408, y: 252, w: 400, h: 190,
       text: "{but}वहाँ कुल {total} जुगनू थे!"
     }
   },
@@ -686,8 +689,11 @@ export const level1 = [
     fireflies: { x: 773, y: 140 },
     counter: "total",
     bubble: {
-      art: `${IMG}bub_4.webp`, who: "agni",
-      x: 199, y: 269, w: 417, h: 201,
+      art: `${IMG}bub_neel.webp`, who: "neel",
+      // His line, so his balloon and his side of the frame. It sits in the
+      // gap the beat leaves on the right: under the counter card, above his
+      // head, and clear of the swarm still hanging in the middle.
+      x: 1408, y: 252, w: 400, h: 190,
       text: "{but}वहाँ कुल {total} बेर थे!"
     }
   },
@@ -865,8 +871,11 @@ export const level2 = [
     fireflies: { x: 688, y: 174 },
     counter: "total",
     bubble: {
-      art: `${IMG}bub_4.webp`, who: "agni",
-      x: 199, y: 269, w: 417, h: 201,
+      art: `${IMG}bub_neel.webp`, who: "neel",
+      // His line, so his balloon and his side of the frame. It sits in the
+      // gap the beat leaves on the right: under the counter card, above his
+      // head, and clear of the swarm still hanging in the middle.
+      x: 1408, y: 252, w: 400, h: 190,
       text: "{but}वहाँ कुल {total} तारे थे!"
     }
   },
@@ -1042,8 +1051,11 @@ export const level3 = [
     fireflies: { x: 696, y: 85 },
     counter: "total",
     bubble: {
-      art: `${IMG}bub_4.webp`, who: "agni",
-      x: 199, y: 269, w: 417, h: 201,
+      art: `${IMG}bub_neel.webp`, who: "neel",
+      // His line, so his balloon and his side of the frame. It sits in the
+      // gap the beat leaves on the right: under the counter card, above his
+      // head, and clear of the swarm still hanging in the middle.
+      x: 1408, y: 252, w: 400, h: 190,
       text: "{but}वहाँ कुल {total} जादुई बीज थे!"
     }
   },
@@ -1218,8 +1230,11 @@ export const level4 = [
     fireflies: { x: 623, y: 138 },
     counter: "total",
     bubble: {
-      art: `${IMG}bub_4.webp`, who: "agni",
-      x: 199, y: 269, w: 417, h: 201,
+      art: `${IMG}bub_neel.webp`, who: "neel",
+      // His line, so his balloon and his side of the frame. It sits in the
+      // gap the beat leaves on the right: under the counter card, above his
+      // head, and clear of the swarm still hanging in the middle.
+      x: 1408, y: 252, w: 400, h: 190,
       text: "{but}वहाँ कुल {total} फूल थे!"
     }
   },
@@ -1290,6 +1305,13 @@ export const levels = [
     name: "Tutorial — the twinkles",
     word: "Twinkle",
     total: TOTAL,
+    // The answer beat names what was counted, so its voice belongs to the
+    // round rather than to the beat: "लेकिन वहाँ कुल 8 जुगनू थे" cannot be
+    // played over a meadow full of berries. `but` is the take for a guess that
+    // was wrong and `plain` the one for a guess that was right — see
+    // dynamicVoice() in js/game.js. A round with none recorded says nothing,
+    // which is what the four levels do until theirs exist.
+    totalVo: { but: "vo_g_total", plain: "vo_g_total_plain" },
     swarmSrc: FIREFLY_SRC,
     layout: FIREFLIES,
     swarmClass: "",
@@ -1300,6 +1322,7 @@ export const levels = [
     name: "Level 1 — the glowberries",
     word: "Glowberry",
     total: BERRY_TOTAL,
+    totalVo: { but: "vo_l1_total", plain: "vo_l1_total_plain" },
     swarmSrc: BERRY_SRC,
     layout: BERRIES,
     swarmClass: "is-berries",
@@ -1310,6 +1333,7 @@ export const levels = [
     name: "Level 2 — the starlights",
     word: "Starlight",
     total: STARLIGHT_TOTAL,
+    totalVo: { but: "vo_l2_total", plain: "vo_l2_total_plain" },
     swarmSrc: STARLIGHT_SRC,
     layout: STARLIGHTS,
     // The star art already glows gold, like the firefly the swarm styling was
@@ -1322,6 +1346,7 @@ export const levels = [
     name: "Level 3 — the magic seeds",
     word: "Magic seed",
     total: SEED_TOTAL,
+    totalVo: { but: "vo_l3_total", plain: "vo_l3_total_plain" },
     swarmSrc: SEED_SRC,
     layout: MAGICSEEDS,
     // The seed is a lit thing rather than a light source, like the berry, and
@@ -1335,6 +1360,7 @@ export const levels = [
     name: "Level 4 — the glow flowers",
     word: "Glow flower",
     total: FLOWER_TOTAL,
+    totalVo: { but: "vo_l4_total", plain: "vo_l4_total_plain" },
     swarmSrc: FLOWER_SRC,
     layout: GLOWFLOWERS,
     // Warm orange petals round a gold face. The art was violet once and was

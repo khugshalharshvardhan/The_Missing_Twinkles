@@ -11,22 +11,24 @@
    the light they have been collecting runs down the join and throws sparks off
    it. So it is still a journey, in one second rather than six.
 
-   The scene that leaves is the REAL one: js/warp.js clones the live pane into
-   this overlay before the game builds the next round underneath, so both
-   places are on screen at once without the game having to hold two levels.
+   The scene that leaves is the REAL one: js/warp.js clones the live pane before
+   the game builds the next round, so both places are on screen at once without
+   the game having to hold two levels. The clone lives INSIDE #game, because
+   every rule that lays a screen out is scoped to #game — a clone outside it
+   keeps its markup and loses all of its layout, and the speech balloon on it
+   comes out unpositioned and fills the frame.
 
    Timings here and in js/warp.js are the same clock. Change one, change both.
    ========================================================= */
 
-#warp {
+/* The place being left, over both panes and under the HUD. It is a child of
+   #game, so it travels on its own transform while the panes travel on theirs. */
+#game .warp {
   position: absolute;
   inset: 0;
-  z-index: 6;              /* over both game panes, under the HUD and the loader */
+  z-index: 3;
   pointer-events: none;
-  visibility: hidden;
 }
-
-#warp.is-running { visibility: visible; }
 
 /* ---- the place they are leaving ----
 
@@ -35,15 +37,9 @@
    way out: a pane at 0.94 has its edges three per cent inside the frame, and
    the letterbox shows through the gap. The depth comes from the dusk that
    falls on it instead. */
-.warp__away {
-  position: absolute;
-  inset: 0;
-  transform-origin: 50% 50%;
-  will-change: transform;
-}
-
-.is-running .warp__away {
+#game.is-warping .warp {
   animation: warp-away var(--warp-ms) cubic-bezier(0.62, 0, 0.24, 1) both;
+  will-change: transform;
 }
 
 @keyframes warp-away {
@@ -60,7 +56,7 @@
   opacity: 0;
 }
 
-.is-running .warp__dim {
+#game.is-warping .warp__dim {
   animation: warp-dim var(--warp-ms) linear both;
 }
 
@@ -109,7 +105,7 @@
     rgba(255, 205, 108, 0.42), rgba(255, 190, 84, 0) 70%);
 }
 
-.is-running .warp__seam {
+#game.is-warping .warp__seam {
   animation: warp-seam var(--warp-ms) cubic-bezier(0.62, 0, 0.24, 1) both;
 }
 
@@ -138,7 +134,7 @@
   opacity: 0;
 }
 
-.is-running .warp__spark {
+#game.is-warping .warp__spark {
   animation: warp-spark var(--life) ease-out var(--delay) both;
 }
 
@@ -150,10 +146,11 @@
 
 /* ---- the place they are arriving at ----
 
-   The game's own container, brought in from the right under the seam. The
-   round inside it has already been built and is being held, so nothing is
-   playing while it travels. */
-#game.is-warping {
+   The panes, brought in from the right under the seam. The round in them has
+   already been built and is being held, so nothing is playing while it travels.
+   Direct children only: the clone of the place being left is a .scene too, and
+   it is travelling the other way. */
+#game.is-warping > .scene {
   animation: warp-in var(--warp-ms, 1000ms) cubic-bezier(0.62, 0, 0.24, 1) both;
 }
 
@@ -166,10 +163,10 @@
    With motion turned down nothing travels: the old place fades out over the
    new one, which is the part that is doing the work. */
 @media (prefers-reduced-motion: reduce) {
-  .is-running .warp__away { animation: warp-hold var(--warp-ms) linear both; }
-  .is-running .warp__seam,
-  .is-running .warp__spark { animation: none; opacity: 0; }
-  #game.is-warping { animation: none; }
+  #game.is-warping .warp { animation: warp-hold var(--warp-ms) linear both; }
+  #game.is-warping .warp__seam,
+  #game.is-warping .warp__spark { animation: none; opacity: 0; }
+  #game.is-warping > .scene { animation: none; }
 }
 
 @keyframes warp-hold {

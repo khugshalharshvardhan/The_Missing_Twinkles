@@ -330,6 +330,7 @@ function armIdle(pane) {
   nudge.classList.remove("is-shown");
   idleTimers.push(window.setTimeout(() => {
     nudge.classList.add("is-shown");
+    playVo({ id: "vo_g_nudge", at: 240, pan: -0.5 });
     idleTimers.push(window.setTimeout(() => {
       nudge.classList.remove("is-shown");
       armIdle(pane);
@@ -455,10 +456,10 @@ function verdict() {
 // bubble, which is showing the figure anyway.
 const SPOKEN_MAX = 20;
 
-// Neel's own range. It stopped at nine while the pad took a single tap; with
-// two digits it follows the pad's own ceiling (keypad.maxValue), so whatever a
-// child can type, he can read back.
-const NEEL_SPOKEN_MAX = 19;
+// Neel's own range. It stopped at nine while the pad took a single tap; he was
+// recorded to twenty with the rest, so whatever a child can type he can read
+// back.
+const NEEL_SPOKEN_MAX = 20;
 
 // `who` picks whose voice says it. Agni counts the twinkles and reads the
 // total; Neel has his own numbers too, because he is the one who says "Hmm...
@@ -498,15 +499,24 @@ function dynamicVoice(screen) {
     return sayNumber(guess, at, -0.5) ? at + clipLength(`vo_n_${guess}`) : 0;
   }
 
-  // "There are {total} …" The answer goes onto the line as it is said.
+  // "लेकिन वहाँ कुल {total} …" The answer goes onto the line as it is said —
+  // and it is said two ways, because the line itself is: a player who guessed
+  // right is told the count plainly, with no "but" to argue against. Same test
+  // the words use, so the two can never disagree (see fill()).
   if (screen.role === "totalline") {
     window.setTimeout(() => dropFromCounter(panes[front], "total", counted || round.total), 620);
-    return 0;
+    const say = round.totalVo?.[verdictKey() === "exact" ? "plain" : "but"];
+    if (!say) return 0;
+    playVo({ id: say, at: 500, pan: 0.45 });
+    return 500 + clipLength(say);
   }
 
   if (screen.role === "verdict") {
     const v = VERDICTS[verdictKey()];
     playSfx({ id: v.sfx, at: 260, gain: 0.85 });
+    // A verdict with no voice would still land its chime and its words — see
+    // VERDICTS above, where every one of them now has a line.
+    if (!v.vo) return 0;
     playVo({ id: v.vo, at: 560, pan: -0.5 });
     return 560 + clipLength(v.vo);
   }
@@ -679,12 +689,26 @@ function swarm(screen) {
   return group;
 }
 
+// The last time Agni said "we have counted that one already", so a child
+// tapping the same twinkle over and over is answered once rather than every
+// time.
+let saidCounted = 0;
+const COUNTED_AGAIN = 2600;
+
 function tally(el) {
-  if (el.classList.contains("is-counted")) return;
   if (el.closest(".scene")?.classList.contains("is-line")) return;
 
+  // Already counted. It stays tappable so that tapping it means something:
+  // she says so, and the number it took is still sitting on it.
+  if (el.classList.contains("is-counted")) {
+    const now = performance.now();
+    if (now - saidCounted < COUNTED_AGAIN) return;
+    saidCounted = now;
+    playVo({ id: "vo_g_counted", at: 0, pan: -0.5 });
+    return;
+  }
+
   el.classList.add("is-counted");
-  el.disabled = true;
   counted += 1;
 
   // Lit, not dimmed. They start low and come up as they are counted, so the
