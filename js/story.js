@@ -21,6 +21,7 @@ import { clearCues, playCues, stopAudio, clipLength } from "./audio.js";
 import { anchorOffset } from "./anchor.js";
 import { roomOf, tailXOf } from "./data/bubbles.js";
 import { fitToText, centreInk, textRoom } from "./fit.js";
+import { after, cancel } from "./clock.js";
 
 const layerHost = document.getElementById("layers");
 const overlayHost = document.getElementById("overlays");
@@ -147,9 +148,9 @@ export function skip() {
 }
 
 function clearTimers() {
-  window.clearTimeout(holdTimer);
-  window.clearTimeout(revealTimer);
-  transitionTimers.forEach(window.clearTimeout);
+  cancel(holdTimer);
+  cancel(revealTimer);
+  transitionTimers.forEach(cancel);
   transitionTimers = [];
 }
 
@@ -158,7 +159,7 @@ function clearTimers() {
 // out on its own clock and only empties once nothing has re-shown it.
 function endTransition() {
   transition.classList.remove("is-active");
-  window.setTimeout(() => {
+  after(() => {
     if (!transition.classList.contains("is-active")) transition.replaceChildren();
   }, LAYER_FADE);
 }
@@ -182,7 +183,7 @@ function go(target) {
   if (cover) return playTransition(cover, entry);
 
   paint(entry);
-  window.setTimeout(() => { busy = false; }, SETTLE);
+  after(() => { busy = false; }, SETTLE);
 }
 
 // Fade a cover in, swap the page underneath it, fade it back out.
@@ -201,9 +202,9 @@ function playTransition(cover, entry) {
   const hold = cover.hold ?? 2400;
   transitionTimers.push(
     // Swap once the cover is opaque enough to hide it.
-    window.setTimeout(() => paint(entry, { silent: true }), hold * 0.36),
-    window.setTimeout(() => { busy = false; }, hold * 0.36 + SETTLE),
-    window.setTimeout(endTransition, hold * 0.75)
+    after(() => paint(entry, { silent: true }), hold * 0.36),
+    after(() => { busy = false; }, hold * 0.36 + SETTLE),
+    after(endTransition, hold * 0.75)
   );
 }
 
@@ -246,13 +247,13 @@ function paint(entry, { silent = false } = {}) {
   if (entry.last) {
     // Closes the page: hand control back once the line has finished, and
     // remember the page has been read — from here on it offers Next at once.
-    revealTimer = window.setTimeout(() => {
+    revealTimer = after(() => {
       completed.add(entry.p);
       setWaiting(true);
       paintNav(entry);
     }, step.reveal ?? 0);
   } else {
-    holdTimer = window.setTimeout(next, holdFor(step));
+    holdTimer = after(next, holdFor(step));
   }
 }
 
@@ -302,18 +303,11 @@ export function devGoto(index) {
 // Hold the chapter where it is, or set it going again. Pausing only cancels
 // what was queued; releasing re-arms the current step from the top, which is
 // predictable in a way that trying to resume a part-elapsed timer is not.
-export function devPause(on) {
-  if (on) return clearTimers();
-
-  const entry = timeline[cursor];
-  if (!entry) return;
-
-  if (entry.last) {
-    revealTimer = window.setTimeout(() => setWaiting(true), entry.step.reveal ?? 0);
-  } else {
-    holdTimer = window.setTimeout(next, holdFor(entry.step));
-  }
-}
+// Nothing to do: the step's hold, its reveal and the transition's timers are
+// all on the freezable clock (js/clock.js), so a pause stops them where they
+// are and releasing carries them on. Restarting them here — which is what this
+// used to do — gave the step its whole hold back every time it was unpaused.
+export function devPause() {}
 
 /* ---- layer diffing ---- */
 
@@ -324,7 +318,7 @@ function diffLayers(want) {
     if (keep.has(key)) continue;
     mounted.delete(key);
     held.el.style.opacity = "0";
-    window.setTimeout(() => held.el.remove(), LAYER_FADE);
+    after(() => held.el.remove(), LAYER_FADE);
   }
 
   want.forEach((layer, depth) => {
@@ -401,7 +395,7 @@ function dissolve(box, layer) {
 
   outgoing.forEach((img) => {
     img.style.opacity = "0";
-    window.setTimeout(() => img.remove(), LAYER_FADE);
+    after(() => img.remove(), LAYER_FADE);
   });
 }
 

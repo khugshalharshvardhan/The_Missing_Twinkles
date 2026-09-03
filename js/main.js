@@ -23,6 +23,7 @@ import { initStory, startStory, nextPage, prevPage } from "./story.js";
 import { initGame, startGame, startEpilogue, releaseHold, armHold, currentLevel } from "./game.js";
 import { initWalk, startWalk, endWalk } from "./walk.js";
 import { initWarp, playWarp, WARP_HOLD_MS } from "./warp.js";
+import { after, cancel } from "./clock.js";
 import { layers as walkLayers, foreground as walkFore, cast as walkCast,
          guide as walkGuide, destinations, homeMode,
          SPARK_SHEET, HAND_OVER_MS } from "./data/walk.js";
@@ -217,7 +218,7 @@ async function handOver() {
 function warpOn() {
   armHold();
   playWarp(() => enterGame());
-  window.setTimeout(releaseHold, WARP_HOLD_MS);
+  after(releaseHold, WARP_HOLD_MS);
 }
 
 function enterWalk(dest, mode = null) {
@@ -243,13 +244,13 @@ function arrive() {
     hud.classList.remove("is-waiting");
     startEpilogue();
     endWalk();
-    window.setTimeout(releaseHold, HAND_OVER_MS);
+    after(releaseHold, HAND_OVER_MS);
     return;
   }
   armHold();
   enterGame();
   endWalk();
-  window.setTimeout(releaseHold, HAND_OVER_MS);
+  after(releaseHold, HAND_OVER_MS);
 }
 
 function enterGame(at = 0) {

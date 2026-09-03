@@ -20,6 +20,7 @@
 
 import { playCues } from "./audio.js";
 import { cues } from "./data/audio.js";
+import { after, cancel } from "./clock.js";
 
 // The whole hand-over. The next round is built at the top of it, behind the
 // place that is still leaving, and held until it has arrived.
@@ -109,7 +110,7 @@ export function playWarp(swap) {
       game.classList.add("is-warping");
       playCues(cues.warp);
 
-      window.setTimeout(() => {
+      after(() => {
         game.classList.remove("is-warping");
         away.remove();
         running = null;

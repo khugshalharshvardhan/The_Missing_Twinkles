@@ -63,6 +63,9 @@ const SPLIT = {
   // of it and the trimmer finds the real edges of each half.
   ithinkStem: { to: 2.43 },
   ithinkTail: { from: 3.09 },
+  // "अब — अपना अंदाज़ा लिखो।" The "अब" is dropped from the line on screen, so it
+  // goes from the take too; there is a clean 106ms gap after it at 0.39.
+  nudge: { from: 0.45 },
   // "लेकिन वहाँ कुल — 8 जुगनू थे", for a guess that was wrong.
   total: {},
   // The same take from "कुल", for a guess that was right: there is no "but"
@@ -122,7 +125,8 @@ const LINES = [
   { id: "vo_g_guess",      file: path.join(AGNI, "dhyan se dekho or andaza lagao (1).mp3") },
   // The nudge that comes up when nobody has touched the keypad for eight
   // seconds. It had no voice at all until this was recorded.
-  { id: "vo_g_nudge",      file: path.join(AGNI, "ab apna andaza likho (1).mp3") },
+  { id: "vo_g_nudge",      file: path.join(AGNI, "ab apna andaza likho (1).mp3"),
+    cut: SPLIT.nudge },
   // Tapping something that has already been counted.
   { id: "vo_g_counted",    file: path.join(AGNI, "ise ham phele hi gin chuke hai (1).mp3") },
 

@@ -16,6 +16,7 @@ import { roomOf, tailXOf } from "./data/bubbles.js";
 import { fitToText, centreInk, textRoom } from "./fit.js";
 import { anchorOffset, bodyBox, castOf } from "./anchor.js";
 import { clearCues, playCues, playSfx, playVo, clipLength } from "./audio.js";
+import { after, cancel } from "./clock.js";
 
 const panes = [
   document.getElementById("game-a"),
@@ -108,7 +109,7 @@ function standInGuess(start) {
 // `at` jumps straight to a beat — see the ?beat= dev shortcut in main.js —
 // and `levelIndex` picks which round to play (see `levels` in data/screens.js).
 export function startGame(at = 0, levelIndex = 0) {
-  clearTimeout(timer);
+  cancel(timer);
   clearCues();
   round = levels[Math.min(Math.max(levelIndex, 0), levels.length - 1)];
   index = -1;
@@ -133,7 +134,7 @@ export function startGame(at = 0, levelIndex = 0) {
 // home. Not a level — currentLevel() reports -1 while it runs, which is how
 // gameDone knows the chapter is over rather than moving on.
 export function startEpilogue() {
-  clearTimeout(timer);
+  cancel(timer);
   clearCues();
   round = epilogue;
   index = -1;
@@ -153,7 +154,7 @@ export function startEpilogue() {
 
 // Dev hook for the ending's beats (the hamburger menu's "The ending" rows).
 export function devGotoEpilogue(at) {
-  clearTimeout(timer);
+  cancel(timer);
   hold = false;
   round = epilogue;
   guess = null;
@@ -164,7 +165,7 @@ export function devGotoEpilogue(at) {
 }
 
 export function next() {
-  clearTimeout(timer);
+  cancel(timer);
   if (index >= round.screens.length - 1) return finish();
   go(index + 1);
 }
@@ -179,7 +180,7 @@ export function currentLevel() {
 }
 
 export function devGoto(at, levelIndex) {
-  clearTimeout(timer);
+  cancel(timer);
   hold = false;
   if (levelIndex != null) {
     const next = levels[Math.min(Math.max(levelIndex, 0), levels.length - 1)];
@@ -196,27 +197,33 @@ export function devGoto(at, levelIndex) {
   return round.screens[i];
 }
 
+// The beat's own clock is frozen by js/clock.js along with every other timer,
+// so pausing no longer has to cancel and re-arm anything: what was left of the
+// beat when the pause began is what is left of it when the pause ends. All this
+// still does is stop a HELD beat from starting while the picture is frozen.
 export function devPause(on) {
-  clearTimeout(timer);
   hold = on;
-  if (on) return;
+  // Only a beat that was BUILT while the pause was on has anything to start:
+  // one already speaking has its clock frozen with everything else, and calling
+  // speak() on it again would replay its cues and queue a second advance.
+  if (on || !pending) return;
 
-  const screen = pending ?? round.screens[index];
+  const screen = pending;
   pending = null;
-  if (screen && !screen.interact) advanceIn(readingTime(screen));
+  speak(screen);
 }
 
 // "Skip" leaves the whole act, not one screen.
 export function skipGame() {
-  clearTimeout(timer);
+  cancel(timer);
   index = round.screens.length - 1;
   finish();
 }
 
 // Queue the next beat. Any new beat cancels whatever was pending.
 function advanceIn(ms) {
-  clearTimeout(timer);
-  timer = window.setTimeout(next, ms);
+  cancel(timer);
+  timer = after(next, ms);
 }
 
 function go(target) {
@@ -227,8 +234,9 @@ function go(target) {
   // cutting it off to answer them.
   const leaving = round.screens[index];
 
-  clearTimeout(timer);
+  cancel(timer);
   clearIdle();
+  saidNudge = false;
   index = target;
   busy = true;
   back.replaceChildren(render(screen));
@@ -306,7 +314,7 @@ function speak(screen) {
   // hand back, so the invitation appears at the moment tapping starts working.
   if (screen.interact === "count") {
     panes[front].classList.add("is-line");
-    revealTimers.push(window.setTimeout(() => {
+    revealTimers.push(after(() => {
       panes[front].classList.remove("is-line");
     }, Math.max(lineEnd + 250, 800)));
   }
@@ -317,16 +325,21 @@ function speak(screen) {
 }
 
 // A beat whose balloon is a nudge rather than a line: nothing is said when the
-// pad arrives — the pad IS the question — and this only comes up if the player
-// has not touched it for a while, then goes again on its own. It re-arms, so a
-// child who is still thinking gets it again rather than once and never after.
+// pad arrives — the pad IS the question — and this only comes up once the
+// player has not touched it for a while.
+//
+// It then STAYS up. It is not a line the beat is delivering, it is a hand held
+// out, and taking it away again while a child is still deciding is the opposite
+// of help; what puts it away is the child doing something, which also starts
+// the wait over. The voice says it once per beat — someone who has heard it and
+// is still thinking does not need telling again.
 const IDLE_AFTER = 8000;
-const IDLE_FOR = 3000;
 
 let idleTimers = [];
+let saidNudge = false;
 
 function clearIdle() {
-  idleTimers.forEach(window.clearTimeout);
+  idleTimers.forEach(cancel);
   idleTimers = [];
 }
 
@@ -339,13 +352,11 @@ function armIdle(pane) {
 
   clearIdle();
   nudge.classList.remove("is-shown");
-  idleTimers.push(window.setTimeout(() => {
+  idleTimers.push(after(() => {
     nudge.classList.add("is-shown");
+    if (saidNudge) return;
+    saidNudge = true;
     playVo({ id: "vo_g_nudge", at: 240, pan: -0.5 });
-    idleTimers.push(window.setTimeout(() => {
-      nudge.classList.remove("is-shown");
-      armIdle(pane);
-    }, IDLE_FOR));
   }, IDLE_AFTER));
 }
 
@@ -375,12 +386,12 @@ function swarmDelay(screen, lineEnd) {
 let revealTimers = [];
 
 function scheduleReveals(screen, pane, swarmAt = 0) {
-  revealTimers.forEach(clearTimeout);
+  revealTimers.forEach(cancel);
   revealTimers = [];
 
   // 1.5: her line ends, the bubble goes, and only then do the twinkles come.
   if (swarmAt) {
-    revealTimers.push(window.setTimeout(() => {
+    revealTimers.push(after(() => {
       pane.classList.add("is-cleared");
     }, swarmAt - 150));
   }
@@ -388,7 +399,7 @@ function scheduleReveals(screen, pane, swarmAt = 0) {
   // The float: feet leave the ground — the standing pose fades under the
   // flyer (see .is-flying), with a burst where he stood.
   if (screen.flight) {
-    revealTimers.push(window.setTimeout(() => {
+    revealTimers.push(after(() => {
       pane.classList.add("is-flying");
       sparkleBurst(pane, {
         x: screen.flight.x + screen.flight.w / 2,
@@ -401,7 +412,7 @@ function scheduleReveals(screen, pane, swarmAt = 0) {
 
   // 2: the pad appears once the question has been asked, on a burst of sparkle.
   if (screen.keypadAt) {
-    revealTimers.push(window.setTimeout(() => {
+    revealTimers.push(after(() => {
       const panel = pane.querySelector(".keypad");
       if (!panel) return;
       panel.classList.remove("is-waiting");
@@ -426,12 +437,12 @@ function sparkleBurst(pane, { x, y, spread, count = 14 }) {
     bit.style.width = bit.style.height = `${7 + (i % 4) * 4}px`;
     bit.style.animationDelay = `${(i % 5) * 60}ms`;
     pane.append(bit);
-    window.setTimeout(() => bit.remove(), 1400);
+    after(() => bit.remove(), 1400);
   }
 }
 
 function settle() {
-  window.setTimeout(() => {
+  after(() => {
     busy = false;
   }, CROSSFADE * 0.45);
 }
@@ -448,7 +459,7 @@ function readingTime(screen) {
 }
 
 function finish() {
-  clearTimeout(timer);
+  cancel(timer);
   clearCues();
   playSfx({ id: "cheer_swell", gain: 0.9 });
   hud.classList.remove("is-active");
@@ -531,7 +542,7 @@ function dynamicVoice(screen) {
   // "You guessed {guess}." — the number is said and drops onto the line with it.
   if (screen.role === "guessline") {
     const at = afterStem();
-    window.setTimeout(() => dropFromCounter(panes[front], "guess", guess), at);
+    after(() => dropFromCounter(panes[front], "guess", guess), at);
     return sayNumber(guess, at, -0.5) ? at + clipLength(`vo_n_${guess}`) : 0;
   }
 
@@ -540,7 +551,7 @@ function dynamicVoice(screen) {
   // right is told the count plainly, with no "but" to argue against. Same test
   // the words use, so the two can never disagree (see fill()).
   if (screen.role === "totalline") {
-    window.setTimeout(() => dropFromCounter(panes[front], "total", counted || round.total), 620);
+    after(() => dropFromCounter(panes[front], "total", counted || round.total), 620);
     const say = round.totalVo?.[verdictKey() === "exact" ? "plain" : "but"];
     if (!say) return 0;
     playVo({ id: say, at: 500, pan: 0.45 });
@@ -787,7 +798,7 @@ function finishCount(pane, last) {
   // The line comes up empty here. The two numbers arrive on the beats that
   // speak them — the answer on "There are eight twinkles", the guess on "You
   // guessed —" — so each one is put on the line as it is said.
-  window.setTimeout(() => {
+  after(() => {
     pane.querySelector(".numline")?.classList.add("is-live");
     playSfx({ id: "sparkle", at: 160, gain: 0.55 });
     advanceIn(LINE_WALK);
@@ -805,7 +816,7 @@ function burst(el) {
     fx.append(s);
   }
   el.append(fx);
-  window.setTimeout(() => fx.remove(), 900);
+  after(() => fx.remove(), 900);
 }
 
 // Comic-burst lettering — a cheer drawn on the frame. Each letter is its own
@@ -973,7 +984,7 @@ function flock(pane, screen) {
     fly.style.animationDuration = `${FLY_MS}ms`;
     fly.style.animationDelay = `${delay}ms`;
     pane.append(fly);
-    window.setTimeout(() => fly.remove(), delay + FLY_MS + 200);
+    after(() => fly.remove(), delay + FLY_MS + 200);
 
     // Its trail, laid along the same arc, each mote lighting as the twinkle
     // passes it.
@@ -988,7 +999,7 @@ function flock(pane, screen) {
       bit.style.width = bit.style.height = `${5 + ((i + k) % 4) * 3}px`;
       bit.style.animationDelay = `${delay + Math.round(t * FLY_MS) - 120}ms`;
       pane.append(bit);
-      window.setTimeout(() => bit.remove(), delay + FLY_MS + 1100);
+      after(() => bit.remove(), delay + FLY_MS + 1100);
     }
   }
 
@@ -997,7 +1008,7 @@ function flock(pane, screen) {
   if (screen.lampLit) {
     const lit = imageLayer(screen.lampLit, "layer lamp-lit fx-lamp-glow");
     pane.append(lit);
-    window.setTimeout(() => {
+    after(() => {
       lit.classList.add("is-on");
       sparkleBurst(pane, { x: to.x, y: to.y, spread: 170, count: 14 });
       playSfx({ id: "lamp_strike", gain: 0.9 });
@@ -1180,15 +1191,15 @@ function flyToCounter(pane, key, value) {
     bit.style.width = bit.style.height = `${6 + (i % 4) * 3.5}px`;
     bit.style.animationDelay = `${Math.round(t * GUESS_FLIGHT) - 140}ms`;
     pane.append(bit);
-    window.setTimeout(() => bit.remove(), GUESS_FLIGHT + 900);
+    after(() => bit.remove(), GUESS_FLIGHT + 900);
   }
 
   // The counter only takes the value once the digit has actually got there.
-  window.setTimeout(() => {
+  after(() => {
     readout.textContent = value;
     readout.classList.add("is-landing");
   }, GUESS_FLIGHT);
-  window.setTimeout(() => flier.remove(), GUESS_FLIGHT + 120);
+  after(() => flier.remove(), GUESS_FLIGHT + 120);
 }
 
 /* ---- the counter ---- */

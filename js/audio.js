@@ -68,7 +68,27 @@ export function initAudio() {
 
 // Browsers only let audio start from a user gesture.
 export function unlockAudio() {
+  // Not while the chapter is paused: a tap anywhere would otherwise start the
+  // sound again under a frozen picture.
+  if (paused) return;
   if (ctx && ctx.state !== "running") ctx.resume().catch(() => {});
+}
+
+// Stop the sound where it is, and start it again from there.
+//
+// The whole soundtrack is scheduled against the AudioContext's own clock — a
+// line at 500ms, a chime 260ms after that — so suspending the context stops
+// that clock and everything hanging off it: the music, the line half said, the
+// sparkle that had not landed yet. Nothing has to be found and stopped one by
+// one, and nothing is lost: resuming carries every one of them on from the
+// sample it stopped at.
+let paused = false;
+
+export function setAudioPaused(on) {
+  paused = Boolean(on);
+  if (!ctx) return;
+  if (paused) ctx.suspend().catch(() => {});
+  else ctx.resume().catch(() => {});
 }
 
 export function isMuted() {
@@ -308,4 +328,9 @@ export function stopAudio() {
   musicLevel = 1;
   clearCues();
   playBed(null);
+}
+
+// What the sound is doing, for the dev tools and for tests.
+export function audioState() {
+  return ctx ? ctx.state : "none";
 }

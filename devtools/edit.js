@@ -168,6 +168,13 @@ function stageScale() {
 
 // Name the thing in the words the scene data uses, so an edit can be placed.
 function identify(el) {
+  // A balloon whose line did not fit the box it was given: the fitter is
+  // scaling it, so what is on screen is not what these numbers say. Worth
+  // knowing before dragging it into a gap it will not stay inside.
+  if (el._design && el._fitAt && el._design.w > 0) {
+    const grew = el._fitAt.w / el._design.w;
+    if (grew > 1.02) return `bubble  (grown to ${Math.round(grew * 100)}% — its box is too small for the line)`;
+  }
   if (el.dataset.role) {
     return el.dataset.index === undefined
       ? el.dataset.role

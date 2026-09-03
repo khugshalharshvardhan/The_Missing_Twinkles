@@ -28,6 +28,7 @@ import {
 } from "./data/walk.js";
 import { playCues, clearCues } from "./audio.js";
 import { cues } from "./data/audio.js";
+import { after, cancel } from "./clock.js";
 
 const host = document.getElementById("walk");
 
@@ -153,7 +154,7 @@ export function stopWalk() {
 export function endWalk() {
   stopWalk();
   host.classList.remove("is-live");
-  window.setTimeout(() => host.replaceChildren(), 1200);
+  after(() => host.replaceChildren(), 1200);
 }
 
 /* ---- the loop ---- */

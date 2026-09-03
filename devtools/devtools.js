@@ -9,7 +9,9 @@
 //     the acts, and every screen in the counting game — click one to jump
 //     straight to it. Game rows name what is on the screen, so the beat with the
 //     keypad or the number line can be found without counting.
-//   * pause, which freezes the artwork, every CSS animation and the video
+//   * pause, which stops everything: every timer in the chapter (js/clock.js),
+//     the whole soundtrack (the AudioContext is suspended), every CSS animation
+//     and transition, and the video
 //   * edit mode: drag to move, drag the corner to resize, arrow keys to nudge
 //     (hold shift for 10px), or type exact numbers
 //   * an export of what you changed, as JSON to hand back for applying
@@ -21,6 +23,8 @@ import { epilogue } from "../js/data/screens.js";
 import { devGoto as storyGoto, devPause as storyPause } from "../js/story.js";
 import { devGoto as gameGoto, devGotoEpilogue as epiGoto, devPause as gamePause } from "../js/game.js";
 import { devGoto as walkGoto, devPause as walkPause } from "../js/walk.js";
+import { freeze as freezeClock, thaw as thawClock } from "../js/clock.js";
+import { setAudioPaused } from "../js/audio.js";
 import { initEdit, markTargets, deselect, nudge, edits, clearEdits, targets, pick } from "./edit.js";
 
 const root = document.documentElement;
@@ -315,8 +319,12 @@ function setPaused(on) {
   ui.pause.textContent = on ? "Play" : "Pause";
   ui.flag.classList.toggle("is-on", on);
 
-  // Both halves: hold the clock so the step cannot move on underneath a frozen
-  // picture, and freeze the picture itself.
+  // Everything, together. The clock first, so no timer fires between stopping
+  // the picture and stopping the sound: every timeout in the chapter, the
+  // soundtrack — music, voice and effects alike — then the artwork and the
+  // film. The act itself only has to be told so a held beat does not begin.
+  if (on) freezeClock(); else thawClock();
+  setAudioPaused(on);
   pauseAct(here.act, on);
   freeze(on);
 }

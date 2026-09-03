@@ -111,6 +111,7 @@ frame coordinates.**
 | `tools/install-vo.js` | Puts the recorded Hindi takes where the game looks for them: maps take -> cue id, trims, levels, and cuts the two lines with a number spoken inside them |
 | `js/warp.js` + `css/warp.css` | The hand-over between levels: the finished place travelling out to the left, the next one arriving behind it, a seam of light down the join |
 | `js/fit.js` + `js/data/bubbles.js` | Speech balloons: where each balloon's round face and tail sit (measured), and the fitter that shrinks a balloon onto its own line |
+| `js/clock.js` | Every timeout in the chapter. `after`/`cancel` have setTimeout's shape; `freeze`/`thaw` take a pause through them, each timer keeping what it had left |
 | `js/anchor.js` + `js/data/poses.js` | Pins each character's centre-x/feet per scene so pose swaps don't slide |
 | `devtools/` | The hamburger menu + live-edit mode |
 | `tools/gen-vo-game.js` | Regenerates game VO via msedge-tts (`npm i msedge-tts`, then `node tools/gen-vo-game.js assets/audios/vo`) |
@@ -215,9 +216,13 @@ Game engine facts that matter when adding a level:
 - **The twinkles sit in the middle of the frame** — every round's swarm mark is
   set so its formation centres on 941 — and no balloon touches them. Two things
   came out of that:
-  - `tail: "right"` on a bubble spec forces the mirror. The tutorial's
-    "चलो, गिनकर देखते हैं…" is too wide for its middle to ever pass Agni, so it
-    could not flip by position like the rest.
+  - `tail: "right"` on a bubble spec forces the mirror, for the two balloons
+    that cannot flip by position: the tutorial's "चलो, गिनकर देखते हैं…" is too
+    wide for its middle ever to pass Agni, and the answer beat's has to point
+    down at Neel from above rather than out into the sky beside him.
+  - The pointing hand belongs to the first thing to be counted, so its mark
+    moved with the swarm — the same shift, so it keeps the offset it was drawn
+    with.
   - That balloon's `artInset` was Figma's: the art sat in the middle third of a
     much bigger box, so the longest line in the game had a third of the room it
     appeared to have, grew to the full 1.35x, and landed on the twinkles. Its
@@ -235,12 +240,34 @@ Game engine facts that matter when adding a level:
   the speaker's, so this is a matter of position, not of art: each balloon was
   measured against where Agni actually stands and moved past her. Screen 2 was
   already like this and is the reference.
+- **Pause stops the whole chapter, not just the picture.** The dev menu's Pause
+  now takes four things together, in this order: every timer (js/clock.js —
+  nothing in the project calls setTimeout directly any more), the entire
+  soundtrack (`setAudioPaused()` suspends the AudioContext, which stops music,
+  voice and effects at once because they are all scheduled on its clock), every
+  CSS animation and transition (`getAnimations()`), and the video. Measured: a
+  beat that runs 10.66s on its own ran 4.00s + 6.65s across a pause — the pause
+  cost it 9ms. Notes:
+  - `unlockAudio()` refuses to resume while paused, or a tap anywhere would
+    start the sound under a frozen picture.
+  - An act's `devPause` no longer re-arms its own clock; the freeze does that.
+    The game's only starts a beat that was BUILT during the pause and never
+    spoke — calling speak() on one already running would replay its cues and
+    queue a second advance.
 - **The keypad beats say nothing.** The pad arriving is the question
   (`keypadAt: 800`, on its own sparkle). If nobody touches it for eight seconds
   a nudge balloon — `bubble: { idle: true }` in screens.js, `armIdle()` in
-  js/game.js, `.bubble--idle` in css/game.css — comes up for three seconds and
-  goes again, re-arming each time. Any key press restarts the eight seconds.
-  The tutorial keeps its spoken question: it is the round that teaches.
+  js/game.js, `.bubble--idle` in css/game.css — comes up and STAYS up. It is a
+  hand held out, not a line the beat is delivering, and taking it away while a
+  child is still deciding is the opposite of help: what puts it away is the
+  child doing something, which also restarts the eight seconds. Its voice plays
+  once per beat, not every time it reappears. The tutorial keeps its spoken
+  question: it is the round that teaches.
+- **A devEdit on a balloon can be a box its line does not fit.** The dev panel
+  reports the DATA box, because that is what an export has to carry — but a
+  line too long for it makes the fitter GROW the balloon, and growth is anchored
+  at the tail, so it walks up and sideways out of whatever gap it was dragged
+  into. The panel now says so in the part's name when it is happening.
 - **The road is walked twice in the whole chapter, not six times.** Out of the
   story into the tutorial, and home again at the end — those two are the scenes
   the parallax was built for. Every level after the tutorial hands over in a

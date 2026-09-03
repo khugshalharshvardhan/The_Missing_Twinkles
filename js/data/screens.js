@@ -331,7 +331,7 @@ export const screens = [
     ],
     bubble: {
       art: `${IMG}bub_neel.webp`, who: "neel",
-      x: 1183, y: 142, w: 400, h: 237,
+      x: 1169, y: 197, w: 400, h: 237,
       text: "तो इस बार ध्यान से देखो!"
     }
   },
@@ -356,7 +356,7 @@ export const screens = [
     dwell: 10000,
     bubble: {
       art: `${IMG}bub_15.webp`, who: "agni",
-      x: 21, y: 107, w: 514, h: 277,
+      x: -5, y: 181, w: 514, h: 277,
       text: "और अंदाज़ा लगाओ कि कितने जुगनू हैं।"
     }
   },
@@ -401,7 +401,7 @@ export const screens = [
     ],
     bubble: {
       art: `${IMG}bub_neel.webp`, who: "neel",
-      x: 1157, y: 209, w: 400, h: 237,
+      x: 1109, y: 207, w: 400, h: 237,
       text: "हम्म… मुझे लगता है {guess} जुगनू थे।"
     }
   },
@@ -442,7 +442,7 @@ export const screens = [
     fireflies: { x: 628, y: 197 },
     counter: "guess",
     numberLine: true,
-    hint: { src: `${SHARED}hand_nudge.svg`, x: 653, y: 180, w: 308.396, h: 308.396 },
+    hint: { src: `${SHARED}hand_nudge.svg`, x: 532, y: 180, w: 308.396, h: 308.396 },
     bubble: {
       art: `${IMG}bub_32.webp`, who: "agni",
       x: 33, y: 252, w: 489, h: 256,
@@ -491,16 +491,18 @@ export const screens = [
       { src: `${IMG}neel_f.webp`, x: 1372, y: 424, w: 465, h: 589, fx: "breathe-slow" }
     ],
     fireflies: { x: 628, y: 197 },
-    // No counter card here: it would be repeating the number the line is
-    // about to show, and the top right of the frame is the only room Neel's
-    // balloon has. The answer flies down from the twinkles instead — see
-    // dropFromCounter() in js/game.js.
+    counter: "total",
     bubble: {
-      art: `${IMG}bub_neel.webp`, who: "neel",
+      art: `${IMG}bub_neel.webp`, who: "neel", tail: "right",
       // His line, so his balloon and his side of the frame. It sits in the
       // gap the beat leaves on the right: under the counter card, above his
       // head, and clear of the swarm still hanging in the middle.
-      x: 1390, y: 128, w: 465, h: 221,
+      // Under the counter card and over Neel's head, tail on the right so it
+      // comes down at him rather than into the sky beside him. Wide and short
+      // on purpose: at this width the line takes two lines rather than three,
+      // which is what lets it sit in the gap between the card and his horns
+      // without the fitter having to grow it.
+      x: 1252, y: 200, w: 408, h: 208,
       text: "{but}वहाँ कुल {total} जुगनू थे!"
     }
   },
@@ -542,7 +544,7 @@ export const screens = [
     lampGlass: { x: 1592, y: 254 },
     bubble: {
       art: `${IMG}bub_51.webp`, who: "agni",
-      x: 693, y: 210, w: 383, h: 184,
+      x: 694, y: 282, w: 383, h: 184,
       text: "लैंप पर टैप करो!"
     }
   },
@@ -608,7 +610,7 @@ export const level1 = [
     dwell: 10000,
     bubble: {
       art: `${IMG}bub_15.webp`, who: "agni",
-      x: 33, y: 107, w: 514, h: 277,
+      x: -1, y: 181, w: 514, h: 277,
       text: "ध्यान से देखो और अंदाज़ा लगाओ।"
     }
   },
@@ -634,7 +636,7 @@ export const level1 = [
       // Not part of the beat's opening — see idle in js/game.js. It comes up
       // only if nobody has typed for a while, and goes again by itself.
       idle: true,
-      text: "अब अपना अंदाज़ा लिखो।"
+      text: "अपना अंदाज़ा लिखो।"
     }
   },
 
@@ -651,7 +653,7 @@ export const level1 = [
     fireflies: { x: 716, y: 140 },
     counter: "guess",
     numberLine: true,
-    hint: { src: `${SHARED}hand_nudge.svg`, x: 909, y: 123, w: 308.396, h: 308.396 },
+    hint: { src: `${SHARED}hand_nudge.svg`, x: 852, y: 123, w: 308.396, h: 308.396 },
     bubble: {
       art: `${IMG}bub_32.webp`, who: "agni",
       x: 40, y: 252, w: 489, h: 256,
@@ -694,16 +696,18 @@ export const level1 = [
       { src: `${IMG}neel_f.webp`, x: 1372, y: 424, w: 465, h: 589, fx: "breathe-slow" }
     ],
     fireflies: { x: 716, y: 140 },
-    // No counter card here: it would be repeating the number the line is
-    // about to show, and the top right of the frame is the only room Neel's
-    // balloon has. The answer flies down from the twinkles instead — see
-    // dropFromCounter() in js/game.js.
+    counter: "total",
     bubble: {
-      art: `${IMG}bub_neel.webp`, who: "neel",
+      art: `${IMG}bub_neel.webp`, who: "neel", tail: "right",
       // His line, so his balloon and his side of the frame. It sits in the
       // gap the beat leaves on the right: under the counter card, above his
       // head, and clear of the swarm still hanging in the middle.
-      x: 1390, y: 128, w: 465, h: 221,
+      // Under the counter card and over Neel's head, tail on the right so it
+      // comes down at him rather than into the sky beside him. Wide and short
+      // on purpose: at this width the line takes two lines rather than three,
+      // which is what lets it sit in the gap between the card and his horns
+      // without the fitter having to grow it.
+      x: 1252, y: 200, w: 408, h: 208,
       text: "{but}वहाँ कुल {total} बेर थे!"
     }
   },
@@ -740,7 +744,7 @@ export const level1 = [
     lampGlass: { x: 1582, y: 254 },
     bubble: {
       art: `${IMG}bub_51.webp`, who: "agni",
-      x: 693, y: 210, w: 383, h: 184,
+      x: 694, y: 282, w: 383, h: 184,
       text: "लैंप पर टैप करो!"
     }
   },
@@ -790,7 +794,7 @@ export const level2 = [
     dwell: 10000,
     bubble: {
       art: `${IMG}bub_15.webp`, who: "agni",
-      x: 33, y: 107, w: 514, h: 277,
+      x: -1, y: 181, w: 514, h: 277,
       text: "ध्यान से देखो और अंदाज़ा लगाओ।"
     }
   },
@@ -816,7 +820,7 @@ export const level2 = [
       // Not part of the beat's opening — see idle in js/game.js. It comes up
       // only if nobody has typed for a while, and goes again by itself.
       idle: true,
-      text: "अब अपना अंदाज़ा लिखो।"
+      text: "अपना अंदाज़ा लिखो।"
     }
   },
 
@@ -836,7 +840,7 @@ export const level2 = [
     // The hand keeps the offset it has from the first countable on level 1
     // (-34, -17 from that box's own origin), so it points at the first star
     // the same way it points at the first berry.
-    hint: { src: `${SHARED}hand_nudge.svg`, x: 654, y: 157, w: 308.396, h: 308.396 },
+    hint: { src: `${SHARED}hand_nudge.svg`, x: 597, y: 157, w: 308.396, h: 308.396 },
     bubble: {
       art: `${IMG}bub_32.webp`, who: "agni",
       x: 40, y: 252, w: 489, h: 256,
@@ -879,16 +883,18 @@ export const level2 = [
       { src: `${IMG}neel_f.webp`, x: 1372, y: 424, w: 465, h: 589, fx: "breathe-slow" }
     ],
     fireflies: { x: 631, y: 174 },
-    // No counter card here: it would be repeating the number the line is
-    // about to show, and the top right of the frame is the only room Neel's
-    // balloon has. The answer flies down from the twinkles instead — see
-    // dropFromCounter() in js/game.js.
+    counter: "total",
     bubble: {
-      art: `${IMG}bub_neel.webp`, who: "neel",
+      art: `${IMG}bub_neel.webp`, who: "neel", tail: "right",
       // His line, so his balloon and his side of the frame. It sits in the
       // gap the beat leaves on the right: under the counter card, above his
       // head, and clear of the swarm still hanging in the middle.
-      x: 1390, y: 128, w: 465, h: 221,
+      // Under the counter card and over Neel's head, tail on the right so it
+      // comes down at him rather than into the sky beside him. Wide and short
+      // on purpose: at this width the line takes two lines rather than three,
+      // which is what lets it sit in the gap between the card and his horns
+      // without the fitter having to grow it.
+      x: 1252, y: 200, w: 408, h: 208,
       text: "{but}वहाँ कुल {total} तारे थे!"
     }
   },
@@ -925,7 +931,7 @@ export const level2 = [
     lampGlass: { x: 1582, y: 254 },
     bubble: {
       art: `${IMG}bub_51.webp`, who: "agni",
-      x: 693, y: 210, w: 383, h: 184,
+      x: 694, y: 282, w: 383, h: 184,
       text: "लैंप पर टैप करो!"
     }
   },
@@ -974,7 +980,7 @@ export const level3 = [
     dwell: 10000,
     bubble: {
       art: `${IMG}bub_15.webp`, who: "agni",
-      x: 33, y: 107, w: 514, h: 277,
+      x: -1, y: 181, w: 514, h: 277,
       text: "ध्यान से देखो और अंदाज़ा लगाओ।"
     }
   },
@@ -1000,7 +1006,7 @@ export const level3 = [
       // Not part of the beat's opening — see idle in js/game.js. It comes up
       // only if nobody has typed for a while, and goes again by itself.
       idle: true,
-      text: "अब अपना अंदाज़ा लिखो।"
+      text: "अपना अंदाज़ा लिखो।"
     }
   },
 
@@ -1019,7 +1025,7 @@ export const level3 = [
     numberLine: true,
     // The hand keeps level 1's offset from the first countable's own box
     // origin (-34, -17), so it points at the first seed the same way.
-    hint: { src: `${SHARED}hand_nudge.svg`, x: 662, y: 68, w: 308.396, h: 308.396 },
+    hint: { src: `${SHARED}hand_nudge.svg`, x: 605, y: 68, w: 308.396, h: 308.396 },
     bubble: {
       art: `${IMG}bub_32.webp`, who: "agni",
       x: 38, y: 252, w: 489, h: 256,
@@ -1062,16 +1068,18 @@ export const level3 = [
       { src: `${IMG}neel_f.webp`, x: 1372, y: 424, w: 465, h: 589, fx: "breathe-slow" }
     ],
     fireflies: { x: 639, y: 85 },
-    // No counter card here: it would be repeating the number the line is
-    // about to show, and the top right of the frame is the only room Neel's
-    // balloon has. The answer flies down from the twinkles instead — see
-    // dropFromCounter() in js/game.js.
+    counter: "total",
     bubble: {
-      art: `${IMG}bub_neel.webp`, who: "neel",
+      art: `${IMG}bub_neel.webp`, who: "neel", tail: "right",
       // His line, so his balloon and his side of the frame. It sits in the
       // gap the beat leaves on the right: under the counter card, above his
       // head, and clear of the swarm still hanging in the middle.
-      x: 1390, y: 128, w: 465, h: 221,
+      // Under the counter card and over Neel's head, tail on the right so it
+      // comes down at him rather than into the sky beside him. Wide and short
+      // on purpose: at this width the line takes two lines rather than three,
+      // which is what lets it sit in the gap between the card and his horns
+      // without the fitter having to grow it.
+      x: 1252, y: 200, w: 408, h: 208,
       text: "{but}वहाँ कुल {total} जादुई बीज थे!"
     }
   },
@@ -1108,7 +1116,7 @@ export const level3 = [
     lampGlass: { x: 1637, y: 254 },
     bubble: {
       art: `${IMG}bub_51.webp`, who: "agni",
-      x: 693, y: 210, w: 383, h: 184,
+      x: 694, y: 282, w: 383, h: 184,
       text: "लैंप पर टैप करो!"
     }
   },
@@ -1156,7 +1164,7 @@ export const level4 = [
     dwell: 10000,
     bubble: {
       art: `${IMG}bub_15.webp`, who: "agni",
-      x: 33, y: 107, w: 514, h: 277,
+      x: -1, y: 181, w: 514, h: 277,
       text: "ध्यान से देखो और अंदाज़ा लगाओ।"
     }
   },
@@ -1182,7 +1190,7 @@ export const level4 = [
       // Not part of the beat's opening — see idle in js/game.js. It comes up
       // only if nobody has typed for a while, and goes again by itself.
       idle: true,
-      text: "अब अपना अंदाज़ा लिखो।"
+      text: "अपना अंदाज़ा लिखो।"
     }
   },
 
@@ -1201,7 +1209,7 @@ export const level4 = [
     numberLine: true,
     // The hand keeps level 1's offset from the first countable's own box
     // origin (-34, -17), so it points at the first flower the same way.
-    hint: { src: `${SHARED}hand_nudge.svg`, x: 589, y: 121, w: 308.396, h: 308.396 },
+    hint: { src: `${SHARED}hand_nudge.svg`, x: 532, y: 121, w: 308.396, h: 308.396 },
     bubble: {
       art: `${IMG}bub_32.webp`, who: "agni",
       x: 38, y: 252, w: 489, h: 256,
@@ -1244,16 +1252,20 @@ export const level4 = [
       { src: `${IMG}neel_f.webp`, x: 1372, y: 424, w: 465, h: 589, fx: "breathe-slow" }
     ],
     fireflies: { x: 566, y: 138 },
-    // No counter card here: it would be repeating the number the line is
-    // about to show, and the top right of the frame is the only room Neel's
-    // balloon has. The answer flies down from the twinkles instead — see
-    // dropFromCounter() in js/game.js.
+    counter: "total",
     bubble: {
-      art: `${IMG}bub_neel.webp`, who: "neel",
+      art: `${IMG}bub_neel.webp`, who: "neel", tail: "right",
       // His line, so his balloon and his side of the frame. It sits in the
       // gap the beat leaves on the right: under the counter card, above his
       // head, and clear of the swarm still hanging in the middle.
-      x: 1390, y: 128, w: 465, h: 221,
+      // Under the counter card and over Neel's head, tail on the right so it
+      // comes down at him rather than into the sky beside him. Wide and short
+      // on purpose: at this width the line takes two lines rather than three,
+      // which is what lets it sit in the gap between the card and his horns
+      // without the fitter having to grow it.
+      // 83px right of where the other rounds put it: the glowflowers are the
+      // widest formation in the game and their right column reaches this far.
+      x: 1335, y: 200, w: 408, h: 208,
       text: "{but}वहाँ कुल {total} फूल थे!"
     }
   },
@@ -1290,7 +1302,7 @@ export const level4 = [
     lampGlass: { x: 1637, y: 254 },
     bubble: {
       art: `${IMG}bub_51.webp`, who: "agni",
-      x: 693, y: 210, w: 383, h: 184,
+      x: 694, y: 282, w: 383, h: 184,
       text: "लैंप पर टैप करो!"
     }
   },
