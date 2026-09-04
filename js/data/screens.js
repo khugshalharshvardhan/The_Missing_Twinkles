@@ -655,11 +655,11 @@ export const level1 = [
     fireflies: { x: 716, y: 140 },
     counter: "guess",
     numberLine: true,
-    hint: { src: `${SHARED}hand_nudge.svg`, x: 852, y: 123, w: 308.396, h: 308.396 },
+    hint: { src: `${SHARED}hand_nudge.svg`, x: 852, y: 123, w: 308.396, h: 308.396, after: 10000 },
     bubble: {
       art: `${IMG}bub_32.webp`, who: "agni",
       x: 40, y: 252, w: 489, h: 256,
-      text: "गिनने के लिए हर बेर पर टैप करो।"
+      text: "अब गिनो!"
     }
   },
 
@@ -840,11 +840,11 @@ export const level2 = [
     // The hand keeps the offset it has from the first countable on level 1
     // (-34, -17 from that box's own origin), so it points at the first star
     // the same way it points at the first berry.
-    hint: { src: `${SHARED}hand_nudge.svg`, x: 597, y: 157, w: 308.396, h: 308.396 },
+    hint: { src: `${SHARED}hand_nudge.svg`, x: 597, y: 157, w: 308.396, h: 308.396, after: 10000 },
     bubble: {
       art: `${IMG}bub_32.webp`, who: "agni",
       x: 40, y: 252, w: 489, h: 256,
-      text: "गिनने के लिए हर तारे पर टैप करो।"
+      text: "अब गिनो!"
     }
   },
 
@@ -1022,11 +1022,11 @@ export const level3 = [
     numberLine: true,
     // The hand keeps level 1's offset from the first countable's own box
     // origin (-34, -17), so it points at the first seed the same way.
-    hint: { src: `${SHARED}hand_nudge.svg`, x: 605, y: 68, w: 308.396, h: 308.396 },
+    hint: { src: `${SHARED}hand_nudge.svg`, x: 605, y: 68, w: 308.396, h: 308.396, after: 10000 },
     bubble: {
       art: `${IMG}bub_32.webp`, who: "agni",
       x: 38, y: 252, w: 489, h: 256,
-      text: "गिनने के लिए हर बीज पर टैप करो।"
+      text: "अब गिनो!"
     }
   },
 
@@ -1204,11 +1204,11 @@ export const level4 = [
     numberLine: true,
     // The hand keeps level 1's offset from the first countable's own box
     // origin (-34, -17), so it points at the first flower the same way.
-    hint: { src: `${SHARED}hand_nudge.svg`, x: 532, y: 121, w: 308.396, h: 308.396 },
+    hint: { src: `${SHARED}hand_nudge.svg`, x: 532, y: 121, w: 308.396, h: 308.396, after: 10000 },
     bubble: {
       art: `${IMG}bub_32.webp`, who: "agni",
       x: 38, y: 252, w: 489, h: 256,
-      text: "गिनने के लिए हर फूल पर टैप करो।"
+      text: "अब गिनो!"
     }
   },
 
@@ -1498,13 +1498,13 @@ export const epilogueScreens = [
   // ---- EEND — the words the chapter closes on ----
   {
     id: "eend",
-    // The street they just lit, and the circle closing over it. The word waits
-    // for the dark: the iris takes 1.6s from 200ms, so 2000ms lands it just
-    // after the last of the picture has gone.
+    // The street they just lit, and the circle closing over it. Nothing is
+    // written on the dark it closes to: the picture going out IS the ending,
+    // and a word over it only labels what the reader has just watched happen.
+    // The dwell is the iris (200 + 1600) and a breath after it.
     layers: [EP_STREET, EP_PAIR],
     iris: { at: 200, over: 1600 },
-    shout: { text: "समाप्त", centre: true, tilt: -3, size: 150, at: 2000 },
-    dwell: 6200
+    dwell: 2800
   }
 ];
 

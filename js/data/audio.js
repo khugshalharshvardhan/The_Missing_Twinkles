@@ -377,9 +377,14 @@ export const gameCues = {
     sfx: [{ id: "page_air", at: 0, gain: 0.5 },
       { id: "sparkle", at: 800, gain: 0.55 }]
   },
+  // The levels' count beats do not say the instruction any more, because the
+  // balloon does not either — it reads "अब गिनो!" now, and a voice reciting the
+  // whole sentence over it would be exactly the repetition that was taken out.
+  // The tutorial still says it in full ("3.2" above): that beat is where
+  // tapping is taught. vo_l1_tapcount..vo_l4_tapcount are untouched on disk,
+  // and a short "अब गिनो!" take would slot straight in here.
   "p3.2": {
-    sfx: [{ id: "page_air", at: 0, gain: 0.5 }],
-    vo: { id: "vo_l1_tapcount", at: 500, pan: -0.5 }
+    sfx: [{ id: "page_air", at: 0, gain: 0.5 }]
   },
 
   // ---- the total, and how the guess did ----
@@ -429,8 +434,7 @@ export const gameCues = {
       { id: "sparkle", at: 800, gain: 0.55 }]
   },
   "s3.2": {
-    sfx: [{ id: "page_air", at: 0, gain: 0.5 }],
-    vo: { id: "vo_l2_tapcount", at: 500, pan: -0.5 }
+    sfx: [{ id: "page_air", at: 0, gain: 0.5 }]
   },
 
   // ---- the total, and how the guess did ----
@@ -478,8 +482,7 @@ export const gameCues = {
       { id: "sparkle", at: 800, gain: 0.55 }]
   },
   "m3.2": {
-    sfx: [{ id: "page_air", at: 0, gain: 0.5 }],
-    vo: { id: "vo_l3_tapcount", at: 500, pan: -0.5 }
+    sfx: [{ id: "page_air", at: 0, gain: 0.5 }]
   },
 
   // ---- the total, and how the guess did ----
@@ -527,8 +530,7 @@ export const gameCues = {
       { id: "sparkle", at: 800, gain: 0.55 }]
   },
   "f3.2": {
-    sfx: [{ id: "page_air", at: 0, gain: 0.5 }],
-    vo: { id: "vo_l4_tapcount", at: 500, pan: -0.5 }
+    sfx: [{ id: "page_air", at: 0, gain: 0.5 }]
   },
 
   // ---- the total, and how the guess did ----

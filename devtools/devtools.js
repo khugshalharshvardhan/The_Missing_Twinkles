@@ -227,7 +227,7 @@ function parts(screen) {
   if (screen.flight) bits.add(`flight @${screen.flight.at}ms`);
   if (screen.video) bits.add("video");
   if (screen.iris) bits.add(`iris @${screen.iris.at ?? 0}ms`);
-  if (screen.hint) bits.add("hint");
+  if (screen.hint) bits.add(screen.hint.after ? `hint after ${screen.hint.after / 1000}s idle` : "hint");
   if (screen.bubble) bits.add(screen.bubble.idle ? "nudge @8s" : "bubble");
   return bits.size ? `  ·  ${[...bits].join("  ·  ")}` : "";
 }

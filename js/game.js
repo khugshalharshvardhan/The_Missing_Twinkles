@@ -297,6 +297,7 @@ function speak(screen) {
   scheduleReveals(screen, panes[front], swarmAt);
 
   armIdle(panes[front]);
+  armHint(panes[front]);
 
   playCues(cue, { swarmAt });
   const spokenEnd = dynamicVoice(screen);
@@ -340,12 +341,32 @@ function speak(screen) {
 // is still thinking does not need telling again.
 const IDLE_AFTER = 8000;
 
+// The tap hand on a beat that does not offer it at once.
+//
+// The tutorial's hand comes out with the line, because that beat is where
+// tapping is taught. The levels' do not: a child who has counted a round is
+// being asked to count, not shown how, and a hand laid over the first item
+// every single time says they are not trusted to remember. It comes out only
+// if nothing has been touched for a while — and goes again the moment
+// something is, which also starts the wait over, so it comes back if they
+// stall again halfway through.
+let hintTimer = 0;
+
+function armHint(pane) {
+  cancel(hintTimer);
+  const hand = pane?.querySelector(".hint.is-held");
+  if (!hand) return;
+  hand.classList.remove("is-shown");
+  hintTimer = after(() => hand.classList.add("is-shown"), Number(hand.dataset.after) || 10000);
+}
+
 let idleTimers = [];
 let saidNudge = false;
 
 function clearIdle() {
   idleTimers.forEach(cancel);
   idleTimers = [];
+  cancel(hintTimer);
 }
 
 // Start, or restart, the wait. Called when a nudging beat begins and again on
@@ -616,7 +637,13 @@ function render(screen) {
   if (screen.keypad) frag.append(keypadPanel(screen));
   if (screen.counter) frag.append(counterCard(screen.counter));
   if (screen.numberLine) frag.append(numberLineStrip(screen));
-  if (screen.hint) frag.append(imageLayer(screen.hint, "layer hint"));
+  if (screen.hint) {
+    // A hint with an `after` is held back rather than offered: it waits for the
+    // player to do nothing for that long. See armHint().
+    const hand = imageLayer(screen.hint, screen.hint.after ? "layer hint is-held" : "layer hint");
+    if (screen.hint.after) hand.dataset.after = String(screen.hint.after);
+    frag.append(hand);
+  }
   if (screen.bubble) frag.append(bubble(screen.bubble, screen));
   if (screen.shout) frag.append(shout(screen.shout));
   if (screen.flight) frag.append(flight(screen.flight));
@@ -801,8 +828,12 @@ function tally(el) {
   // be on screen mid-fade, holding a stale counter of its own.
   const pane = el.closest(".scene");
 
-  // The tap hint has done its job once the player gets the idea.
-  pane?.querySelector(".hint")?.classList.add("is-done");
+  // The tap hint has done its job once the player gets the idea — unless it is
+  // one of the ones that waits, which goes back to waiting instead of retiring,
+  // so a child who stalls again halfway is offered it again.
+  const hand = pane?.querySelector(".hint");
+  if (hand?.classList.contains("is-held")) armHint(pane);
+  else hand?.classList.add("is-done");
 
   if (counted === round.total) {
     playSfx({ id: "count_done", at: 260, gain: 0.85 });

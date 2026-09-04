@@ -636,6 +636,14 @@
 
 #game .lamp {
   cursor: pointer;
+  /* The one layer that does not clip.
+     Every other .layer is a crop box (overflow: hidden), and this one's crop is
+     horizontal only — the art is a lamp on a transparent field, narrowed to the
+     lamp. But the box also cut the glow below, which is why the halo had a
+     straight edge across it at the lamp's foot. There is nothing outside the
+     box but transparent pixels, so letting it show costs nothing and the glow
+     ends where the light ends. */
+  overflow: visible;
 }
 
 #game .lamp:hover .fill,
@@ -1053,6 +1061,18 @@
 
 #game .hint.is-done {
   opacity: 0;
+}
+
+/* Held back: present in the pane from the start so nothing has to be built
+   mid-beat, but not offered until the wait is up. Both classes are needed on
+   the second rule so it outranks .scene.is-line .hint above — which is what
+   keeps a hand from appearing over a line that is still being said. */
+#game .hint.is-held {
+  opacity: 0;
+}
+
+#game .hint.is-held.is-shown {
+  opacity: 1;
 }
 
 /* =========================================================

@@ -467,6 +467,37 @@ Two things had to follow it:
   a swarm that arrives has a life the beat must outlast, one that is simply
   standing there does not.
 
+## Told once, then trusted
+
+The tutorial teaches the tap and says the whole sentence — "गिनने के लिए हर
+जुगनू पर टैप करो।" The four levels used to say their own version of it every
+time, which was the longest repeated thing in the chapter. They say **"अब
+गिनो!"** now: a child who has counted a round is being asked to count, not
+shown how.
+
+The voice follows the text. `vo_l1_tapcount`..`vo_l4_tapcount` are off those
+cues — a voice reciting the full sentence over a two-word balloon is exactly
+the repetition that was taken out. The recordings are untouched on disk, and a
+short "अब गिनो!" take drops straight into the same four cues.
+
+**And the hand waits.** The hint hand used to lie over the first item from the
+moment the line ended, in every round. On the levels it is now held back
+(`hint.after: 10000`, `armHint()` in js/game.js) and only offered if nothing has
+been touched for ten seconds — and it goes again the moment something is, which
+restarts the wait, so it comes back if a child stalls halfway through. The
+tutorial's hand still comes out with the line, because that beat is where
+tapping is taught.
+
+Measured: beat opens with no hand, hand at ~10s, gone on the first tap, back
+ten seconds later if the counting stops.
+
+## The chapter ends on the dark
+
+No word. The picture closing to a point IS the ending, and "समाप्त" over it only
+labelled what the reader had just watched happen. The iris stays; `eend` is the
+iris and a breath after it (dwell 2800), and the chapter closes onto its own
+cover as before — verified reaching `chapter:done` 11s after the last line.
+
 ## The lamp asks to be tapped
 
 `#game .lamp .fill` already had a warm halo on `:hover` — which a child on a
@@ -484,6 +515,14 @@ that glows steadily.
 
 It is on every round's lamp beat, not only the tutorial's: the instruction
 appears each round and so should the thing it points at.
+
+`#game .lamp` is the one `.layer` that does not clip. Every other layer is a
+crop box (`overflow: hidden`), and the lamp's crop is horizontal only — the art
+is a lamp on a transparent field, narrowed to the lamp. But the box was cutting
+the halo below as well, which is why the glow had a straight edge across it at
+the lamp's foot. There is nothing outside that box but transparent pixels
+(checked: the corners are 0/10000 opaque), so letting it show costs nothing and
+the glow now ends where the light ends.
 
 ## No "यय!"
 
