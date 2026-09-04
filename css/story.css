@@ -983,6 +983,9 @@
      the two characters, rather than against the edge of the frame. */
   padding: 0 80px 176px;
   background: #05060d url("../assets/images/cover_hindi.webp") center / cover no-repeat;
+  /* Nothing to draw once the chapter has started, and a full-frame picture
+     costs the device the same whether it is visible or not. */
+  &.is-spent { background-image: none; }
 }
 
 /* Once the art is in, the loading furniture goes: the cover should be the cover,

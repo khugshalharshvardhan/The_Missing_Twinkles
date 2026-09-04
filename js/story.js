@@ -72,6 +72,20 @@ export function initStory(handlers) {
   onComplete = handlers.onComplete;
 }
 
+// The story is over: drop its artwork. Every layer still mounted is a decoded
+// bitmap the device is holding — around forty megabytes of pages nobody can see
+// once the walk has started, which on a phone is the difference between running
+// and being killed and reloaded. startStory() builds it all again from the
+// data, so there is nothing here to keep.
+export function releaseStory() {
+  clearTimers();
+  mounted.clear();
+  layerHost.replaceChildren();
+  overlayHost.replaceChildren();
+  transition.classList.remove("is-active");
+  transition.replaceChildren();
+}
+
 export function startStory() {
   clearTimers();
   stopAudio();

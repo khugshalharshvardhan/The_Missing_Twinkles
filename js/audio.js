@@ -8,6 +8,7 @@
 // can cancel what hasn't sounded yet.
 
 import { clipUrl } from "./data/audio.js";
+import { after } from "./clock.js";
 
 const STORE_KEY = "mystry.muted";
 
@@ -28,7 +29,12 @@ const buffers = new Map();
 // Sources scheduled for the current beat, each with the window it sounds in so
 // a beat change can tell what is mid-sentence from what has not started.
 let live = [];
-let bed = null;           // { id, source, gain }
+let bed = null;           // { id, el, gain } — the one playing now
+// One media element per bed, kept so a track that comes back does not have to
+// be fetched again. They are NOT decoded into memory: a bed runs for minutes
+// and decoding one costs about fifteen megabytes for every minute of it, which
+// on a phone is most of the budget the artwork also needs.
+const beds = new Map();
 let muted = false;
 // A multiplier on the music bus that beats can set, so one continuous track can
 // still fall away for the lights-out and come back with the fireflies. Ducking
@@ -87,6 +93,12 @@ let paused = false;
 export function setAudioPaused(on) {
   paused = Boolean(on);
   if (!ctx) return;
+  // The bed is a media element with a clock of its own: suspending the context
+  // makes it silent but does not stop it, so it would come back seconds ahead.
+  if (bed) {
+    if (paused) bed.el.pause();
+    else bed.el.play().catch(() => {});
+  }
   if (paused) ctx.suspend().catch(() => {});
   else ctx.resume().catch(() => {});
 }
@@ -211,6 +223,25 @@ export function playVo(cue) {
 
 /* ---- ambience ---- */
 
+// A bed's element and its own gain, made once and kept. Routed into the music
+// bus like everything else, so ducking, the mute and the level a beat sets all
+// reach it unchanged.
+function bedNode(id) {
+  let node = beds.get(id);
+  if (node) return node;
+
+  const el = new Audio(clipUrl(id));
+  el.loop = true;
+  el.preload = "auto";
+  const gain = ctx.createGain();
+  gain.gain.value = 0;
+  ctx.createMediaElementSource(el).connect(gain).connect(buses.music);
+
+  node = { el, gain };
+  beds.set(id, node);
+  return node;
+}
+
 export function playBed(id, at = 0) {
   if (!ctx) return;
 
@@ -222,21 +253,26 @@ export function playBed(id, at = 0) {
     old.gain.gain.cancelScheduledValues(when);
     old.gain.gain.setValueAtTime(old.gain.gain.value, when);
     old.gain.gain.linearRampToValueAtTime(0, when + BED_FADE);
-    old.source.stop(when + BED_FADE + 0.1);
+    // Stopped once it is inaudible. A media element cannot be scheduled on the
+    // audio clock, so this is the one place a timer stands in for it.
+    after(() => { old.el.pause(); old.el.currentTime = 0; }, at + BED_FADE * 1000 + 120);
     bed = null;
   }
 
   if (!id) return;
 
-  const node = source(id, "music");
-  if (!node) return;
-
-  node.src.loop = true;
+  const node = bedNode(id);
+  node.gain.gain.cancelScheduledValues(when);
   node.gain.gain.setValueAtTime(0, when);
   node.gain.gain.linearRampToValueAtTime(1, when + BED_FADE);
-  node.src.start(when);
 
-  bed = { id, source: node.src, gain: node.gain };
+  const go = () => {
+    node.el.currentTime = 0;
+    if (!paused) node.el.play().catch(() => {});
+  };
+  if (at > 0) after(go, at); else go();
+
+  bed = { id, el: node.el, gain: node.gain };
 }
 
 // Dip the music so a line sits on top of it, then bring it back to whatever
@@ -333,4 +369,16 @@ export function stopAudio() {
 // What the sound is doing, for the dev tools and for tests.
 export function audioState() {
   return ctx ? ctx.state : "none";
+}
+
+// What the music is doing. The bed is a detached media element, so this is the
+// only way to see it — the dev tools show it, and the tests read it.
+export function bedState() {
+  if (!bed) return { id: null };
+  return {
+    id: bed.id,
+    playing: !bed.el.paused,
+    at: Number(bed.el.currentTime.toFixed(1)),
+    gain: Number(bed.gain.gain.value.toFixed(2))
+  };
 }

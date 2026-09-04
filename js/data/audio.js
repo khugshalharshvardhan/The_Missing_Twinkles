@@ -555,11 +555,15 @@ export const gameCues = {
 
 // Every clip the soundtrack needs, for the preloader — both acts, one list, so
 // the game never has to stop and load a sound mid-chapter.
+// The beds are deliberately NOT in here. Everything listed is fetched and
+// DECODED before the chapter starts, and a decoded minute of audio is about
+// fifteen megabytes held for the life of the tab — the beds alone came to more
+// than half the soundtrack's memory. They stream from a media element instead;
+// see playBed() in js/audio.js.
 export const audioManifest = [
   ...new Set([
     UI_ADVANCE,
     ...[...Object.values(cues), ...Object.values(gameCues)].flatMap((c) => [
-      ...(typeof c.bed === "string" ? [c.bed] : c.bed?.id ? [c.bed.id] : []),
       ...(c.sfx ?? []).map((s) => s.id),
       ...(c.vo ? [c.vo.id] : [])
     ]),

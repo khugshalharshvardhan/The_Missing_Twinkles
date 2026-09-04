@@ -19,7 +19,7 @@ import {
 import { audioManifest, UI_ADVANCE } from "./data/audio.js";
 import { watchStage, setFrame } from "./stage.js";
 import { preload } from "./preload.js";
-import { initStory, startStory, nextPage, prevPage } from "./story.js";
+import { initStory, startStory, nextPage, prevPage, releaseStory } from "./story.js";
 import { initGame, startGame, startEpilogue, releaseHold, armHold, currentLevel } from "./game.js";
 import { initWalk, startWalk, endWalk } from "./walk.js";
 import { initWarp, playWarp, WARP_HOLD_MS } from "./warp.js";
@@ -188,7 +188,22 @@ Promise.all([
 // Back to the cover, everything wound down: the next press of Play runs the
 // whole chapter again from the top. The loader kept its is-ready state from
 // boot, so the button is already waiting on it.
+// Everything the story was holding, put down.
+//
+// A device holds every image the document still points at as width x height x
+// four bytes, whatever the file compressed to. The story's pages came to about
+// forty megabytes and the cover to eight, and none of it is on screen once the
+// chapter has moved on — but the walk is about to ask for a dozen more images,
+// and on a phone that sum is the difference between running and having the tab
+// killed and reloaded. startStory() builds it all again from the data, and
+// resetToTitle() puts the cover back for the title screen it belongs to.
+function leaveStory() {
+  releaseStory();
+  loader.classList.add("is-spent");
+}
+
 function resetToTitle() {
+  loader.classList.remove("is-spent");
   goingHome = false;
   chapter = 0;
   stopAudio();
@@ -222,6 +237,7 @@ function warpOn() {
 }
 
 function enterWalk(dest, mode = null) {
+  leaveStory();
   document.body.dataset.act = "walk";
   // The walk borrows the game's frame, so arriving is a cross-fade, not a cut.
   setFrame(GAME_W, GAME_H);
@@ -254,6 +270,7 @@ function arrive() {
 }
 
 function enterGame(at = 0) {
+  leaveStory();
   document.body.dataset.act = "game";
   // The game was drawn at its own size; the stage takes that frame on. Coming
   // from the walk this is already the frame, so nothing moves.
@@ -274,6 +291,7 @@ function enterStory() {
 // Dev only: put an act on stage without starting it playing. The tools pick
 // the moment themselves, so kicking off a run first would only be undone.
 function devSetAct(act) {
+  if (act !== "story") leaveStory();
   // The walk is drawn in the game's frame, not the story's — see js/data/walk.js.
   const wide = act === "game" || act === "walk";
   document.body.dataset.act = act;

@@ -111,6 +111,7 @@ frame coordinates.**
 | `tools/install-vo.js` | Puts the recorded Hindi takes where the game looks for them: maps take -> cue id, trims, levels, and cuts the two lines with a number spoken inside them |
 | `js/warp.js` + `css/warp.css` | The hand-over between levels: the finished place travelling out to the left, the next one arriving behind it, a seam of light down the join |
 | `js/fit.js` + `js/data/bubbles.js` | Speech balloons: where each balloon's round face and tail sit (measured), and the fitter that shrinks a balloon onto its own line |
+| `tools/shrink-art.js` | Brings the heaviest artwork down to the size it is drawn at. Originals kept in `assets/full/` |
 | `js/clock.js` | Every timeout in the chapter. `after`/`cancel` have setTimeout's shape; `freeze`/`thaw` take a pause through them, each timer keeping what it had left |
 | `js/anchor.js` + `js/data/poses.js` | Pins each character's centre-x/feet per scene so pose swaps don't slide |
 | `devtools/` | The hamburger menu + live-edit mode |
@@ -331,6 +332,41 @@ Game engine facts that matter when adding a level:
   transform animation on `.layer` stomps the `is-flipped` transform.
 
 ---
+
+### Memory — why it used to die on a phone
+
+A browser holds every decoded image as **width x height x 4 bytes**, whatever
+the file compressed to: a 24KB WebP that happens to be 4344x1448 costs a device
+24 MEGABYTES the moment it is on screen. Audio is the same — decoded PCM, about
+0.29 MB per second.
+
+The chapter used to ask a device for **272 MB** (171 MB of bitmap plus 101 MB of
+audio), and the peak landed exactly at the walk, because that is where the
+parallax decodes on top of everything the story is still holding. A phone
+answers that by killing the tab and reloading it — which looks like the game
+restarting itself the moment the walk begins. It is now **98 MB**. Four things
+did it, and all four are worth keeping:
+
+- **The story lets go of its art** (`releaseStory()` in js/story.js, called from
+  `leaveStory()` in js/main.js on every route out of the story). Forty megabytes
+  of pages nobody could see stayed mounted through the walk and the whole game.
+  startStory() rebuilds from the data, so nothing is lost.
+- **The cover is put down** when the chapter starts (`.is-spent` on the loader):
+  eight megabytes of full-frame picture sat behind the game for ever.
+- **The heaviest art is stored at the size it is drawn** —
+  `node tools/shrink-art.js`, originals in `assets/full/`. The spark sheet alone
+  was 24 MB decoded for the smallest thing on screen. Nothing in it is a
+  judgement call: each file is measured against the height its layer is drawn
+  at in js/data/walk.js.
+- **The music streams instead of being decoded** (`bedNode()` in js/audio.js).
+  A bed runs for minutes and decoding one costs ~15 MB per minute for the life
+  of the tab; they now play from a media element routed into the same music bus,
+  so the cross-fade, the duck and the mute are unchanged. They are deliberately
+  absent from `audioManifest`. The pause has to stop the element as well as
+  suspending the context — a media element has a clock of its own.
+
+If you add art, check it with the same arithmetic before shipping it: pixels x 4
+is what the device pays, not the file size.
 
 ## 4. The level recipe (exactly how level 1 was added — copy it)
 
