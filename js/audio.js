@@ -153,7 +153,8 @@ function source(id, bus) {
   return { src, gain, buffer };
 }
 
-// `at` is milliseconds from now; `pan` is -1..1; `sweep` pans across the clip.
+// `at` is milliseconds from now; `pan` is -1..1; `sweep` pans across the clip;
+// `muffle` puts it behind some air (see below).
 function fire(cue, bus) {
   const node = source(cue.id, bus);
   if (!node) return null;
@@ -164,10 +165,30 @@ function fire(cue, bus) {
   gain.gain.value = cue.gain ?? 1;
   if (cue.rate) src.playbackRate.value = cue.rate;
 
+  // Whatever sits between the gain and the bus, in order. Each link takes over
+  // the connection to the bus from the one before it, so the chain can grow
+  // without every branch below having to know what came earlier.
+  let tail = gain;
+  const chain = (added) => {
+    tail.disconnect();
+    tail.connect(added).connect(buses[bus]);
+    tail = added;
+  };
+
+  // Distance is not just level: air takes the top off a sound long before it
+  // takes its loudness, so a clip only turned down still reads as close and
+  // quiet. `muffle` is a lowpass corner in Hz — the lower it is, the further
+  // away whatever made the sound is.
+  if (cue.muffle) {
+    const far = ctx.createBiquadFilter();
+    far.type = "lowpass";
+    far.frequency.value = cue.muffle;
+    chain(far);
+  }
+
   if (cue.pan != null || cue.sweep) {
     const panner = ctx.createStereoPanner();
-    gain.disconnect();
-    gain.connect(panner).connect(buses[bus]);
+    chain(panner);
 
     if (cue.sweep) {
       // The script has Mr. Giggles' laugh cross the screen, so the voice

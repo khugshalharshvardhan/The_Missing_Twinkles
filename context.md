@@ -727,6 +727,24 @@ the tutorial's `lamp_off.webp`/`lamp_on.webp` at their existing coordinates**
   and `lamp_out` are unreferenced but kept on disk.
 - **Never delete audio files** when removing them from code — just remove the
   references.
+- **Nothing on the dark screens may be written down.** Step 3.1 holds nothing
+  but two pairs of eyes, so any text on it reads as one of *them* saying it —
+  which is why Mr Giggles' laugh is heard there and never spelled out (the
+  "ही! ही!" that used to pop in time with it is gone; `hehes()` in js/story.js
+  is kept, unused, beside `laugh()`). Same reason the two lines after him are
+  spoken in each character's own colour rather than in a balloon.
+- **Distance is not just level.** A cue can carry `muffle` — a lowpass corner
+  in Hz applied before the pan (`fire()` in js/audio.js) — so something far off
+  loses its top end as well as its loudness. The giggle uses it: `gain 0.32,
+  muffle 1500, pan -0.62`. Turning a clip down on its own leaves it sounding
+  close and quiet.
+- **A sound that must straddle a beat boundary has to start on the later
+  beat.** Every step change calls `clearCues()` (js/story.js), which stops
+  anything still running on the sfx bus — only a voice already mid-line is
+  spared, and only where `keepVoice` is passed. Something wanted "over the
+  transition" therefore belongs at `at: 0` of the beat being dissolved *to*,
+  where it plays under the 700ms layer fade; scheduled at the tail of the
+  outgoing beat it is cut off mid-sound.
 - **Update the devtools hamburger menu with every screen/feature change**,
   unprompted (`parts()` in devtools/devtools.js; TARGETS in devtools/edit.js).
 - Every dialogue VO must complete (+ air) before the next beat — pacing bugs are
@@ -757,14 +775,25 @@ the tutorial's `lamp_off.webp`/`lamp_on.webp` at their existing coordinates**
   msedge-tts casting, silence-trimmed and loudness-matched to −16 LUFS like the
   rest. `tools/gen-vo-game.js` stays the source of truth for a full regen.
 
-- **Two things headless verification cannot see**, so don't read their absence
+- **Things headless verification cannot see**, so don't read their absence
   from a screenshot as a bug: the `enter: "magic"` materialise-in on every
   level's look beat (its CSS animation clock does not advance under
   `--virtual-time-budget`, so the swarm sits at opacity 0 — the shipped
   tutorial and level 1 behave identically), and the walk when it is entered by
   a devtools jump rather than by finishing the previous level (it renders empty
   for `clearing` and `meadow` too). Verify the walk by riding the previous
-  level's last beat to its end instead; that path renders correctly.
+  level's last beat to its end instead; that path renders correctly. Also
+  blind: the eyes on 3.1 (a `<video>` — headless decodes none, so that beat
+  screenshots black), and any balloon on a beat reached by a devtools jump (the
+  overlay fades in on a CSS transition that never runs — check the text is in
+  the DOM instead).
+- **Audio cannot be verified in a headless browser at all**: `decodeAudioData`
+  never resolves under `--virtual-time-budget` (there is no audio thread to
+  advance), so `loadAudio()` hangs and every buffer stays empty. To check what
+  the mixer *builds* for a cue — the filter, the pan, the order of the chain —
+  stub `window.AudioContext` with a recording fake **before** importing
+  js/audio.js and read the connect/disconnect calls the real `fire()` makes.
+  How it actually sounds still needs a person and a pair of speakers.
 
 - **Multi-digit keypad — done.** The pad now builds a number: digits land in the
   readout (`keypad.display`, back in the place Figma drew it, which is why the

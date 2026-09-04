@@ -219,13 +219,22 @@ const STREET_DUSK = { key: "street-dusk", kind: "dusk" };
 // steps, so the player's layer diffing GLIDES it out of her hand rather than
 // re-drawing it somewhere else (see .layer's transition in css/story.css).
 //
-// The shock mark is measured, not guessed: the gold swirl painted into the new
+// Both marks are measured, not guessed. The gold swirl painted into the shock
 // art sits at (0.4318, 0.5111) of the picture, so the sprite is centred there
-// through the layer box below. The cheer mark is where the ghost used to
-// hover, which is the far side of the street from her hand.
+// through the layer box below.
+//
+// The cheer mark is on the line of her finger. In the cheer art she points up
+// and to her right; the fingertip is at (877, 390) of that 1800x1115 picture,
+// which the layer box below puts at (891, 498) of the frame, and the finger
+// itself runs at 35 degrees above the horizontal. The box centre here sits on
+// that ray, about 570px out — the first stretch of open sky past Neel, clear
+// of his hair and of his raised fist. It used to hang at (1695, 481), which
+// was where the cut ghost had hovered: level with her eyes and a long way
+// right of where she is pointing, so she read as gesturing at nothing and the
+// twinkle as being unrelated to her.
 const FIREFLY_IN_HAND = {
   shock: { key: "firefly", src: `${IMG}firefly.webp`, x: 731, y: 587, w: 118, h: 79, glow: "spark" },
-  cheer: { key: "firefly", src: `${IMG}firefly.webp`, x: 1695, y: 481, w: 118, h: 79, glow: "spark" }
+  cheer: { key: "firefly", src: `${IMG}firefly.webp`, x: 1300, y: 127, w: 118, h: 79, glow: "spark" }
 };
 
 // "Very faint lights blink in distant hiding places" — clear of the characters
@@ -396,9 +405,10 @@ export const pages = [
       },
 
       // Figma 2.3 / 2.4 / 3 — pitch dark, two pairs of eyes. The eyes open the
-      // moment the light has gone, and Mr Giggles crosses overhead: once, heard
-      // and read, but never shown. A bubble would light the frame, so the two
-      // lines after him are spoken in each character's own colour.
+      // moment the light has gone, and Mr Giggles laughs somewhere out in it:
+      // once, heard but never shown and never written. A bubble would light the
+      // frame, so the two lines after him are spoken in each character's own
+      // colour.
       //
       // The holds across these three used to be set by the round number rather
       // than by the lines, which left roughly a second of nothing after every
@@ -408,14 +418,18 @@ export const pages = [
       // later.
       {
         id: "3.1",
-        // One blink (900ms, see the cue), then the hehes: three of them
-        // popping at scattered spots while the giggle roams the dark. The last
-        // fades out around 4.1s.
-        hold: 4600,
+        // The laugh runs 0-2.2s, from the first frame of the dissolve, and one
+        // blink lands under it at 900ms (both in js/data/audio.js). Ending a
+        // beat after he does leaves a second of dark quiet before she calls
+        // out — which is the beat working, not dead air.
+        hold: 3400,
         layers: [{ key: "night", kind: "night" }, EYES],
-        // Three pairs of "हे हे", one for each pair of his six — the gap is his
-        // phrasing, not a round number. See the cue in js/data/audio.js.
-        sfx: [{ kind: "hehes", count: 3, delay: 1250, gap: 600 }]
+        // Nothing written on this one. Three pairs of "ही! ही!" used to pop
+        // here in time with the laugh, and on a screen with nobody on it but
+        // two pairs of eyes they read as one of the two of THEM giggling —
+        // exactly the wrong impression, since he is the reason they are in the
+        // dark. He is heard now and never read; the renderer for them is still
+        // in js/story.js (hehes), unused, like laugh() beside it.
       },
 
       {
