@@ -29,6 +29,7 @@ import {
 import { playCues, clearCues } from "./audio.js";
 import { cues } from "./data/audio.js";
 import { after, cancel } from "./clock.js";
+import { mark } from "./watch.js";
 
 const host = document.getElementById("walk");
 
@@ -127,6 +128,7 @@ export function initWalk(handlers) {
 // The journey is the same either way; the destination swaps the painting the
 // settle dissolves into and the guide leading the pair to it.
 export function startWalk(dest = destinations.clearing, mode = null) {
+  mark("walk:build");
   stopWalk();
   host.replaceChildren();
 
@@ -142,6 +144,7 @@ export function startWalk(dest = destinations.clearing, mode = null) {
   masks = [];
   lastSettled = -1;
   scroll = 0;
+  framesRun = 0;
 
   // Behind the pair.
   layers.forEach((layer) =>
@@ -160,6 +163,7 @@ export function startWalk(dest = destinations.clearing, mode = null) {
   const castRun = mode?.cast
     ? cast.map((who) => ({ ...who, ...mode.cast[who.key] }))
     : cast;
+  mark("walk:bands", String(strips.length));
   castRun.forEach((who) => host.append(shadow(who)));
   castRun.forEach((who) => host.append(walker(who)));
   // A run whose arrival painting holds the pair fades the walking sprites out
@@ -218,7 +222,15 @@ export function endWalk() {
 
 /* ---- the loop ---- */
 
+let framesRun = 0;
+
 function tick(now) {
+  // The first frame, and then once a second: enough to see how far a run got
+  // without filling the trail.
+  if (framesRun === 0) mark("walk:frame-1");
+  framesRun++;
+  if (framesRun % 60 === 0) mark("walk:running", `${framesRun}f`);
+
   const t = now - startedAt;
   // Measured, not assumed: a fixed per-frame step would run the walk at double
   // pace on a 120Hz screen. Clamped so a stalled tab cannot jump the scroll.

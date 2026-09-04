@@ -23,10 +23,11 @@ import { initStory, startStory, nextPage, prevPage, releaseStory } from "./story
 import { initGame, startGame, startEpilogue, releaseHold, armHold, currentLevel } from "./game.js";
 import { initWalk, startWalk, endWalk, refitWalk } from "./walk.js";
 import { initWarp, playWarp, WARP_HOLD_MS } from "./warp.js";
+import { mark, fault, lastRun, watchFaults, deviceNote } from "./watch.js";
 import { after, cancel } from "./clock.js";
 import { layers as walkLayers, foreground as walkFore, cast as walkCast,
          guide as walkGuide, destinations, homeMode,
-         SPARK_SHEET, HAND_OVER_MS } from "./data/walk.js";
+         SPARK_SHEET, HAND_OVER_MS, WALK_MS } from "./data/walk.js";
 import {
   initAudio,
   loadAudio,
@@ -60,6 +61,13 @@ watchStage({ onRefit: refitWalk });
 
 // The context starts suspended, which is enough to decode the soundtrack while
 // the loader runs; unlockAudio() resumes it on the first click.
+watchFaults();
+mark("boot", deviceNote());
+
+// What the run before this one was doing when it stopped, or null. A device
+// that kills the tab reloads it, so this is the only trace that survives.
+const lastTrail = lastRun();
+
 const hasAudio = initAudio();
 paintSound();
 
@@ -91,9 +99,11 @@ initGame({
 let goingHome = false;
 
 function gameDone() {
+  mark("round:done", String(currentLevel()));
   // The ending just played out: the chapter closes back onto its own cover —
   // "The End", then the title screen, ready to be played again.
   if (currentLevel() === -1) {
+    mark("chapter:done");
     resetToTitle();
     return;
   }
@@ -170,6 +180,10 @@ Promise.all([
   // bar and the note off and leaves the cover with one thing to press.
   loader.classList.add("is-ready");
   loaderCta.hidden = false;
+  mark("loader:ready");
+  // If the run before this one stopped somewhere, say where — on a phone that
+  // killed the tab, this is the only trace of it that survives.
+  showLastRun();
   // Deliberately not focused. Chrome treats a programmatic focus as
   // focus-visible, so auto-focusing drew the focus ring as a bright circle
   // around the button for everyone, not just keyboard users. It is the only
@@ -202,6 +216,30 @@ function leaveStory() {
   loader.classList.add("is-spent");
 }
 
+// What the run before this one was doing when it stopped. A device that kills
+// the tab reloads it, so this is the only place the reason can surface.
+// The road killed the last run. On a device that cannot hold the walk this is
+// the only thing standing between a child and the game, and it is a scene they
+// have already seen once by the time it matters — so the chapter goes straight
+// on instead, rather than dying in the same place every time.
+function walkIsUnsafe() {
+  const last = lastTrail?.[lastTrail.length - 1] ?? "";
+  // Only a trail that STOPS inside the walk. A tab closed or navigated away
+  // from ends in pagehide wherever it was, and that is not the road's fault —
+  // counting it would take the walk away from a device that was fine.
+  return last.includes("walk:") && !last.includes("walk:arrive");
+}
+
+function showLastRun() {
+  const trail = lastTrail;
+  if (!trail) return;
+
+  loaderNote.textContent = `stopped at ${trail[trail.length - 1]}`;
+  loaderNote.title = trail.join("\n");
+  loaderNote.classList.add("is-report");
+  console.warn("the run before this one:\n" + trail.join("\n"));
+}
+
 function resetToTitle() {
   loader.classList.remove("is-spent");
   goingHome = false;
@@ -220,10 +258,23 @@ function resetToTitle() {
 // cross-fades: the outgoing act stays on screen at falling opacity while the
 // incoming one comes up, which is why neither needs a cover over it.
 async function handOver() {
+  mark("story:done");
   // Still raised for anything outside the chapter that wants to know.
   document.dispatchEvent(new CustomEvent("story:complete"));
 
+  // The road is the heaviest thing in the chapter. If it took the last run
+  // down, do not ask this device for it again — go straight to the clearing.
+  if (walkIsUnsafe()) {
+    mark("walk:skipped");
+    await prefetchGame();
+    armHold();
+    enterGame();
+    after(releaseHold, 600);
+    return;
+  }
+
   await Promise.all([prefetchWalk(), prefetchGame()]);
+  mark("art:ready");
   enterWalk(destinations[levels[chapter].walkTo]);
 }
 
@@ -236,7 +287,18 @@ function warpOn() {
   after(releaseHold, WARP_HOLD_MS);
 }
 
+// If the road does not deliver them, the chapter goes on without it. A stalled
+// frame loop — a tab throttled in the background, a device that cannot keep up
+// — used to leave a child looking at a still picture with nothing to press.
+let walkGuard = 0;
+
 function enterWalk(dest, mode = null) {
+  mark("walk:enter", dest?.key ?? "");
+  cancel(walkGuard);
+  walkGuard = after(() => {
+    mark("walk:guard");
+    arrive();
+  }, (mode?.walkMs ?? WALK_MS) + 4000);
   leaveStory();
   document.body.dataset.act = "walk";
   // The walk borrows the game's frame, so arriving is a cross-fade, not a cut.
@@ -250,6 +312,12 @@ function enterWalk(dest, mode = null) {
 // Every arrival holds the first beat until the hand-over is done — the walk to
 // level 1 needs the same grace the story's did.
 function arrive() {
+  // Whichever gets here first — the walk finishing or the guard — the other
+  // must not fire too.
+  cancel(walkGuard);
+  walkGuard = 0;
+  mark("walk:arrive");
+  if (document.body.dataset.act !== "walk") return;
   // Home: the walk dissolved into the celebration painting the first end
   // screen stands on, so the ending begins exactly like any other arrival —
   // built under the fade, held until it is done.
@@ -270,6 +338,7 @@ function arrive() {
 }
 
 function enterGame(at = 0) {
+  mark("game:enter", String(chapter));
   leaveStory();
   document.body.dataset.act = "game";
   // The game was drawn at its own size; the stage takes that frame on. Coming
@@ -328,6 +397,7 @@ function goFullscreen() {
 
 const actions = {
   begin: () => {
+    mark("begin");
     unlockAudio();
     goFullscreen();
     loader.classList.remove("is-active");

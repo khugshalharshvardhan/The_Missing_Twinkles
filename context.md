@@ -112,6 +112,7 @@ frame coordinates.**
 | `js/warp.js` + `css/warp.css` | The hand-over between levels: the finished place travelling out to the left, the next one arriving behind it, a seam of light down the join |
 | `js/fit.js` + `js/data/bubbles.js` | Speech balloons: where each balloon's round face and tail sit (measured), and the fitter that shrinks a balloon onto its own line |
 | `tools/shrink-art.js` | Brings the heaviest artwork down to the size it is drawn at. Originals kept in `assets/full/` |
+| `js/watch.js` | The black box. Writes where the chapter got to into sessionStorage, so a run the device kills leaves a note for the run that follows — read at import, BEFORE the first mark of the new run can overwrite it |
 | `js/clock.js` | Every timeout in the chapter. `after`/`cancel` have setTimeout's shape; `freeze`/`thaw` take a pause through them, each timer keeping what it had left |
 | `js/anchor.js` + `js/data/poses.js` | Pins each character's centre-x/feet per scene so pose swaps don't slide |
 | `devtools/` | The hamburger menu + live-edit mode |
@@ -394,6 +395,25 @@ Where it landed, on an iPhone-shaped viewport:
 | compositor texture | 146 MB | 43 MB |
 | decoded audio | 101 MB | 41 MB |
 | widest single layer | 6342 px | 1882 px |
+
+**When a device kills the tab there is no console**, so the chapter keeps a
+black box (js/watch.js). It marks each stage — boot with the device's own
+numbers, loader, begin, story:done, walk:build, walk:bands, walk:frame-1,
+walk:running every 60 frames, walk:arrive, game:enter — plus any error or
+rejection, into sessionStorage. A killed tab reloads, and the title screen shows
+what the run before it was doing when it stopped ("stopped at 40.1s
+walk:frame-1"); the full trail is in the note's tooltip and in the console.
+
+Two things act on it rather than only reporting it:
+
+- **A run that stopped ON the road does not take it again.** `walkIsUnsafe()` in
+  js/main.js sends the next run straight from the story to the clearing. Only a
+  trail whose last mark is inside the walk counts — a tab closed or navigated
+  away from ends in pagehide wherever it was, and counting that would take the
+  walk away from a device that was perfectly happy.
+- **A walk that stalls still delivers them.** `walkGuard` hands over anyway at
+  WALK_MS + 4s, so a throttled frame loop cannot strand a child in front of a
+  still picture with nothing to press.
 
 If you add art, check it with the same arithmetic before shipping it: pixels x 4
 is what the device pays, not the file size — and nothing may be wider than the

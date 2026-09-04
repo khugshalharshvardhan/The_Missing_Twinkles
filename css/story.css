@@ -997,6 +997,16 @@
   transition: opacity var(--speed) var(--ease), visibility var(--speed);
 }
 
+/* Except when it is carrying a report from a run that did not finish — that is
+   the only place a phone which killed the tab can tell anyone what happened. */
+.loader__note.is-report {
+  opacity: 1;
+  color: #ffd08a;
+  font-size: 20px;
+  max-width: 86%;
+  text-align: center;
+}
+
 /* Icon only — the label lives on aria-label. The art is play_btn.svg
    recoloured; see index.html for the four variants and which is in use. The
    bloom and the twinkles are treatments around it rather than part of the file,
