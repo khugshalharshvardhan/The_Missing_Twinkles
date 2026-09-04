@@ -268,10 +268,22 @@ const BUBBLE_NEEL ={ src: `${IMG}bubble_neel.webp`, x: 732, y: 182, w: 420, h: 2
 
 /* ---- the pages ------------------------------------------------------- */
 
+// THE CAKE GAG, ON A SWITCH.
+//
+// The chapter runs long for a four-year-old, and the cake is the part that can
+// go without taking the story with it: what is left is still whole — they are
+// walking through town, the lights go out, something laughs in the dark, and
+// they go looking. Nothing is deleted. Set this back to true and the gag comes
+// back exactly as it was, here and in the ending (js/data/screens.js), along
+// with every recording it uses.
+const CAKE = false;
+
 export const pages = [
   {
     id: "page-1",
-    name: "Cupcake Lane",
+    // The name is the dev menu's, and with the gag cut there is no cupcake on
+    // this lane any more.
+    name: CAKE ? "Cupcake Lane" : "The Walk",
     // The lit street is painted once and stays for the whole page.
     layers: [TOWN_LIT],
     steps: [
@@ -281,11 +293,16 @@ export const pages = [
       {
         id: "1.1",
         hold: 3500, // "…taking a walk" ends at 2.54s; a beat of air after it
+        // Without the gag this closes the page, so the chevron comes in after
+        // the narrator has finished rather than the step turning itself.
+        ...(CAKE ? {} : { reveal: 2800 }),
         layers: [
           { ...AGNI_WALKING, fx: "walk-in-left" },
           { ...NEEL_WALKING, fx: "walk-in-right" }
         ]
       },
+
+      ...(CAKE ? [
 
       // Neel catches the bakery on the air.
       {
@@ -325,6 +342,8 @@ export const pages = [
         reveal: 2100,
         layers: [NEEL_CHEEKY, AGNI_TALKING]
       }
+
+      ] : [])
     ]
   },
 

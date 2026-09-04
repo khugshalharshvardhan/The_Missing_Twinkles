@@ -389,6 +389,41 @@ Two more, which are about the *moment* rather than the total. A phone can hold
 Together those take the peak at the hand-over from ~98 MB to **49 MB**,
 settling to 30 MB once a round is being played.
 
+## The cake gag, on a switch
+
+The chapter ran long for a four-year-old, and the cake is the part that can go
+without taking the story with it. `const CAKE = false` in **js/data/scenes.js**
+and the same in **js/data/screens.js** cut it in both halves at once. Nothing is
+deleted — set both back to `true` and the gag returns exactly as it was, with
+every recording it uses.
+
+What it removes:
+
+- **Story, page one** — 1.2 (Neel smells the bakery), 1.3 (Agni: you just ate),
+  1.4 (his grin). The page keeps 1.1, the walk into town, and 1.1 takes a
+  `reveal` because it is now the last step of the page and a last step waits for
+  the reader instead of turning itself. The page is called "The Walk" while the
+  gag is off — there is no cupcake on that lane any more.
+- **The ending** — e3 ("नील?", he has wandered off) and ev (the film of him
+  floating to the bakery), plus the smell drifting across e1 and e2, which was
+  only ever the gag's setup.
+
+What is left is the flow as asked for: they are walking through town, the
+lights go out, something laughs in the dark, they decide to find the twinkles,
+and the game begins. It ends on "हमने कर दिखाया, नील!" / "शहर फिर से चमक रहा
+है!" and then समाप्त.
+
+The story reaches the road at **38s instead of 52s**, and the ending runs 8s
+instead of 21s.
+
+**The manifests follow the data by themselves.** `audioManifest` now fetches
+only the cues whose beat is still in the chapter — and it checks each act
+against ITS OWN ids, because the two halves reuse them and mean different beats
+by them: "1.2" is Neel smelling the bakery in the story and the third screen of
+the tutorial in the game. Checking one against the other is how a cut beat's
+voice went on being downloaded and decoded. Four clips and four pictures come
+off the load as a result.
+
 ## Why it looked right here and wrong live
 
 A picture that is preloaded and then dropped is not loaded. `preload()` used to

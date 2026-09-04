@@ -29,6 +29,12 @@
 // request for the bed already playing. `music.to` is a fraction of the bus
 // level, and rides on top for the dips that let a line land.
 
+// Read only to know which beats are still in the chapter — see the manifest at
+// the foot of this file. Neither of these imports anything, so there is no
+// cycle.
+import { pages } from "./scenes.js";
+import { levels, epilogueScreens } from "./screens.js";
+
 const SFX_DIR = "assets/audios/sfx/";
 const VO_DIR = "assets/audios/vo/";
 
@@ -558,10 +564,39 @@ export const gameCues = {
 // fifteen megabytes held for the life of the tab — the beds alone came to more
 // than half the soundtrack's memory. They stream from a media element instead;
 // see playBed() in js/audio.js.
+// Only the beats the chapter can still reach. A cue table keyed by a step that
+// is no longer in the story (see CAKE in js/data/scenes.js) would otherwise
+// still download and decode its voice — half a minute of audio nobody will
+// hear, held for the life of the tab. The tables themselves are left whole, so
+// putting a beat back puts its sound back with it.
+// A table PER ACT, because the two halves reuse ids and mean different beats by
+// them — "1.2" is Neel smelling the bakery in the story and the third screen of
+// the tutorial in the game. Checking a story cue against the game's ids is how
+// a cut beat's voice went on being fetched.
+const storyBeats = new Set([
+  ...pages.flatMap((p) => [p.enter?.id, ...p.steps.map((s) => s.id)]),
+  // The two cues that are not a beat: the road (js/walk.js) and the hand-over
+  // between rounds (js/warp.js). Both are played by name, so nothing in the
+  // data can vouch for them. ("1.0" is a third key with no caller at all — a
+  // page-cover cue from before page one had a cover to play.)
+  "walk",
+  "warp"
+].filter(Boolean));
+
+const gameBeats = new Set([
+  ...levels.flatMap((l) => l.screens.map((s) => s.id)),
+  ...epilogueScreens.map((s) => s.id)
+]);
+
+const live = (table, beats) =>
+  Object.entries(table)
+    .filter(([id]) => beats.has(id))
+    .map(([, c]) => c);
+
 export const audioManifest = [
   ...new Set([
     UI_ADVANCE,
-    ...[...Object.values(cues), ...Object.values(gameCues)].flatMap((c) => [
+    ...[...live(cues, storyBeats), ...live(gameCues, gameBeats)].flatMap((c) => [
       ...(c.sfx ?? []).map((s) => s.id),
       ...(c.vo ? [c.vo.id] : [])
     ]),

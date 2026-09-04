@@ -1432,15 +1432,23 @@ const EP_STREET = { src: `${IMG}ep_street.webp`, x: 0, y: 0, w: FRAME_W, h: FRAM
 // and seated by measuring where those pixels sit in the design's render.
 const EP_PAIR = { src: `${IMG}ep_pair.webp`, x: 414, y: 434, w: 895, h: 560, flipX: true };
 
+// The same switch as the story's (js/data/scenes.js): with the gag cut, the
+// chapter ends on what they came to say — they did it, the town is lit — and
+// then the word. Neel wandering off after the smell, and the clip of him
+// floating to the bakery, are the gag's other half and go with it. Nothing is
+// deleted.
+const CAKE = false;
+
+// The smell drifting out of the bakery is the gag's setup; with no gag to set
+// up it is a thread that goes nowhere, so it is on the switch too.
+const AROMA = (fx) =>
+  CAKE ? [{ src: `${SHARED}smell.webp`, x: 1180, y: 150, w: 620, h: 378, fx }] : [];
+
 export const epilogueScreens = [
   // ---- E1 — "We did it, Neel!" (149:356) ----
   {
     id: "e1",
-    layers: [
-      EP_STREET,
-      EP_PAIR,
-      { src: `${SHARED}smell.webp`, x: 1180, y: 150, w: 620, h: 378, fx: "aroma-1" }
-    ],
+    layers: [EP_STREET, EP_PAIR, ...AROMA("aroma-1")],
     bubble: {
       art: `${IMG}bub_51.webp`, who: "agni",
       x: 679, y: 268, w: 322, h: 167,
@@ -1451,17 +1459,15 @@ export const epilogueScreens = [
   // ---- E2 — "The town is shining again!" (149:365, same painting) ----
   {
     id: "e2",
-    layers: [
-      EP_STREET,
-      EP_PAIR,
-      { src: `${SHARED}smell.webp`, x: 1180, y: 150, w: 620, h: 378, fx: "aroma-2" }
-    ],
+    layers: [EP_STREET, EP_PAIR, ...AROMA("aroma-2")],
     bubble: {
       art: `${IMG}bub_51.webp`, who: "agni",
       x: 657, y: 238, w: 400, h: 196,
       text: "शहर फिर से चमक रहा है!"
     }
   },
+
+  ...(CAKE ? [
 
   // ---- E3 — "Neel?" — he has wandered off (149:375) ----
   {
@@ -1492,6 +1498,8 @@ export const epilogueScreens = [
     // closes over its last frame, and the beat turns once it is dark.
     dwell: 8400
   },
+
+  ] : []),
 
   // ---- EEND — the words the chapter closes on ----
   {
