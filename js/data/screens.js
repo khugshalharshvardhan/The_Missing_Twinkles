@@ -1424,7 +1424,18 @@ const EP_STREET = { src: `${IMG}ep_street.webp`, x: 0, y: 0, w: FRAME_W, h: FRAM
 // Every cutout below is the design's own source art (the raw uploads keep
 // their alpha; node exports flatten onto white), cropped to its opaque pixels
 // and seated by measuring where those pixels sit in the design's render.
-const EP_PAIR = { src: `${IMG}ep_pair.webp`, x: 414, y: 434, w: 895, h: 560, flipX: true };
+// The corrected render: ep_pair.webp had the white of Agni's eyes erased.
+//
+// Two things come with it. It is drawn the right way round already — Agni on
+// the left, as she appears on screen — where the old one was Neel-left and
+// needed flipX to get there, so the flip goes. And it is the same composition
+// on a taller canvas (its ink measures 1.599 wide-to-tall, the same as the old
+// one's to three places), so the box is not the old box: it is the box that
+// puts the ink back on exactly the pixels it used to cover — x 414..1309,
+// y 434..994 of the frame — with the new margins allowed for.
+//
+// ep_pair.webp is untouched on disk.
+const EP_PAIR = { src: `${IMG}agni_neel_highfive.webp`, x: 400, y: 348, w: 916, h: 664 };
 
 // The same switch as the story's (js/data/scenes.js): with the gag cut, the
 // chapter ends on what they came to say — they did it, the town is lit — and

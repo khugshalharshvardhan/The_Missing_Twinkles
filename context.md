@@ -467,6 +467,35 @@ Two things had to follow it:
   a swarm that arrives has a life the beat must outlast, one that is simply
   standing there does not.
 
+## Seating a replacement drawing
+
+`ep_pair.webp` — the high-five — had the white of Agni's eyes erased. The fixed
+render (`agni_neel_highfive.webp`) is NOT a drop-in, and neither difference is
+visible in the file listing:
+
+- **It is drawn the right way round.** The old one was Neel-left and carried
+  `flipX: true` to put Agni on the left; the new one is already Agni-left, so
+  the flip has to go or the pair swap sides.
+- **It is the same composition on a taller canvas.** Same box, different
+  margins, so reusing the old box would have stretched it.
+
+The way to move a drawing between two renders is to match the INK, not the
+file: measure the alpha bounding box of each, work out where the old ink landed
+on the frame (x 414..1309, y 434..994 — remembering the old box was mirrored,
+so its ink spans the mirror of where it sits in the source), and solve for the
+box that puts the new ink on those same pixels. That gives
+`x: 400, y: 348, w: 916, h: 664`. The two inks measure 1.599 wide-to-tall to
+three places, which is the check that the render really is the same drawing and
+not a recomposition — if that number had drifted, no box would fit and
+something else would have to give.
+
+The scratchpad script that does it is `bbox.cjs`; it is worth keeping the
+approach in mind for the next replacement.
+
+Converted to WebP at the height it is drawn (764, per tools/shrink-art.js), so
+it costs 3.1 MB decoded where the old one cost 4.5. The PNG and the old
+ep_pair.webp are both untouched on disk.
+
 ## Both of them are frightened
 
 Only Neel shivered when the mist came in, which read as him being the scared one
