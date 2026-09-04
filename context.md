@@ -467,6 +467,39 @@ Two things had to follow it:
   a swarm that arrives has a life the beat must outlast, one that is simply
   standing there does not.
 
+## Both of them are frightened
+
+Only Neel shivered when the mist came in, which read as him being the scared one
+and Agni being fine with it — and she is the one looking down at it crawling
+over her feet. She has `fx: "shiver-slow"` now: the same shake, 290ms instead of
+220 and slightly smaller, because two people shivering in perfect step is a
+mechanism and two different times are two people.
+
+## The cover speaks its own name
+
+Pressing Play now says the title (`vo_title`, played straight from
+js/main.js — no cue table names it, so it is listed in `audioManifest` by hand)
+and the cover holds while it is said. Opening the story underneath would put
+the title and the narrator's first line in the same breath and neither would be
+heard. `clipLength` is 0 on a silent device, so that case waits nothing.
+
+## Why Mr Giggles could not be heard
+
+He was being charged for distance three times over: `gain: 0.32`, a lowpass at
+1500Hz — through the middle of his voice, not above it — and the **sfx bus**,
+which runs at 0.85 and, far more to the point, does not duck the music. So the
+laugh was playing at roughly a quarter of full underneath a `bed_dark` that
+never got out of its way.
+
+He is `vo` now. That is most of the fix: full bus, and the bed steps back under
+him like it does for every other line in the chapter. What is left of the
+distance is the part that still reads as distance once he can be heard — the
+lowpass moved up to 3600Hz and the pan further out to the side than the blink
+beside him. Net, about +10 dB before the duck.
+
+The lesson generalises: **a voice on the sfx bus is a voice the music will
+bury.** `fire()` ducks on `bus === "vo"` and nothing else.
+
 ## Told once, then trusted
 
 The tutorial teaches the tap and says the whole sentence — "गिनने के लिए हर
@@ -490,6 +523,11 @@ tapping is taught.
 
 Measured: beat opens with no hand, hand at ~10s, gone on the first tap, back
 ten seconds later if the counting stops.
+
+The take arrived: `vo_l_countnow` ("अब गिनो!", 0.8s after trimming) is on all
+four level count cues, so the balloon and the voice say the same short thing.
+`vo_l1_tapcount`..`vo_l4_tapcount` — the four long reads — are untouched on
+disk and no longer played.
 
 ## The chapter ends on the dark
 

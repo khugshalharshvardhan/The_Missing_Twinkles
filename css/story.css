@@ -135,6 +135,9 @@
    performance instead. Their entrances and the scared shiver stay. */
 
 .fx-shiver { animation: shiver 220ms ease-in-out infinite alternate; }
+/* The same shake, a touch slower and a touch smaller, so the pair are plainly
+   two frightened people rather than one animation playing twice. */
+.fx-shiver-slow { animation: shiver-slow 290ms ease-in-out infinite alternate; }
 .fx-float  { animation: float 5s ease-in-out infinite; }
 
 .fx-flicker { animation: flicker 2.4s ease-in-out infinite; }
@@ -225,6 +228,11 @@
 @keyframes shiver {
   from { transform: translateX(-3px) rotate(-0.25deg); }
   to   { transform: translateX(3px) rotate(0.25deg); }
+}
+
+@keyframes shiver-slow {
+  from { transform: translateX(-2.4px) rotate(0.2deg); }
+  to   { transform: translateX(2.4px) rotate(-0.2deg); }
 }
 
 @keyframes float {
@@ -1181,6 +1189,7 @@
   .play__spark { animation: none; }
 
   .fx-shiver,
+  .fx-shiver-slow,
   .fx-float,
   .fx-flicker,
   .fx-drift,

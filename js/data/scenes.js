@@ -135,7 +135,14 @@ const LONE_TWINKLE = {
 
 const TOWN_MOONLIT = { key: "bg-moonlit", src: `${IMG}bg_town_moonlit.webp`, x: 0, y: 0, w: 1920, h: 1080 };
 
-const AGNI_DOWN = { key: "agni", src: `${IMG}agni_looking_down.webp`, x: 297, y: 461, w: 613, h: 566 };
+// She shakes as well. Only Neel did, which read as him being the frightened one
+// and her being fine with it — and she is looking down at a mist crawling over
+// her own feet. A second fx rather than the same one: two people shivering in
+// perfect step is a mechanism, and slightly different times read as two people.
+const AGNI_DOWN = {
+  key: "agni", src: `${IMG}agni_looking_down.webp`, x: 297, y: 461, w: 613, h: 566,
+  fx: "shiver-slow"
+};
 
 const NEEL_SCARED = {
   key: "neel", src: `${IMG}neel_scared.webp`, x: 945, y: 403, w: 489, h: 624,
@@ -234,7 +241,7 @@ const STREET_DUSK = { key: "street-dusk", kind: "dusk" };
 // twinkle as being unrelated to her.
 const FIREFLY_IN_HAND = {
   shock: { key: "firefly", src: `${IMG}firefly.webp`, x: 731, y: 587, w: 118, h: 79, glow: "spark" },
-  cheer: { key: "firefly", src: `${IMG}firefly.webp`, x: 1300, y: 127, w: 118, h: 79, glow: "spark" }
+  cheer: { key: "firefly", src: `${IMG}firefly.webp`, x: 1739, y: 254, w: 118, h: 79, glow: "spark" }
 };
 
 // "Very faint lights blink in distant hiding places" — clear of the characters

@@ -35,10 +35,17 @@ import {
   initAudio,
   loadAudio,
   unlockAudio,
+  playVo,
+  clipLength,
   stopAudio,
   toggleMuted,
   isMuted
 } from "./audio.js";
+
+// The cover speaks its own name when Play is pressed, and the chapter starts
+// when it has finished. TITLE_TAIL is the breath between the two.
+const TITLE_VO = "vo_title";
+const TITLE_TAIL = 350;
 
 const loader = document.getElementById("loader");
 const loaderBar = document.getElementById("loader-bar");
@@ -463,13 +470,24 @@ const actions = {
     mark("begin");
     unlockAudio();
     goFullscreen();
-    loader.classList.remove("is-active");
 
-    if (straightToGame) {
-      enterGame(jumpTo === null ? 0 : Number(jumpTo));
-      return;
-    }
-    enterStory();
+    // The title, read off the cover it is printed on — the one moment in the
+    // chapter where the picture and the words are the same thing. The cover
+    // holds while it is said and the chapter starts as it finishes: opening
+    // the story underneath would put the title and the narrator's first line
+    // in the same breath, and neither would be heard.
+    //
+    // clipLength is 0 if the clip never loaded or there is no audio at all, so
+    // a silent device waits TITLE_TAIL and no longer.
+    playVo({ id: TITLE_VO });
+    after(() => {
+      loader.classList.remove("is-active");
+      if (straightToGame) {
+        enterGame(jumpTo === null ? 0 : Number(jumpTo));
+        return;
+      }
+      enterStory();
+    }, clipLength(TITLE_VO) + (clipLength(TITLE_VO) ? TITLE_TAIL : 0));
   },
   sound: () => {
     unlockAudio();

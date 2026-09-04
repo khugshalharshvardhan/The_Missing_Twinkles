@@ -76,6 +76,9 @@ const SPLIT = {
 // take -> id. Everything the game plays, in the order it is played.
 const LINES = [
   /* ---- the story ---- */
+  // The title, read off the cover it is printed on. Played by the Play button
+  // itself (js/main.js), not by any beat, so it belongs to no cue table.
+  { id: "vo_title",        file: path.join(VO, "title.mp3") },
   { id: "vo_narr_walk",    file: path.join(VO, "narrator.mp3") },
   { id: "vo_neel_cake",    file: path.join(NEEL, "hmmmm cake (1).mp3") },
   { id: "vo_agni_cookie",  file: path.join(AGNI, "neel abhi to tumne kuch khaya tha (1).mp3") },
@@ -107,6 +110,9 @@ const LINES = [
     cut: SPLIT.ithinkTail, like: "vo_g_ithink" },
   { id: "vo_g_count",      file: path.join(AGNI, "chalo gin kar dekte hai tumhara andaza kitna sahi tha (1).mp3") },
   { id: "vo_g_tapcount",   file: path.join(AGNI, "gin ne ke liye har jugnu pe tap kro (1).mp3") },
+  // The short form the four levels use instead of saying it again in full —
+  // see "अब गिनो!" in js/data/screens.js.
+  { id: "vo_l_countnow",   file: path.join(AGNI2, "ab gino.mp3") },
   { id: "vo_g_youguessed", file: path.join(AGNI, "tumhara andaza tha 10 (1).mp3"), cut: SPLIT.guessStem },
   { id: "vo_g_total",      file: path.join(NEEL, "lekin vaha kul 8 jugnu the (1).mp3"), cut: SPLIT.total },
   // The tutorial is the one round with no plain take of its own, so its is cut

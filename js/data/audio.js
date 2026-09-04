@@ -143,14 +143,20 @@ export const cues = {
     // (see 3.1 in js/data/scenes.js), because on a screen holding nobody but
     // two pairs of eyes, text reads as one of THEM saying it.
     //
-    // So he has to carry the moment on sound alone, and what the script wants
-    // is something far off in the dark: down from 0.95 to a third of that,
-    // lowpassed to take the near edge off him, and further out to the side
-    // than the blink beside him. The whole point is that he is somewhere else.
-    sfx: [
-      { id: "blink", at: 900, gain: 0.55, pan: -0.42 },
-      { id: "vo_giggles_1", at: 0, gain: 0.32, muffle: 1500, pan: -0.62 }
-    ]
+    // So he has to carry the moment on sound alone — which he cannot do if he
+    // cannot be heard, and at a third of full, lowpassed to 1500Hz, on a bus
+    // that does not duck the music, he could not. Distance was being paid for
+    // three times over.
+    //
+    // He is `vo` now, and that is most of the fix: the sfx bus runs at 0.85 and
+    // never gets out of the music's way, so bed_dark was playing straight over
+    // him. On the voice bus he plays at full and the bed steps back under him,
+    // the same as every line in the chapter. What is left of the distance is
+    // the part that still reads as distance once he is audible: a lowpass with
+    // the corner well above his voice rather than through the middle of it, and
+    // the pan, further out to the side than the blink beside him.
+    sfx: [{ id: "blink", at: 900, gain: 0.55, pan: -0.42 }],
+    vo: { id: "vo_giggles_1", at: 0, gain: 0.9, muffle: 3600, pan: -0.62 }
   },
 
   // She calls a beat sooner than she used to. The whole exchange was carrying a
@@ -387,14 +393,14 @@ export const gameCues = {
     sfx: [{ id: "page_air", at: 0, gain: 0.5 },
       { id: "sparkle", at: 800, gain: 0.55 }]
   },
-  // The levels' count beats do not say the instruction any more, because the
-  // balloon does not either — it reads "अब गिनो!" now, and a voice reciting the
-  // whole sentence over it would be exactly the repetition that was taken out.
-  // The tutorial still says it in full ("3.2" above): that beat is where
-  // tapping is taught. vo_l1_tapcount..vo_l4_tapcount are untouched on disk,
-  // and a short "अब गिनो!" take would slot straight in here.
+  // The levels' count beats say the short line, matching the balloon: "अब
+  // गिनो!" rather than the whole sentence a fifth time. The tutorial still says
+  // it in full ("3.2" above), because that beat is where tapping is taught.
+  // vo_l1_tapcount..vo_l4_tapcount — the four long reads, one per level — are
+  // untouched on disk and no longer played.
   "p3.2": {
-    sfx: [{ id: "page_air", at: 0, gain: 0.5 }]
+    sfx: [{ id: "page_air", at: 0, gain: 0.5 }],
+    vo: { id: "vo_l_countnow", at: 500, pan: -0.5 }
   },
 
   // ---- the total, and how the guess did ----
@@ -444,7 +450,8 @@ export const gameCues = {
       { id: "sparkle", at: 800, gain: 0.55 }]
   },
   "s3.2": {
-    sfx: [{ id: "page_air", at: 0, gain: 0.5 }]
+    sfx: [{ id: "page_air", at: 0, gain: 0.5 }],
+    vo: { id: "vo_l_countnow", at: 500, pan: -0.5 }
   },
 
   // ---- the total, and how the guess did ----
@@ -492,7 +499,8 @@ export const gameCues = {
       { id: "sparkle", at: 800, gain: 0.55 }]
   },
   "m3.2": {
-    sfx: [{ id: "page_air", at: 0, gain: 0.5 }]
+    sfx: [{ id: "page_air", at: 0, gain: 0.5 }],
+    vo: { id: "vo_l_countnow", at: 500, pan: -0.5 }
   },
 
   // ---- the total, and how the guess did ----
@@ -540,7 +548,8 @@ export const gameCues = {
       { id: "sparkle", at: 800, gain: 0.55 }]
   },
   "f3.2": {
-    sfx: [{ id: "page_air", at: 0, gain: 0.5 }]
+    sfx: [{ id: "page_air", at: 0, gain: 0.5 }],
+    vo: { id: "vo_l_countnow", at: 500, pan: -0.5 }
   },
 
   // ---- the total, and how the guess did ----
@@ -608,6 +617,8 @@ const live = (table, beats) =>
 export const audioManifest = [
   ...new Set([
     UI_ADVANCE,
+    // Played by the Play button itself (js/main.js), so no cue table names it.
+    "vo_title",
     ...[...live(cues, storyBeats), ...live(gameCues, gameBeats)].flatMap((c) => [
       ...(c.sfx ?? []).map((s) => s.id),
       ...(c.vo ? [c.vo.id] : [])
