@@ -1600,14 +1600,29 @@ export function artFor(round) {
       ...(screen.lamp ? [screen.lamp.src] : []),
       ...(screen.lampLit ? [screen.lampLit.src] : []),
       ...(screen.hint ? [screen.hint.src] : []),
-      ...(screen.bubble ? [screen.bubble.art] : [])
+      ...(screen.bubble ? [screen.bubble.art] : []),
+      // The ending's clip. It is a screen's picture like any other, and being
+      // left off this list meant it began downloading at the moment it was
+      // due to play.
+      ...(screen.video ? [screen.video.src] : [])
     ]),
     round.swarmSrc
   ])].filter(Boolean);
 }
 
-// The furniture every round shares.
-export const commonArt = [keypad.frame.src, keypad.keyArt, counter.src];
+// The furniture every round shares. All of it: the pad is seven pieces, not
+// three, and the four that were left off this list were fetched only when the
+// keypad first drew itself — which on a real connection is a pad that arrives
+// in parts while a child is looking at it.
+export const commonArt = [
+  keypad.frame.src,
+  keypad.display.src,
+  keypad.keyArt,
+  keypad.clearArt,
+  keypad.confirmArt,
+  keypad.tick.src,
+  counter.src
+];
 
 // Everything the game needs on screen, in one list — the dev tools jump
 // anywhere, so they fetch the lot.
@@ -1619,12 +1634,11 @@ export const manifest = [
         ...(screen.lamp ? [screen.lamp.src] : []),
         ...(screen.lampLit ? [screen.lampLit.src] : []),
         ...(screen.hint ? [screen.hint.src] : []),
-        ...(screen.bubble ? [screen.bubble.art] : [])
+        ...(screen.bubble ? [screen.bubble.art] : []),
+        ...(screen.video ? [screen.video.src] : [])
       ]),
       level.swarmSrc
     ]),
-    keypad.frame.src,
-    keypad.keyArt,
-    counter.src
+    ...commonArt
   ])
 ];

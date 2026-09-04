@@ -645,7 +645,7 @@ function hehes(cue) {
   for (let i = 0; i < count; i++) {
     const b = document.createElement("b");
     b.className = "sfx-hehe";
-    b.textContent = "हे हे";
+    b.textContent = "ही! ही!";
     const z = ZONES[i % ZONES.length];
     const x = z.x + noise(i, 21) * z.w;
     const y = z.y + noise(i, 22) * z.h;

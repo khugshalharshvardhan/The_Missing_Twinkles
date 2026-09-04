@@ -164,7 +164,7 @@ Game engine facts that matter when adding a level:
   - **Mr Giggles laughs once**, in his own recording (`vo_giggles_1`, delivered
     as .ogg and installed as mp3 — iOS will not play Ogg at all). Six "he"s over
     2.2s, where the beat used to play two short clips three times and pretend
-    they were one voice. The text on screen is his: three pairs of "हे हे"
+    they were one voice. The text on screen is his: three pairs of "ही! ही!"
     popping at 1250 / 1850 / 2450, which is his phrasing rather than a round
     number, so what is read and what is heard are the same laugh.
   - Still English: Neel's chuckle on story 1.4. It is wordless.
@@ -388,6 +388,54 @@ Two more, which are about the *moment* rather than the total. A phone can hold
 
 Together those take the peak at the hand-over from ~98 MB to **49 MB**,
 settling to 30 MB once a round is being played.
+
+## Why it looked right here and wrong live
+
+A picture that is preloaded and then dropped is not loaded. `preload()` used to
+build an `Image`, wait for it, and let it go — after which the only copy left
+was the HTTP cache, which a phone evicts whenever it likes and a host can tell
+the browser not to keep at all. So the picture was fetched AGAIN at the instant
+it was finally put on screen. Off localhost that second fetch is invisible;
+over a real connection it is a character who is not there yet, a speech bubble
+that never draws, a blank screen with the voice still playing — which is
+exactly what came back from the live site and never once from this machine.
+
+`preload(sources, onProgress, group)` now **holds** what it loaded, under a
+group name, and `release(group)` lets it go when that act is done: `"story"`
+(dropped by `leaveStory()`), `"walk"`, `"round:N"`. This is the same memory
+shape as before — one place's art at a time — with the guarantee that what was
+loaded is still there. Measured on the emulated phone: unchanged at 32 / 26 /
+49 / 30 MB.
+
+Three more holes the same investigation turned up, all of them invisible on a
+fast connection:
+
+- **The keypad is seven pieces, not three.** `commonArt` listed the frame, the
+  key art and the counter; the readout, the clear key, the confirm key and the
+  tick inside it were fetched only when the pad first drew itself.
+- **The ending's clip was never preloaded.** `artFor()` and `manifest` read
+  `screen.layers`, `lamp`, `hint` and `bubble` but not `screen.video`, so the
+  5.9s film began downloading at the moment it was due to play.
+- **A slow fetch was treated as a broken one.** The per-image timeout was 15s
+  and a timeout was retried — so on mobile data, where the whole chapter's art
+  and voice share one thin pipe, a picture that was merely queued got abandoned
+  AND re-requested, putting it back at the end of the same queue. It is 45s
+  now, only a real error is retried, and every place that waits on art has its
+  own much shorter cap (`ready()`, `ART_WAIT` 12s) so nothing on screen is ever
+  waiting on that number.
+
+And the round hand-over is gated: `warpOn()` does not begin the light until
+`prefetchRound(chapter)` has landed. The round after this one is fetched a
+beat into this one, so in practice it waits for nothing.
+
+**How to test this without a phone.** Throttle the connection — none of it
+reproduces on localhost. `Network.emulateNetworkConditions` at 1.6 Mbps / 150ms
+over the whole player path, sampling twice a second for anything on screen
+whose picture has not arrived (an `img` with no `naturalWidth`, or a
+background-image with no `PerformanceResourceTiming` entry). Before: the
+keypad arrived in pieces and level 1 came up without Neel. After: cover →
+story → walk → tutorial → warp → level 1 with nothing on screen ever waiting,
+and no faults in the black box.
 
 And a fifth, which was the iPhone-only half of it:
 

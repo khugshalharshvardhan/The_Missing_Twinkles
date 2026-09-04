@@ -21,7 +21,7 @@ import {
 } from "./data/screens.js";
 import { audioManifest, UI_ADVANCE } from "./data/audio.js";
 import { watchStage, setFrame } from "./stage.js";
-import { preload } from "./preload.js";
+import { preload, release } from "./preload.js";
 import { initStory, startStory, nextPage, prevPage, releaseStory } from "./story.js";
 import { initGame, startGame, startEpilogue, releaseHold, armHold, currentLevel } from "./game.js";
 import { initWalk, startWalk, endWalk, refitWalk } from "./walk.js";
@@ -121,7 +121,9 @@ function gameDone() {
     return;
   }
   goingHome = true;
-  enterWalk(destinations.home, homeMode);
+  // The road was let go of when the game began. Fetch it again — off the
+  // cache, so this is usually instant — before walking it.
+  ready(prefetchWalk()).then(() => enterWalk(destinations.home, homeMode));
 }
 
 /* ---- loading ---- */
@@ -138,9 +140,30 @@ function prefetchRound(i) {
   const round = i === -1 ? epilogue : levels[i];
   if (!round) return Promise.resolve([]);
   if (!roundArt.has(i)) {
-    roundArt.set(i, preload(i === 0 ? [...commonArt, ...artFor(round)] : artFor(round)));
+    roundArt.set(i, preload(
+      i === 0 ? [...commonArt, ...artFor(round)] : artFor(round),
+      undefined,
+      `round:${i}`
+    ));
   }
   return roundArt.get(i);
+}
+
+// A place that has been left behind. Dropping the memo as well as the hold
+// means coming back to it fetches again — off the cache, in practice — rather
+// than trusting art nothing is holding on to any more.
+function dropRound(i) {
+  roundArt.delete(i);
+  release(`round:${i}`);
+}
+
+// Wait for the art, but never for ever. A connection that has died must not
+// leave a child looking at a frozen screen: the round starts anyway, and the
+// pictures arrive into it. Every working connection is far inside this.
+const ART_WAIT = 12000;
+
+function ready(art) {
+  return Promise.race([art, new Promise((go) => after(go, ART_WAIT))]);
 }
 
 function prefetchGame() {
@@ -165,13 +188,15 @@ const walkManifest = [
 let walkArt = null;
 
 function prefetchWalk() {
-  walkArt ??= preload(walkManifest);
+  walkArt ??= preload(walkManifest, undefined, "walk");
   return walkArt;
 }
 
 // Going straight to act two, its art is needed up front instead.
+// Going straight to a level, its art is in `upFront` already, so the round
+// fetch has nothing left to do.
 const upFront = straightToGame ? [...manifest, ...gameManifest] : manifest;
-if (straightToGame) gameArt = Promise.resolve([]);
+if (straightToGame) roundArt.set(jumpLevel, Promise.resolve([]));
 
 // Images and clips share one bar, weighted by file count.
 const total = upFront.length + (hasAudio ? audioManifest.length : 0);
@@ -183,7 +208,7 @@ function step() {
 }
 
 Promise.all([
-  preload(upFront, step),
+  preload(upFront, step, "story"),
   hasAudio ? loadAudio(audioManifest, step) : Promise.resolve()
 ]).then(() => {
   loaderBar.style.width = "100%";
@@ -227,6 +252,9 @@ Promise.all([
 // resetToTitle() puts the cover back for the title screen it belongs to.
 function leaveStory() {
   releaseStory();
+  // releaseStory() unmounts the pages; this lets go of the pictures behind
+  // them, which is the half that the preloader was still holding.
+  release("story");
   loader.classList.add("is-spent");
 }
 
@@ -295,8 +323,15 @@ async function handOver() {
 // Level to level. The next round is built inside the glare — held, like every
 // other arrival, so its first line does not start under the light — and begins
 // as the light draws off it.
-function warpOn() {
+async function warpOn() {
   armHold();
+  // The next place is fetched a beat into the round before this one, so by now
+  // it is almost always already here and this waits for nothing. Almost
+  // always is not always — a slow connection would otherwise land them in a
+  // room with no walls and Agni talking — so the warp does not begin until the
+  // art has arrived, or ART_WAIT has passed.
+  await ready(prefetchRound(chapter));
+  mark("warp:art-ready", String(chapter));
   playWarp(() => enterGame());
   after(releaseHold, WARP_HOLD_MS);
 }
@@ -353,6 +388,15 @@ function arrive() {
 
 function enterGame(at = 0) {
   mark("game:enter", String(chapter));
+  // The places behind this one, put down: their pictures were held so that
+  // nothing could be evicted out from under them while they were on screen,
+  // and that reason has gone. The road too — it is the heaviest thing in the
+  // chapter and is not walked again until the very end.
+  for (const i of [...roundArt.keys()]) if (i !== chapter && i !== -1) dropRound(i);
+  if (!goingHome) {
+    walkArt = null;
+    release("walk");
+  }
   // The next place, fetched while this one is being played. By the time the
   // warp hands over, it is already here.
   after(() => {
@@ -367,7 +411,8 @@ function enterGame(at = 0) {
   startGame(at, chapter);
 }
 
-function enterStory() {
+async function enterStory() {
+  await ready(preload(manifest, undefined, "story"));
   document.body.dataset.act = "story";
   setFrame(STORY_W, STORY_H);
   endWalk();
