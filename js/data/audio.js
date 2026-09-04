@@ -124,22 +124,32 @@ export const cues = {
     sfx: [{ id: "mist_rush", at: 0, gain: 0.9 },
       { id: "blackout_hit", at: 2750, gain: 1 }
     ]
-    // No laugh here: it belongs over the eyes, and there is only ever one.
+    // The laugh is not here, but it is close: it starts on the first frame of
+    // 3.1, which is this screen dissolving into the eyes. Scheduling it here
+    // instead would not work — the step change clears every sound still
+    // running on the sfx bus (clearCues in js/story.js), so it would be cut
+    // mid-laugh at the boundary. And there is only ever one.
   },
 
   /* ---------- Screen 3 ---------- */
 
-  // Agni calls into the dark. Blinks match the BLINK! captions.
-  // The eyes open, and he crosses overhead. The pan sweeps with the text.
-  // The dip from 2.2 carries: nothing here puts the music back.
+  // Agni calls into the dark. The dip from 2.2 carries: nothing here puts the
+  // music back.
   "3.1": {
-    // One blink, then the laugh — a single recording of him, six "he"s over
-    // two seconds, rather than three plays of two clips pretending to be one
-    // voice. The hehes on screen pop in time with it (scenes.js: 1250, then
-    // every 600ms), so what is read and what is heard are the same laugh.
+    // The laugh rides in on the dissolve — `at: 0` is the frame the dark town
+    // starts becoming the eyes, so he is heard while the picture is still
+    // changing rather than a beat and a quarter after it has settled. He is no
+    // longer read: the "ही! ही!" that used to pop on screen with him is gone
+    // (see 3.1 in js/data/scenes.js), because on a screen holding nobody but
+    // two pairs of eyes, text reads as one of THEM saying it.
+    //
+    // So he has to carry the moment on sound alone, and what the script wants
+    // is something far off in the dark: down from 0.95 to a third of that,
+    // lowpassed to take the near edge off him, and further out to the side
+    // than the blink beside him. The whole point is that he is somewhere else.
     sfx: [
       { id: "blink", at: 900, gain: 0.55, pan: -0.42 },
-      { id: "vo_giggles_1", at: 1250, gain: 0.95, pan: -0.35 }
+      { id: "vo_giggles_1", at: 0, gain: 0.32, muffle: 1500, pan: -0.62 }
     ]
   },
 
