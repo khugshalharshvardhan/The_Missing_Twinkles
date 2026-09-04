@@ -49,15 +49,17 @@
 /* The moving part of a strip: the tile, one tile wider than the frame, slid by
    transform so the browser composites it on the GPU in sub-pixel steps — see
    strip() in js/walk.js for why background-position could not do this job. */
+/* Each band is a canvas the size of the band ON SCREEN — see sizeStrip() in
+   js/walk.js. It used to be a wide element with a repeating background, moved
+   by transform, which on an iPhone meant a backing store past the 4096 pixels
+   Safari can allocate: the parallax stopped rendering and the tab was killed.
+   Nothing here may be wider than the box it sits in. */
 .pw__scroll {
   position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
+  inset: 0;
   width: 100%;
-  background-repeat: repeat-x;
-  background-size: auto 100%;
-  will-change: transform;
+  height: 100%;
+  display: block;
 }
 
 /* Solid earth under the two ground planes, which are semi-transparent texture

@@ -32,10 +32,18 @@ export function setFrame(w, h) {
   fitStage();
 }
 
-export function watchStage() {
+// Anything that rasterises at the stage's own scale — the walk's bands draw
+// themselves into canvases sized to the screen — has to hear about a resize,
+// or it comes back blurred on a rotate.
+let onRefit = () => {};
+
+export function watchStage(handlers = {}) {
+  onRefit = handlers.onRefit ?? onRefit;
+
+  const refit = () => { fitStage(); onRefit(); };
   fitStage();
-  window.addEventListener("resize", fitStage);
-  window.addEventListener("orientationchange", fitStage);
+  window.addEventListener("resize", refit);
+  window.addEventListener("orientationchange", refit);
   // Mobile browsers resize the visual viewport without firing `resize`.
-  window.visualViewport?.addEventListener("resize", fitStage);
+  window.visualViewport?.addEventListener("resize", refit);
 }

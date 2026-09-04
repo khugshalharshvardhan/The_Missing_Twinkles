@@ -60,6 +60,59 @@ let lastNow = 0;
 let heldAt = 0;
 let onArrive = () => {};
 let strips = [];
+// How many pixels a band's canvas gets per design pixel.
+//
+// The stage is scaled to the viewport, so a band 1882 design pixels across is
+// perhaps 700 real ones on a phone and there is no sense rasterising more than
+// that. Above that it is capped, and the cap is lower on a dense screen: a
+// third of a pixel of extra detail is invisible on a background that is moving,
+// and every band pays for it in memory the device may not have.
+function stripDensity() {
+  const stage = document.getElementById("stage");
+  const scale = parseFloat(getComputedStyle(stage).getPropertyValue("--scale")) || 1;
+  const dpr = window.devicePixelRatio || 1;
+  const cap = dpr > 1.5 ? 1 : 1.35;
+  return Math.max(0.4, Math.min(cap, scale * dpr));
+}
+
+// Give a band's canvas a backing store the size it is actually drawn at — and
+// only for the part of it inside the frame. Several bands are taller than the
+// frame and hang off the bottom (the shrubs are 1286 against a 1059 frame);
+// those rows are drawn, composited and paid for, and never seen.
+function sizeStrip(s) {
+  const px = stripDensity();
+  const seen = Math.max(1, Math.min(s.h, FRAME_H - s.y));
+  const w = Math.ceil(FRAME_W * px);
+  const h = Math.ceil(seen * px);
+  if (s.el.width === w && s.el.height === h && s.px === px) return;
+
+  s.px = px;
+  s.seen = seen;
+  s.el.width = w;
+  s.el.height = h;
+  // The canvas covers the visible part of the band, top-aligned; the art is
+  // drawn at the band's full height so nothing is squashed.
+  s.el.style.height = `${(seen / s.h) * 100}%`;
+  s.at = null;
+  drawStrip(s, s.last ?? 0);
+}
+
+// One band, drawn at a fractional offset. Two tiles is almost always enough —
+// the loop covers a tile narrower than the frame.
+function drawStrip(s, off) {
+  s.last = off;
+  if (!s.art || !s.tile) return;
+  // Nothing to do if it has not moved a whole pixel of the screen. The sky
+  // travels nine pixels a second; redrawing it sixty times for that is most of
+  // a frame's budget spent on a picture nobody can see change.
+  if (s.at !== null && Math.abs(off - s.at) * s.px < 1) return;
+  s.at = off;
+
+  const ctx = s.ctx;
+  ctx.setTransform(s.px, 0, 0, s.px, 0, 0);
+  ctx.clearRect(0, 0, FRAME_W, s.seen);
+  for (let x = -off; x < FRAME_W; x += s.tile) ctx.drawImage(s.art, x, 0, s.tile, s.h);
+}
 let walkers = [];
 let fades = [];
 let masks = [];
@@ -144,6 +197,12 @@ export function startWalk(dest = destinations.clearing, mode = null) {
   raf = requestAnimationFrame(tick);
 }
 
+// The stage is re-fitted on a resize or a rotate, which changes how many real
+// pixels a band covers — so the canvases are given the new size and redrawn.
+export function refitWalk() {
+  strips.forEach(sizeStrip);
+}
+
 export function stopWalk() {
   cancelAnimationFrame(raf);
   cancelAnimationFrame(liveRaf);
@@ -177,8 +236,7 @@ function tick(now) {
     // Wrap by whole tiles; until the tile width is known (one frame at most)
     // the strip holds still rather than exposing an edge.
     const raw = (run.reverse ? -scroll : scroll) * s.speed;
-    const off = s.tile ? ((raw % s.tile) + s.tile) % s.tile : 0;
-    s.el.style.transform = `translate3d(${-off}px, 0, 0)`;
+    drawStrip(s, s.tile ? ((raw % s.tile) + s.tile) % s.tile : 0);
   }
 
   // The clearing opens over the same stretch the scroll is easing down. Both
@@ -286,28 +344,37 @@ function strip(layer) {
     return el;
   }
 
-  // The art scrolls on an inner element moved by transform, not by
-  // background-position: a transform is composited on the GPU and moves in
-  // sub-pixels, where background-position repaints the whole strip on the CPU
-  // every frame and snaps to whole pixels — which is exactly the stutter the
-  // slow layers showed (the sky moves ~9px a second; pixel-snapped, it stepped
-  // visibly). The inner is one tile wider than the frame and wraps by whole
-  // tiles, so there is never an exposed edge. Everything frame-aligned — the
-  // settle masks, the bottom fade, the dim, the opacity — stays on the
-  // stationary outer box.
-  const inner = document.createElement("i");
+  // The art is drawn into a canvas the size of the band ON SCREEN, and the
+  // tile is re-drawn at a fractional offset each frame. It used to be a DOM
+  // element one tile wider than the frame, moved by transform — which on an
+  // iPhone meant a backing store of up to 6342 device pixels, past the 4096
+  // Safari allows, and 146MB of texture across the eleven bands. Motion is
+  // still sub-pixel: drawImage takes fractional coordinates.
+  //
+  // Everything frame-aligned — the settle masks, the bottom fade, the dim, the
+  // opacity — stays on the stationary outer box, untouched.
+  const inner = document.createElement("canvas");
   inner.className = "pw__scroll";
-  inner.style.backgroundImage = `url("${layer.src}")`;
   el.append(inner);
 
-  const entry = { el: inner, speed: layer.speed, tile: 0 };
+  const entry = {
+    el: inner,
+    ctx: inner.getContext("2d", { alpha: true }),
+    speed: layer.speed,
+    tile: 0,
+    art: null,
+    at: null,
+    y: layer.y ?? 0,
+    h: layer.h ?? FRAME_H
+  };
   strips.push(entry);
   // The wrap period is the tile's on-screen width: the art's own aspect at
   // this band's height. Cached by the preloader, so this fires immediately.
   const probe = new Image();
   probe.onload = () => {
-    entry.tile = probe.naturalWidth * ((layer.h ?? FRAME_H) / probe.naturalHeight);
-    inner.style.width = `${Math.ceil(FRAME_W + entry.tile)}px`;
+    entry.art = probe;
+    entry.tile = probe.naturalWidth * (entry.h / probe.naturalHeight);
+    sizeStrip(entry);
   };
   probe.src = layer.src;
   if (layer.settle != null) fades.push({ el, base, to: layer.settle });

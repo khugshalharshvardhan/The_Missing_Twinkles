@@ -21,7 +21,7 @@ import { watchStage, setFrame } from "./stage.js";
 import { preload } from "./preload.js";
 import { initStory, startStory, nextPage, prevPage, releaseStory } from "./story.js";
 import { initGame, startGame, startEpilogue, releaseHold, armHold, currentLevel } from "./game.js";
-import { initWalk, startWalk, endWalk } from "./walk.js";
+import { initWalk, startWalk, endWalk, refitWalk } from "./walk.js";
 import { initWarp, playWarp, WARP_HOLD_MS } from "./warp.js";
 import { after, cancel } from "./clock.js";
 import { layers as walkLayers, foreground as walkFore, cast as walkCast,
@@ -56,7 +56,7 @@ const jumpLevel = Math.min(Math.max(Number(params.get("level") ?? 0) || 0, 0), l
 // deleting devtools/ plus this block removes it completely.
 const devMode = params.has("dev");
 
-watchStage();
+watchStage({ onRefit: refitWalk });
 
 // The context starts suspended, which is enough to decode the soundtrack while
 // the loader runs; unlockAudio() resumes it on the first click.

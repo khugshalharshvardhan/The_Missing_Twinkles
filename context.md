@@ -365,8 +365,39 @@ did it, and all four are worth keeping:
   absent from `audioManifest`. The pause has to stop the element as well as
   suspending the context — a media element has a clock of its own.
 
+And a fifth, which was the iPhone-only half of it:
+
+- **No layer may be wider than the frame.** The walk's scrolling bands were DOM
+  elements one tile wider than the frame, moved by transform. On an iPhone in
+  landscape the widest came to **6342 device pixels** — past the 4096 a Safari
+  backing store can be — and the eleven together asked the compositor for
+  **146MB of texture**. Safari answers by not rendering them, which is the
+  parallax standing still, and then by killing the tab, which is the game
+  appearing to restart the moment the walk begins. Chrome tiles oversized layers
+  and survives, which is why Android was fine and one phone was not.
+
+  Each band is a **canvas sized to the pixels it occupies on the screen**
+  (`sizeStrip()` in js/walk.js) with the tile drawn at a fractional offset. The
+  motion is still sub-pixel, which is what the transform was for. Two things
+  keep it at full frame rate: a band is not drawn at all until it has moved a
+  whole screen pixel — the sky travels nine pixels a second — and only the part
+  of it inside the frame is drawn, since several hang off the bottom. Measured
+  62fps, against 36 for the naive version and 60 for the DOM one it replaced.
+  `refitWalk()` re-sizes the canvases when the stage does, so a rotate does not
+  leave them blurred.
+
+Where it landed, on an iPhone-shaped viewport:
+
+| | before | after |
+|---|---|---|
+| bitmap at the walk | 171 MB | 26 MB |
+| compositor texture | 146 MB | 43 MB |
+| decoded audio | 101 MB | 41 MB |
+| widest single layer | 6342 px | 1882 px |
+
 If you add art, check it with the same arithmetic before shipping it: pixels x 4
-is what the device pays, not the file size.
+is what the device pays, not the file size — and nothing may be wider than the
+frame it sits in.
 
 ## 4. The level recipe (exactly how level 1 was added — copy it)
 
