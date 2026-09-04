@@ -278,8 +278,9 @@ export const screens = [
     //
     // Timing lives in @keyframes ff-swarm in css/game.css: 0.9s in, 5s held,
     // 0.7s to vanish where they stand. Change one, change the other.
-    fireflies: { x: 628, y: 197, enter: "left" },
-    dwell: 7100,
+    // The first twinkles a child ever sees here, and the longest they are ever
+    // held: five seconds.
+    fireflies: { x: 628, y: 197, enter: "left", life: 5000 },
     bubble: {
       art: `${IMG}bub_11.webp`, who: "agni",
       x: 80, y: 263, w: 416, h: 229,
@@ -352,8 +353,7 @@ export const screens = [
     // runs 500 to 2581), holds its five seconds, and vanishes the same way.
     // The player is asked to guess at something they have just watched appear
     // and disappear by magic.
-    fireflies: { x: 628, y: 197, enter: "magic", at: 2650 },
-    dwell: 10000,
+    fireflies: { x: 628, y: 197, enter: "magic", at: 2650, life: 4000 },
     bubble: {
       art: `${IMG}bub_15.webp`, who: "agni",
       x: -5, y: 181, w: 514, h: 277,
@@ -563,9 +563,9 @@ export const screens = [
       { src: `${IMG}neel_turn.webp`, x: 1125, y: 391, w: 735, h: 610, fill: CROP.neelTurn, fx: "breathe-slow" },
       { src: `${IMG}lamp_on.webp`, x: 1408, y: 74, w: 287, h: 927, fill: CROP.lampOn, fx: "lamp-glow" }
     ],
-    // Neel's cheer, drawn as well as heard: comic-burst lettering over his
-    // head as he spins to the lit lamp. Matches vo_neel_yay in the cue table.
-    shout: { text: "यय!", x: 150, y: 236, tilt: 9 }
+    // No caption on this beat. They cheer — vo_neel_yay and vo_agni_yay in
+    // the cue table — and a word on the screen only says again, more slowly,
+    // what two voices have already said.
   },
 
   // ---- SCREEN 6.1 — handing over (99:587) ----
@@ -609,8 +609,7 @@ export const level1 = [
     ],
     // Same clock as tutorial 1.5: her line ends (vo_g_guess runs 500 to 2581),
     // the bubble goes, the berries materialise, hold five seconds, vanish.
-    fireflies: { x: 716, y: 140, enter: "magic", at: 2650 },
-    dwell: 10000,
+    fireflies: { x: 716, y: 140, enter: "magic", at: 2650, life: 3500 },
     bubble: {
       art: `${IMG}bub_15.webp`, who: "agni",
       x: -1, y: 181, w: 514, h: 277,
@@ -762,7 +761,9 @@ export const level1 = [
       { src: `${IMG}neel_turn.webp`, x: 1125, y: 391, w: 735, h: 610, fill: CROP.neelTurn, fx: "breathe-slow" },
       { src: `${IMG}lamp_on.webp`, x: 1398, y: 74, w: 287, h: 927, fill: CROP.lampOn, fx: "lamp-glow" }
     ],
-    shout: { text: "यय!", x: 150, y: 236, tilt: 9 }
+    // No caption on this beat. They cheer — vo_neel_yay and vo_agni_yay in
+    // the cue table — and a word on the screen only says again, more slowly,
+    // what two voices have already said.
   }
 ];
 
@@ -790,8 +791,7 @@ export const level2 = [
     ],
     // Same clock as level 1's p1: her line ends (vo_g_guess runs 500 to 2581),
     // the bubble goes, the stars materialise, hold five seconds, vanish.
-    fireflies: { x: 631, y: 174, enter: "magic", at: 2650 },
-    dwell: 10000,
+    fireflies: { x: 631, y: 174, enter: "magic", at: 2650, life: 3500 },
     bubble: {
       art: `${IMG}bub_15.webp`, who: "agni",
       x: -1, y: 181, w: 514, h: 277,
@@ -946,7 +946,9 @@ export const level2 = [
       { src: `${IMG}neel_turn.webp`, x: 1125, y: 391, w: 735, h: 610, fill: CROP.neelTurn, fx: "breathe-slow" },
       { src: `${IMG}lamp_on.webp`, x: 1398, y: 74, w: 287, h: 927, fill: CROP.lampOn, fx: "lamp-glow" }
     ],
-    shout: { text: "यय!", x: 150, y: 236, tilt: 9 }
+    // No caption on this beat. They cheer — vo_neel_yay and vo_agni_yay in
+    // the cue table — and a word on the screen only says again, more slowly,
+    // what two voices have already said.
   }
 ];
 
@@ -972,8 +974,7 @@ export const level3 = [
     ],
     // Same clock as p1 and s1: her line ends (vo_g_guess runs 500 to 2581),
     // the bubble goes, the seeds materialise, hold five seconds, vanish.
-    fireflies: { x: 639, y: 85, enter: "magic", at: 2650 },
-    dwell: 10000,
+    fireflies: { x: 639, y: 85, enter: "magic", at: 2650, life: 2500 },
     bubble: {
       art: `${IMG}bub_15.webp`, who: "agni",
       x: -1, y: 181, w: 514, h: 277,
@@ -1127,7 +1128,9 @@ export const level3 = [
       { src: `${IMG}neel_turn.webp`, x: 1125, y: 391, w: 735, h: 610, fill: CROP.neelTurn, fx: "breathe-slow" },
       { src: `${IMG}lamp_on.webp`, x: 1453, y: 74, w: 287, h: 927, fill: CROP.lampOn, fx: "lamp-glow" }
     ],
-    shout: { text: "यय!", x: 150, y: 236, tilt: 9 }
+    // No caption on this beat. They cheer — vo_neel_yay and vo_agni_yay in
+    // the cue table — and a word on the screen only says again, more slowly,
+    // what two voices have already said.
   }
 ];
 
@@ -1153,8 +1156,7 @@ export const level4 = [
     ],
     // Same clock as every other look beat: her line ends (vo_g_guess runs 500
     // to 2581), the bubble goes, the flowers open, hold five seconds, vanish.
-    fireflies: { x: 566, y: 138, enter: "magic", at: 2650 },
-    dwell: 10000,
+    fireflies: { x: 566, y: 138, enter: "magic", at: 2650, life: 2500 },
     bubble: {
       art: `${IMG}bub_15.webp`, who: "agni",
       x: -1, y: 181, w: 514, h: 277,
@@ -1310,7 +1312,9 @@ export const level4 = [
       { src: `${IMG}neel_turn.webp`, x: 1125, y: 391, w: 735, h: 610, fill: CROP.neelTurn, fx: "breathe-slow" },
       { src: `${IMG}lamp_on.webp`, x: 1453, y: 74, w: 287, h: 927, fill: CROP.lampOn, fx: "lamp-glow" }
     ],
-    shout: { text: "यय!", x: 150, y: 236, tilt: 9 }
+    // No caption on this beat. They cheer — vo_neel_yay and vo_agni_yay in
+    // the cue table — and a word on the screen only says again, more slowly,
+    // what two voices have already said.
   }
 ];
 

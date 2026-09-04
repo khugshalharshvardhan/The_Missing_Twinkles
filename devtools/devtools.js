@@ -218,7 +218,8 @@ function parts(screen) {
   if (screen.numberLine) bits.add("number line");
   if (screen.fireflies) {
     const f = screen.fireflies;
-    bits.add(`swarm${f.enter ? ` ⇢ ${f.enter}` : ""}${f.at ? ` @${f.at}ms` : ""}${f.dim ? " · dim" : ""}`);
+    bits.add(`swarm${f.enter ? ` ⇢ ${f.enter}` : ""}${f.at ? ` @${f.at}ms` : ""}` +
+      `${f.life ? ` for ${f.life / 1000}s` : ""}${f.dim ? " · dim" : ""}`);
   }
   if (screen.keypadAt) bits.add(`pad @${screen.keypadAt}ms`);
   if (screen.lamp) bits.add(screen.lampLit ? "lamp ⇢ lit" : "lamp");

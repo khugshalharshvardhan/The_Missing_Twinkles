@@ -434,6 +434,64 @@ Three things followed from the cut:
   keyframes (`shout-rock-centre`) because it animates `transform`, which would
   otherwise throw the centring translate away.
 
+## How long the items stay
+
+One number in CSS used to govern every round, so the tutorial — where a child
+is meeting the idea — and the last level — where they have counted four rounds
+already — showed their countables for the same 6.6 seconds. It is per screen
+now: `fireflies.life` in js/data/screens.js, out through `--swarm-life` to the
+`ff-swarm` animation, with the poof's delay written as a fraction of it
+(88.2%, which is where 5820 of the old 6600 was) so it still bursts where they
+vanish rather than after they have gone.
+
+| round | items on screen |
+| --- | --- |
+| tutorial, first time | 5s |
+| tutorial, second time | 4s |
+| levels 1 and 2 | 3.5s |
+| levels 3 and 4 | 2.5s |
+
+Measured in the browser rather than read off the data: 4.9 / 4.0 / 3.5 / 2.5.
+
+Two things had to follow it:
+
+- **Six hand-written dwells came out.** Every swarm beat carried `dwell: 10000`
+  (or 7100), which was the old 6.9s life written out by hand — stale the moment
+  the life changed, and a stale dwell holds the beat open on an empty screen.
+  The beat already knows how to work this out: `swarmAt + swarmLife + SWARM_AIR`
+  is one of the four terms in its `max()`.
+- **The first beat's swarm now counts towards its own length.** The test was
+  `swarmAt`, which is zero on screen 1.1 — the twinkles come in WITH her line
+  there rather than after it — so that one beat's swarm did not count, and the
+  hand-written dwell had been covering for it. It tests `fireflies.enter` now:
+  a swarm that arrives has a life the beat must outlast, one that is simply
+  standing there does not.
+
+## The lamp asks to be tapped
+
+`#game .lamp .fill` already had a warm halo on `:hover` — which a child on a
+tablet will never see. The same halo now breathes on its own for as long as the
+lamp is unstruck (`lamp-ask`, css/game.css): a tight near-white core to pick the
+ironwork out of the dark and a wide amber one behind it, because one soft
+shadow alone washes out against a lit sky.
+
+It is on `.fill` rather than `.lamp` because the lamp box carries the beat's
+camera move (`.is-lampstage`) and an animation there would take it over. And it
+is scoped `:not(.is-struck)`, so the invitation cannot outlive the tap that
+answered it. Under `prefers-reduced-motion` it holds still rather than
+disappearing — a lamp that gives no sign of being tappable is worse than one
+that glows steadily.
+
+It is on every round's lamp beat, not only the tutorial's: the instruction
+appears each round and so should the thing it points at.
+
+## No "यय!"
+
+The comic-burst caption over Neel on screen 5.2 is gone from all five rounds.
+`vo_neel_yay` and `vo_agni_yay` still play from the cue table, so the beat is
+still their cheer — heard rather than read, which is one fewer thing asking to
+be looked at on a beat whose subject is the lamp.
+
 ## No page turning
 
 The story turns its own pages. It is eight beats long; a reader holding its
