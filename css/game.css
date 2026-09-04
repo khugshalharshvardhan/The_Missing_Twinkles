@@ -186,7 +186,12 @@
    `.swarm.is-swarming .firefly` (0,2,1). Without it these rules lose and the
    swarm just bobs in place. */
 #game .swarm.is-swarming .firefly {
-  animation: ff-swarm 6.6s both;
+  /* How long they are on screen, arrival and poof included. Set per screen
+     (--swarm-life, from fireflies.life in js/data/screens.js) so the tutorial
+     can hold them and the last level need not. The keyframes are written in
+     percentages, so shortening this shortens the whole gesture in proportion:
+     they arrive faster, are held for less, and go faster. */
+  animation: ff-swarm var(--swarm-life, 6600ms) both;
   animation-delay: calc(var(--swarm-at, 0ms) + var(--d, 0ms));
   animation-play-state: paused;
 }
@@ -300,7 +305,7 @@
 
 #game .swarm.is-swarming .firefly .poof__bit {
   animation: poof-burst 700ms cubic-bezier(0.16, 0.8, 0.32, 1) both;
-  animation-delay: calc(var(--swarm-at, 0ms) + var(--d, 0ms) + 5820ms);
+  animation-delay: calc(var(--swarm-at, 0ms) + var(--d, 0ms) + var(--swarm-life, 6600ms) * 0.882);
   animation-play-state: paused;
 }
 
@@ -636,6 +641,36 @@
 #game .lamp:hover .fill,
 #game .lamp:focus-visible .fill {
   filter: drop-shadow(0 0 26px rgba(255, 209, 102, 0.65));
+}
+
+/* TAP ME.
+   The rule above offers the lamp to a pointer, and a child on a tablet has no
+   pointer — so on the beat where the lamp is the only thing that does anything,
+   the same warm halo is offered without being asked for. It breathes rather
+   than sits, because a still glow on a lamp reads as part of the painting and
+   a moving one reads as an invitation.
+
+   On .fill rather than on .lamp: the lamp box carries the beat's camera move
+   (.is-lampstage below) and an animation here would take it over. And it stops
+   the instant the lamp is struck, which is what :not(.is-struck) is for — the
+   invitation must not outlive the tap that answered it. */
+#game .scene.is-begun .lamp:not(.is-struck) .fill {
+  animation: lamp-ask 1700ms ease-in-out infinite;
+}
+
+@keyframes lamp-ask {
+  /* Two shadows, not one: a tight near-white core that picks the ironwork out
+     of the dark, and a wide amber halo behind it. One soft shadow on its own
+     washes out against a lit sky — this reads as a lamp being pointed at even
+     on a phone. */
+  0%, 100% {
+    filter: drop-shadow(0 0 4px rgba(255, 232, 170, 0.35))
+            drop-shadow(0 0 12px rgba(255, 186, 66, 0.3));
+  }
+  50% {
+    filter: drop-shadow(0 0 12px rgba(255, 240, 200, 0.95))
+            drop-shadow(0 0 38px rgba(255, 186, 66, 0.8));
+  }
 }
 
 #game .lamp:focus-visible {
@@ -1282,6 +1317,12 @@
   }
 
   #game .video-layer.is-iris { animation: none; }
+
+  /* Still offered, just not breathing. */
+  #game .scene.is-begun .lamp:not(.is-struck) .fill {
+    animation: none;
+    filter: drop-shadow(0 0 22px rgba(255, 209, 102, 0.7));
+  }
   /* No sweep, but the picture must still be gone — the word is read against
      the dark it leaves. */
   #game .scene-iris { animation: none; clip-path: circle(0% at 50% 50%); }

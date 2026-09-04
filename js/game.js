@@ -306,8 +306,13 @@ function speak(screen) {
   // added, and long enough for the twinkles to arrive, be looked at and go.
   // Reading pace alone was cutting lines off — it is counted from the caption,
   // and a caption is a poor guide to how long it takes to say.
-  const wait = Math.max(readingTime(screen), lineEnd + VO_TAIL, spokenEnd + VO_TAIL,
-    swarmAt ? swarmAt + SWARM_LIFE : 0);
+  // A swarm that ARRIVES has a life the beat must outlast; one that is simply
+  // standing there does not. The old test was swarmAt, which is zero on the
+  // very first beat — the twinkles come in with her line there rather than
+  // after it — so that beat was the one screen whose swarm did not count
+  // towards its own length, and a hand-written dwell had been covering for it.
+  const swarmEnd = screen.fireflies?.enter ? swarmAt + swarmLife(screen) + SWARM_AIR : 0;
+  const wait = Math.max(readingTime(screen), lineEnd + VO_TAIL, spokenEnd + VO_TAIL, swarmEnd);
 
   // The count beat's swarm cannot be tapped over the instruction — the pane
   // holds .is-line until the line has been said, which also holds the hint
@@ -368,10 +373,22 @@ function armIdle(pane) {
 // The recordings have been replaced twice already, each take its own length, so
 // this is measured rather than written down.
 //
-// SWARM_LIFE is what css/game.css gives them once they are here: 5820ms before
-// the poof and 700ms of poof, plus air.
+// SWARM_LIFE is the default a screen gets if it does not say: what
+// css/game.css falls back to. A screen sets its own with fireflies.life, and
+// the numbers run down the chapter — five seconds the first time the twinkles
+// are ever seen, four the second, three and a half through the middle levels,
+// two and a half at the end. A child who has counted four rounds does not need
+// as long as one meeting the idea.
+//
+// SWARM_AIR is the beat's own pause after the last of them has gone, so the
+// screen does not turn on the poof.
 const SWARM_AFTER_LINE = 300;
-const SWARM_LIFE = 6900;
+const SWARM_LIFE = 6600;
+const SWARM_AIR = 300;
+
+function swarmLife(screen) {
+  return screen.fireflies?.life ?? SWARM_LIFE;
+}
 
 function swarmDelay(screen, lineEnd) {
   const asked = screen.fireflies?.at ?? 0;
@@ -676,6 +693,8 @@ function swarm(screen) {
   // twinkle's stagger, its vanish, the poof it vanishes on — is CSS arithmetic
   // over this one number; see --swarm-at in css/game.css.
   group.style.setProperty("--swarm-at", `${screen.fireflies.at ?? 0}ms`);
+  // And how long they stay — see swarmLife().
+  group.style.setProperty("--swarm-life", `${swarmLife(screen)}ms`);
 
   round.layout.forEach((spot, i) => {
     // A countable twinkle is a real button; a decorative one is not.
