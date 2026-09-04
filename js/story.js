@@ -258,17 +258,13 @@ function paint(entry, { silent = false } = {}) {
   if (!silent) clearCues();
   playCues(cues[step.id]);
 
-  if (entry.last) {
-    // Closes the page: hand control back once the line has finished, and
-    // remember the page has been read — from here on it offers Next at once.
-    revealTimer = after(() => {
-      completed.add(entry.p);
-      setWaiting(true);
-      paintNav(entry);
-    }, step.reveal ?? 0);
-  } else {
-    holdTimer = after(next, holdFor(step));
-  }
+  // Every beat turns itself, the last of a page included. There are eight of
+  // them now, and a story this short does not need a reader holding its hand
+  // through it — so there is no Next to press and nothing that stops and waits
+  // for one. A page-closing step still gets its `reveal` as a floor, because
+  // that number is the beat of air the page was written to end on.
+  if (entry.last) completed.add(entry.p);
+  holdTimer = after(next, Math.max(holdFor(step), step.reveal ?? 0));
 }
 
 // Which page-turn buttons this step offers. Prev is live wherever there is a

@@ -19,10 +19,10 @@ import {
   FRAME_W as GAME_W,
   FRAME_H as GAME_H
 } from "./data/screens.js";
-import { audioManifest, UI_ADVANCE } from "./data/audio.js";
+import { audioManifest } from "./data/audio.js";
 import { watchStage, setFrame } from "./stage.js";
 import { preload, release } from "./preload.js";
-import { initStory, startStory, nextPage, prevPage, releaseStory } from "./story.js";
+import { initStory, startStory, releaseStory } from "./story.js";
 import { initGame, startGame, startEpilogue, releaseHold, armHold, currentLevel } from "./game.js";
 import { initWalk, startWalk, endWalk, refitWalk } from "./walk.js";
 import { initWarp, playWarp, WARP_HOLD_MS } from "./warp.js";
@@ -35,7 +35,6 @@ import {
   initAudio,
   loadAudio,
   unlockAudio,
-  playUi,
   stopAudio,
   toggleMuted,
   isMuted
@@ -472,14 +471,6 @@ const actions = {
     }
     enterStory();
   },
-  // Only click back if the press actually turned a page — a press the story
-  // is not ready for does nothing, and a sound would suggest otherwise.
-  next: () => {
-    if (nextPage()) playUi(UI_ADVANCE, 0.5);
-  },
-  prev: () => {
-    if (prevPage()) playUi(UI_ADVANCE, 0.5);
-  },
   sound: () => {
     unlockAudio();
     toggleMuted();
@@ -526,23 +517,7 @@ document.addEventListener("click", (event) => {
   actions[trigger.dataset.action]?.();
 });
 
-// Space / Enter / Right arrow turn a story page forward, Left arrow turns it
-// back — matching the two buttons. The game's own beats read themselves, so
-// there is nothing to advance there.
-document.addEventListener("keydown", (event) => {
-  if (event.code === "ArrowLeft") {
-    // Only where the Prev button is live, so the key matches the button.
-    if (!hud.classList.contains("has-prev")) return;
-    event.preventDefault();
-    actions.prev();
-    return;
-  }
-
-  if (!["Space", "Enter", "ArrowRight"].includes(event.code)) return;
-  // Only where the Next button is showing, so the keys match it and the
-  // loader and end-card buttons keep their native keyboard behaviour.
-  if (!hud.classList.contains("is-waiting")) return;
-
-  event.preventDefault();
-  actions.next();
-});
+// No page-turn keys either. They existed to match the two buttons, and with
+// the buttons gone a key that turned a page would be a control nothing on
+// screen offers — and would let a keyboard run ahead of the voice. The loader
+// and end-card buttons keep their own native keyboard behaviour.

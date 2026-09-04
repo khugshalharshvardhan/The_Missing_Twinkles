@@ -725,6 +725,17 @@
   100% { transform: scale(1) rotate(var(--ch-tilt, 0deg)); }
 }
 
+/* The idle rock, for a centred word: the same movement, composed on top of the
+   translate that centres it instead of replacing it. */
+#game .shout--centre {
+  animation-name: shout-rock-centre;
+}
+
+@keyframes shout-rock-centre {
+  0%, 100% { transform: translate(-50%, -50%) rotate(calc(var(--tilt, 0deg) - 1.5deg)); }
+  50%      { transform: translate(-50%, -50%) rotate(calc(var(--tilt, 0deg) + 1.5deg)); }
+}
+
 @keyframes shout-rock {
   0%, 100% { transform: rotate(var(--tilt, 0deg)); }
   50%      { transform: rotate(calc(var(--tilt, 0deg) + 3deg)); }
@@ -1111,6 +1122,33 @@
   animation: g-iris 2000ms cubic-bezier(0.4, 0, 0.6, 1) 150ms both;
 }
 
+/* The closing circle, on the beat rather than on a film. The scene's own
+   pictures live inside this box and it shrinks to a point on the middle of the
+   frame, so what closes is the picture and what is left is the dark behind it
+   — the same shape the film's iris had, just no longer tied to a film. It
+   holds at nothing (fill: both) rather than springing back open. */
+#game .scene-iris {
+  position: absolute;
+  inset: 0;
+  clip-path: circle(130% at 50% 50%);
+  animation-name: g-scene-iris;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.6, 1);
+  animation-fill-mode: both;
+}
+
+@keyframes g-scene-iris {
+  from { clip-path: circle(130% at 50% 50%); }
+  to   { clip-path: circle(0% at 50% 50%); }
+}
+
+/* Centred on the frame, both ways, whatever the word turns out to measure. */
+#game .shout--centre {
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) rotate(var(--tilt, 0deg));
+  z-index: 7;
+}
+
 @keyframes g-iris {
   from { clip-path: circle(130% at 62% 52%); }
   to   { clip-path: circle(0% at 62% 52%); }
@@ -1244,6 +1282,9 @@
   }
 
   #game .video-layer.is-iris { animation: none; }
+  /* No sweep, but the picture must still be gone — the word is read against
+     the dark it leaves. */
+  #game .scene-iris { animation: none; clip-path: circle(0% at 50% 50%); }
 
   #game .scene.is-lampstage,
   #game .scene.is-lampstage .lamp,

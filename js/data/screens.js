@@ -550,6 +550,10 @@ export const screens = [
   },
 
   // ---- SCREEN 5.2 — the lamp catches one (112:132) ----
+  // There is deliberately no twinkle drawn beside the lamp here. The beat
+  // before this pours the whole flock into the glass, so one left sitting
+  // outside it reads as one that got away — the opposite of what the scene is
+  // saying. The light in the glass is where they all are.
   {
     id: "5.2",
     anchor: LAMP_STAGE,
@@ -557,8 +561,7 @@ export const screens = [
       BG,
       { src: `${IMG}agni_celebrating.webp`, x: 579, y: 465, w: 549, h: 528, fx: "breathe" },
       { src: `${IMG}neel_turn.webp`, x: 1125, y: 391, w: 735, h: 610, fill: CROP.neelTurn, fx: "breathe-slow" },
-      { src: `${IMG}lamp_on.webp`, x: 1408, y: 74, w: 287, h: 927, fill: CROP.lampOn, fx: "lamp-glow" },
-      { src: FIREFLY_SRC, x: 1637, y: 263, w: 25, h: 26, fx: "flicker" }
+      { src: `${IMG}lamp_on.webp`, x: 1408, y: 74, w: 287, h: 927, fill: CROP.lampOn, fx: "lamp-glow" }
     ],
     // Neel's cheer, drawn as well as heard: comic-burst lettering over his
     // head as he spins to the lit lamp. Matches vo_neel_yay in the cue table.
@@ -757,10 +760,7 @@ export const level1 = [
       BG_MEADOW,
       { src: `${IMG}agni_celebrating.webp`, x: 579, y: 465, w: 549, h: 528, fx: "breathe" },
       { src: `${IMG}neel_turn.webp`, x: 1125, y: 391, w: 735, h: 610, fill: CROP.neelTurn, fx: "breathe-slow" },
-      { src: `${IMG}lamp_on.webp`, x: 1398, y: 74, w: 287, h: 927, fill: CROP.lampOn, fx: "lamp-glow" },
-      // The caught one, glowing in the glass where the tutorial kept its
-      // firefly.
-      { src: BERRY_SRC, x: 1627, y: 262, w: 24, h: 27, fx: "flicker" }
+      { src: `${IMG}lamp_on.webp`, x: 1398, y: 74, w: 287, h: 927, fill: CROP.lampOn, fx: "lamp-glow" }
     ],
     shout: { text: "यय!", x: 150, y: 236, tilt: 9 }
   }
@@ -944,11 +944,7 @@ export const level2 = [
       BG_VALLEY,
       { src: `${IMG}agni_celebrating.webp`, x: 579, y: 465, w: 549, h: 528, fx: "breathe" },
       { src: `${IMG}neel_turn.webp`, x: 1125, y: 391, w: 735, h: 610, fill: CROP.neelTurn, fx: "breathe-slow" },
-      { src: `${IMG}lamp_on.webp`, x: 1398, y: 74, w: 287, h: 927, fill: CROP.lampOn, fx: "lamp-glow" },
-      // The caught one, in the glass where level 1 keeps its berry. Sized to
-      // the star's aspect on the same centre (845, 276), so all three levels
-      // hold their catch in exactly the same spot.
-      { src: STARLIGHT_SRC, x: 1626, y: 263, w: 26, h: 25, fx: "flicker" }
+      { src: `${IMG}lamp_on.webp`, x: 1398, y: 74, w: 287, h: 927, fill: CROP.lampOn, fx: "lamp-glow" }
     ],
     shout: { text: "यय!", x: 150, y: 236, tilt: 9 }
   }
@@ -1129,10 +1125,7 @@ export const level3 = [
       BG_FOREST,
       { src: `${IMG}agni_celebrating.webp`, x: 579, y: 465, w: 549, h: 528, fx: "breathe" },
       { src: `${IMG}neel_turn.webp`, x: 1125, y: 391, w: 735, h: 610, fill: CROP.neelTurn, fx: "breathe-slow" },
-      { src: `${IMG}lamp_on.webp`, x: 1453, y: 74, w: 287, h: 927, fill: CROP.lampOn, fx: "lamp-glow" },
-      // The caught one, sized to the seed's aspect on the shared centre
-      // (845, 276) — the same spot all four levels hold their catch.
-      { src: SEED_SRC, x: 1683, y: 261, w: 22, h: 29, fx: "flicker" }
+      { src: `${IMG}lamp_on.webp`, x: 1453, y: 74, w: 287, h: 927, fill: CROP.lampOn, fx: "lamp-glow" }
     ],
     shout: { text: "यय!", x: 150, y: 236, tilt: 9 }
   }
@@ -1315,10 +1308,7 @@ export const level4 = [
       BG_FLOWERMEADOW,
       { src: `${IMG}agni_celebrating.webp`, x: 579, y: 465, w: 549, h: 528, fx: "breathe" },
       { src: `${IMG}neel_turn.webp`, x: 1125, y: 391, w: 735, h: 610, fill: CROP.neelTurn, fx: "breathe-slow" },
-      { src: `${IMG}lamp_on.webp`, x: 1453, y: 74, w: 287, h: 927, fill: CROP.lampOn, fx: "lamp-glow" },
-      // The caught one, sized to the flower's aspect on the shared centre
-      // (845, 276) — the same spot all four levels hold their catch.
-      { src: FLOWER_SRC, x: 1682, y: 262, w: 25, h: 27, fx: "flicker" }
+      { src: `${IMG}lamp_on.webp`, x: 1453, y: 74, w: 287, h: 927, fill: CROP.lampOn, fx: "lamp-glow" }
     ],
     shout: { text: "यय!", x: 150, y: 236, tilt: 9 }
   }
@@ -1504,12 +1494,13 @@ export const epilogueScreens = [
   // ---- EEND — the words the chapter closes on ----
   {
     id: "eend",
-    // Nothing but the dark the iris closed down to — the pane is empty and
-    // the letterbox shows through, so the cross-fade from the clipped-black
-    // video is invisible. Then the words.
-    layers: [],
-    shout: { text: "समाप्त", x: 585, y: 380, tilt: -3, size: 150, at: 450 },
-    dwell: 5000
+    // The street they just lit, and the circle closing over it. The word waits
+    // for the dark: the iris takes 1.6s from 200ms, so 2000ms lands it just
+    // after the last of the picture has gone.
+    layers: [EP_STREET, EP_PAIR],
+    iris: { at: 200, over: 1600 },
+    shout: { text: "समाप्त", centre: true, tilt: -3, size: 150, at: 2000 },
+    dwell: 6200
   }
 ];
 

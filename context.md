@@ -416,6 +416,37 @@ and the game begins. It ends on "हमने कर दिखाया, नी�
 The story reaches the road at **38s instead of 52s**, and the ending runs 8s
 instead of 21s.
 
+Three things followed from the cut:
+
+- **Nothing is left outside the lamp.** Screen 5.2 in every level drew a single
+  twinkle beside the lit lamp — the one it had "caught". The beat before it
+  pours the whole flock INTO the glass, so one sitting outside read as one that
+  got away. All five are gone; the light in the glass is where they all are.
+- **The closing circle is back, and belongs to the beat now.** It used to be
+  part of the film — the last frame shrank to a point and the chapter ended in
+  the dark it left — so cutting the film took the iris with it and the chapter
+  simply went black. `screen.iris` puts the scene's layers inside a box that
+  closes to nothing on the middle of the frame (`.scene-iris`, js/game.js +
+  css/game.css). What it closes down to is the pane's own ground. The word is
+  appended OUTSIDE that box, or it would be clipped away with the picture.
+- **समाप्त is centred**, on both axes, by `shout: { centre: true }` rather than
+  by an x/y that was only right at one size. The idle rock needed its own
+  keyframes (`shout-rock-centre`) because it animates `transform`, which would
+  otherwise throw the centring translate away.
+
+## No page turning
+
+The story turns its own pages. It is eight beats long; a reader holding its
+hand through it was worth having at twenty-two and is not at eight, so the two
+arrow buttons are gone from index.html, their styles are gone from
+css/story.css, and the keys that matched them are gone from js/main.js. In
+js/story.js every beat now schedules the next itself — a page-closing step
+takes its `reveal` as a floor, because that number is the beat of air the page
+was written to end on. Verified by pressing nothing at all: cover to road in
+42s, unattended.
+
+`nav_arrow.svg` and `nav_arrow_blue.svg` are still in assets/images/.
+
 **The manifests follow the data by themselves.** `audioManifest` now fetches
 only the cues whose beat is still in the chapter — and it checks each act
 against ITS OWN ids, because the two halves reuse them and mean different beats

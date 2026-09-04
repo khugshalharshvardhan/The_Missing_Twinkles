@@ -587,7 +587,12 @@ function fill(text) {
 function render(screen) {
   const frag = document.createDocumentFragment();
 
-  screen.layers.forEach((layer) => frag.append(imageLayer(layer, "layer", screen.anchor)));
+  // With an iris, the layers go into the circle that closes over them — the
+  // picture is what shrinks. Everything after this (the word, above all) is
+  // appended outside it, or it would be clipped away with the scene.
+  const stack = screen.iris ? iris(screen.iris) : frag;
+  screen.layers.forEach((layer) => stack.append(imageLayer(layer, "layer", screen.anchor)));
+  if (screen.iris) frag.append(stack);
 
   if (screen.fireflies) frag.append(swarm(screen));
   if (screen.lamp) frag.append(lamp(screen));
@@ -822,11 +827,30 @@ function burst(el) {
 // Comic-burst lettering — a cheer drawn on the frame. Each letter is its own
 // element so they can pop up the word one after another, at their own small
 // tilts, the way a comic sets an exclamation rather than a caption.
+// The closing circle. It used to belong to the film — the last frame shrank to
+// a point and the chapter ended in the dark it left behind. With the film cut
+// the chapter would simply have gone black, so the circle is its own thing
+// now: a box holding the scene, closing to nothing on the middle of the frame.
+// What it closes down to is the pane's own ground, the letterbox behind
+// everything, and the word is read against that.
+function iris(spec) {
+  const el = document.createElement("div");
+  el.className = "scene-iris";
+  el.style.animationDuration = `${spec.over ?? 1600}ms`;
+  el.style.animationDelay = `${spec.at ?? 0}ms`;
+  return el;
+}
+
 function shout(spec) {
   const wrap = document.createElement("div");
   wrap.className = "shout";
-  wrap.style.left = `${spec.x}px`;
-  wrap.style.top = `${spec.y}px`;
+  // Centred on the frame rather than placed on it — for a word that is the
+  // whole screen, the middle is the only mark that is right at every size.
+  if (spec.centre) wrap.classList.add("shout--centre");
+  else {
+    wrap.style.left = `${spec.x}px`;
+    wrap.style.top = `${spec.y}px`;
+  }
   wrap.style.setProperty("--tilt", `${spec.tilt ?? 0}deg`);
 
   if (spec.size) wrap.style.setProperty("--shout-size", `${spec.size}px`);

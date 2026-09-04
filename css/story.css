@@ -795,59 +795,9 @@
 
 /* ---- page turning ----
 
-   Two round arrow buttons in the bottom corners, the supplied art (the blue
-   one mirrored to point back, the amber one pointing on). Next shows under
-   .is-waiting, exactly as the old chevron did: at the end of a page on a first
-   read, from the start on a page already read. Prev is live under .has-prev
-   (any page with one behind it) and merely present under .has-prev-off —
-   page 1 once it has been read, so coming back from page 2 shows the pair. */
-.nav {
-  position: absolute;
-  bottom: 40px;
-  z-index: 2;
-  width: 122px;
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-  transition: opacity var(--speed-slow) var(--ease), visibility var(--speed-slow),
-    transform var(--speed) var(--ease);
-}
-
-.nav__art {
-  display: block;
-  width: 100%;
-}
-
-.nav--next { right: 58px; }
-.nav--prev { left: 58px; }
-
-/* The blue art points right; back means the mirror of it. */
-.nav--prev .nav__art { transform: scaleX(-1); }
-
-.hud.is-waiting .nav--next {
-  opacity: 1;
-  visibility: visible;
-  pointer-events: auto;
-}
-
-/* The old chevron's sideways nudge, kept — on the art, so it cannot fight the
-   button's own hover scale. */
-.hud.is-waiting .nav--next .nav__art {
-  animation: nudge 1.6s ease-in-out infinite;
-}
-
-.hud.has-prev .nav--prev {
-  opacity: 1;
-  visibility: visible;
-  pointer-events: auto;
-}
-
-/* Present but not live: the first page has nothing behind it, and once it has
-   been read the pair of buttons still reads as a pair. */
-.hud.has-prev-off .nav--prev {
-  opacity: 0.35;
-  visibility: visible;
-}
+   There is none. The story turns its own pages (js/story.js), so the two arrow
+   buttons that lived in the bottom corners are gone, along with .is-waiting,
+   .has-prev and .has-prev-off which only ever showed and hid them. */
 
 .nav:hover { transform: scale(1.08); }
 .nav:active { transform: scale(0.96); }
