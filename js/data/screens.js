@@ -1588,9 +1588,29 @@ export const numberLine = { x: 500, y: 866, w: 900, max: 12 };
 // The counter card (99:487).
 export const counter = { src: `${IMG}counter.webp`, x: 1490, y: 57, w: 338, h: 190 };
 
-// Everything the game needs on screen, in one list, for the preloader —
-// every level's screens and every level's countable, so a later level never
-// stops to fetch mid-chapter.
+// What one round puts on screen. The chapter fetches a round at a time rather
+// than all of them at the hand-over: forty-nine images decoding at once is
+// forty-nine full-size bitmaps alive at the same instant, which is more than a
+// phone will give a tab. A round is fetched while the one before it is being
+// played, so nothing ever waits.
+export function artFor(round) {
+  return [...new Set([
+    ...round.screens.flatMap((screen) => [
+      ...screen.layers.map((layer) => layer.src),
+      ...(screen.lamp ? [screen.lamp.src] : []),
+      ...(screen.lampLit ? [screen.lampLit.src] : []),
+      ...(screen.hint ? [screen.hint.src] : []),
+      ...(screen.bubble ? [screen.bubble.art] : [])
+    ]),
+    round.swarmSrc
+  ])].filter(Boolean);
+}
+
+// The furniture every round shares.
+export const commonArt = [keypad.frame.src, keypad.keyArt, counter.src];
+
+// Everything the game needs on screen, in one list — the dev tools jump
+// anywhere, so they fetch the lot.
 export const manifest = [
   ...new Set([
     ...[...levels, epilogue].flatMap((level) => [

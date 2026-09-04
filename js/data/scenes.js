@@ -394,7 +394,9 @@ export const pages = [
         // fades out around 4.1s.
         hold: 4600,
         layers: [{ key: "night", kind: "night" }, EYES],
-        sfx: [{ kind: "hehes", count: 3, delay: 1250, gap: 1000 }]
+        // Three pairs of "हे हे", one for each pair of his six — the gap is his
+        // phrasing, not a round number. See the cue in js/data/audio.js.
+        sfx: [{ kind: "hehes", count: 3, delay: 1250, gap: 600 }]
       },
 
       {

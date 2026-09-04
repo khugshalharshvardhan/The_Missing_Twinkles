@@ -127,15 +127,13 @@ export const cues = {
   // The eyes open, and he crosses overhead. The pan sweeps with the text.
   // The dip from 2.2 carries: nothing here puts the music back.
   "3.1": {
-    // One blink, then a giggle PER hehe: each starts exactly as its text pops
-    // (scenes.js: 1250 / 2250 / 3250) and comes from where the text is —
-    // left, the middle gap, high right. The rates keep three plays of two
-    // clips from sounding like copies.
+    // One blink, then the laugh — a single recording of him, six "he"s over
+    // two seconds, rather than three plays of two clips pretending to be one
+    // voice. The hehes on screen pop in time with it (scenes.js: 1250, then
+    // every 600ms), so what is read and what is heard are the same laugh.
     sfx: [
       { id: "blink", at: 900, gain: 0.55, pan: -0.42 },
-      { id: "vo_giggles_1", at: 1250, gain: 0.95, pan: -0.6 },
-      { id: "vo_giggles_2", at: 2250, gain: 0.9, pan: 0.05, rate: 1.06 },
-      { id: "vo_giggles_1", at: 3250, gain: 0.95, pan: 0.55, rate: 0.94 }
+      { id: "vo_giggles_1", at: 1250, gain: 0.95, pan: -0.35 }
     ]
   },
 

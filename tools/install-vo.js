@@ -82,6 +82,10 @@ const LINES = [
   { id: "vo_neel_what",    file: path.join(NEEL, "are ye kya hora hai (1).mp3") },
   { id: "vo_agni_neil",    file: path.join(AGNI, "Neel.mp3") },
   { id: "vo_neel_here",    file: path.join(NEEL, "haan mai yahi hu (1).mp3") },
+  // Mr Giggles, laughing from the dark. Delivered as .ogg, which iOS cannot
+  // play at all — everything the game loads is mp3, and this comes out as one
+  // like the rest.
+  { id: "vo_giggles_1",    file: path.join(VO, "giggle_hehehe.ogg") },
   { id: "vo_agni_giggles", file: path.join(AGNI2, "lagta hai mister giggles ne sabi jugnu ko dara diya hai agni (1).mp3") },
   { id: "vo_agni_light",   file: path.join(AGNI, "chalo unhe dhundkar shear ko fir se roshan kre (1).mp3") },
 

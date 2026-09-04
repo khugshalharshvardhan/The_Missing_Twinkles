@@ -161,8 +161,13 @@ Game engine facts that matter when adding a level:
   - The lamp beat cheers with BOTH of them — one take each, his a beat ahead of
     hers, panned to where LAMP_STAGE puts them. Hers rides in the beat's `sfx`
     list, because a beat has one `vo` and this beat has two voices.
-  - Still English: Neel's chuckle on story 1.4 and Mr Giggles' two laughs. Both
-    are wordless.
+  - **Mr Giggles laughs once**, in his own recording (`vo_giggles_1`, delivered
+    as .ogg and installed as mp3 — iOS will not play Ogg at all). Six "he"s over
+    2.2s, where the beat used to play two short clips three times and pretend
+    they were one voice. The text on screen is his: three pairs of "हे हे"
+    popping at 1250 / 1850 / 2450, which is his phrasing rather than a round
+    number, so what is read and what is heard are the same laugh.
+  - Still English: Neel's chuckle on story 1.4. It is wordless.
   - **The answer beat has no counter card.** There was nowhere on Neel's side to
     put his balloon — under the card is 163px and the line needs 176, below the
     swarm the number line is in the way, and the band between them is 151px
@@ -365,6 +370,24 @@ did it, and all four are worth keeping:
   so the cross-fade, the duck and the mute are unchanged. They are deliberately
   absent from `audioManifest`. The pause has to stop the element as well as
   suspending the context — a media element has a clock of its own.
+
+Two more, which are about the *moment* rather than the total. A phone can hold
+98 MB comfortably and still be killed by a spike, and the hand-over was one:
+
+- **Six images decode at a time, not sixty** (`AT_ONCE` in js/preload.js).
+  `preload()` used to fire every source at once, so the hand-over asked for the
+  walk's fifteen and the game's forty-nine in the same instant — sixty-four full
+  bitmaps alive together, at exactly the point where the walk starts. A worker
+  pool turns that spike into a window that moves along. Measured on the
+  emulated phone: **64 in flight becomes 16**.
+- **One round at a time** (`artFor(round)` in js/data/screens.js,
+  `prefetchRound()` in js/main.js). The hand-over only needs the tutorial's
+  pictures; every round after it is fetched a second and a half into the round
+  before it, so nothing ever waits and no two places are held at once. The dev
+  tools jump anywhere, so `?dev` still fetches the whole manifest.
+
+Together those take the peak at the hand-over from ~98 MB to **49 MB**,
+settling to 30 MB once a round is being played.
 
 And a fifth, which was the iPhone-only half of it:
 

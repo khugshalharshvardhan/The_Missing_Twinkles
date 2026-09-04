@@ -12,6 +12,9 @@
 import { manifest, FRAME_W as STORY_W, FRAME_H as STORY_H } from "./data/scenes.js";
 import {
   manifest as gameManifest,
+  artFor,
+  commonArt,
+  epilogue,
   levels,
   FRAME_W as GAME_W,
   FRAME_H as GAME_H
@@ -126,11 +129,22 @@ function gameDone() {
 // The story's art and the whole soundtrack gate the Begin button. The game's
 // art is fetched in the background once the story is running, so the opening
 // wait stays short and the hand-over has nothing left to wait for.
-let gameArt = null;
+// One round at a time. The tutorial's art is what the hand-over needs; every
+// round after it is fetched while the round before it is being played, so the
+// device is never asked for two places at once.
+const roundArt = new Map();
+
+function prefetchRound(i) {
+  const round = i === -1 ? epilogue : levels[i];
+  if (!round) return Promise.resolve([]);
+  if (!roundArt.has(i)) {
+    roundArt.set(i, preload(i === 0 ? [...commonArt, ...artFor(round)] : artFor(round)));
+  }
+  return roundArt.get(i);
+}
 
 function prefetchGame() {
-  gameArt ??= preload(gameManifest);
-  return gameArt;
+  return prefetchRound(0);
 }
 
 // Everything the walk puts on screen. Fetched alongside the game's art, since
@@ -195,7 +209,7 @@ Promise.all([
   if (devMode) {
     loader.classList.remove("is-active");
     prefetchWalk();
-    prefetchGame();
+    preload(gameManifest);
   }
 });
 
@@ -339,6 +353,11 @@ function arrive() {
 
 function enterGame(at = 0) {
   mark("game:enter", String(chapter));
+  // The next place, fetched while this one is being played. By the time the
+  // warp hands over, it is already here.
+  after(() => {
+    prefetchRound(chapter + 1 < levels.length ? chapter + 1 : -1);
+  }, 1500);
   leaveStory();
   document.body.dataset.act = "game";
   // The game was drawn at its own size; the stage takes that frame on. Coming

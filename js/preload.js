@@ -2,8 +2,20 @@
 // blank frame. A missing file resolves rather than rejects — one bad asset
 // shouldn't stall the whole chapter.
 
+// A FEW AT A TIME, which matters far more than it looks. An image being decoded
+// holds a full uncompressed bitmap — width x height x 4 bytes — and starting
+// sixty of them together asks the device for all sixty at that instant. On a
+// desktop it is a spike nobody notices; on a phone it is the entire budget, and
+// the browser answers by killing the tab. This is why the hand-over was fatal
+// and the story was not: the story loads thirty images, the hand-over fired the
+// walk's fifteen and every level's forty-nine at the same moment.
+//
+// Six in flight turns a spike into a window that moves.
+const AT_ONCE = 6;
+
 export function preload(sources, onProgress = () => {}) {
   let settled = 0;
+  let next = 0;
 
   const finish = (src, ok) => {
     if (!ok) console.warn(`Story asset failed to load: ${src}`);
@@ -11,12 +23,19 @@ export function preload(sources, onProgress = () => {}) {
     return ok;
   };
 
+  const one = (src) =>
+    /\.(webm|mp4)$/i.test(src)
+      ? clip(src).then((ok) => finish(src, ok))
+      : still(src).then((ok) => finish(src, ok));
+
+  // Each worker takes the next source once it has finished its last, so there
+  // are never more than AT_ONCE decodes alive at the same moment.
+  const worker = async () => {
+    while (next < sources.length) await one(sources[next++]);
+  };
+
   return Promise.all(
-    sources.map((src) =>
-      /\.(webm|mp4)$/i.test(src)
-        ? clip(src).then((ok) => finish(src, ok))
-        : still(src).then((ok) => finish(src, ok))
-    )
+    Array.from({ length: Math.min(AT_ONCE, sources.length) }, worker)
   );
 }
 
